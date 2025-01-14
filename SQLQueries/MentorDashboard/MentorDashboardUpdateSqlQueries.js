@@ -1,0 +1,74 @@
+export const mentorProfilePictureDashboardUpdateQuery = `
+INSERT INTO [dbo].[mentor_dtls] (
+    [mentor_user_dtls_id],
+    [mentor_phone_number],
+    [mentor_email],
+    [mentor_profile_photo],
+    [mentor_company_name],
+    [mentor_years_of_experience],
+    [mentor_academic_qualification],
+    [mentor_currency_type]
+) OUTPUT INSERTED.mentor_dtls_id VALUES (
+    @mentorUserDtlsId1,
+    @mentorPhoneNumber,
+    @mentorEmail,
+    @mentorProfilePhoto,
+    @mentor_company_name,
+    @mentor_years_of_experience,
+    @mentor_academic_qualification,
+    @mentor_currency
+);
+`;
+export const mentorProfilePicDashboardUpdateQuery = `
+INSERT INTO [dbo].[mentor_dtls] (
+    [mentor_user_dtls_id],
+    [mentor_phone_number],
+    [mentor_email],
+    [mentor_profile_photo],
+    [mentor_social_media_profile],
+    [mentor_job_title],
+    [mentor_company_name],
+    [mentor_years_of_experience],
+    [mentor_academic_qualification],
+    [mentor_recommended_area_of_mentorship],
+    [mentor_guest_lectures_interest],
+    [mentor_curating_case_studies_interest],
+    [mentor_sessions_free_of_charge],
+    [mentor_language],
+    [mentor_timezone],
+    [mentor_country],
+    [mentor_headline],   
+    [mentor_session_price],
+    [mentor_currency_type],
+    [mentor_city],
+    [mentor_institute],
+    [mentor_area_expertise],
+    [mentor_passion_dtls],
+    [mentor_domain]
+) OUTPUT INSERTED.mentor_dtls_id VALUES (
+    @mentor_user_dtls_id,
+    @mentor_phone_number,
+    @mentor_email,
+    @mentor_profile_photo,
+    @mentor_social_media_profile,
+    @mentor_job_title,
+    @mentor_company_name,
+    @mentor_years_of_experience,
+    @mentor_academic_qualification,
+    @mentor_recommended_area_of_mentorship,
+    @mentor_guest_lectures_interest,
+    @mentor_curating_case_studies_interest,
+    @mentor_sessions_free_of_charge,
+    @mentor_language,
+    @mentor_timezone,
+    @mentor_country,
+    @mentor_headline,
+    @mentor_session_price,
+    @mentor_currency,
+    @City,
+    @Institute,
+    @areaOfExpertise,
+    @passionAbout,
+    @mentorDomain
+);
+`;

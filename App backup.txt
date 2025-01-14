@@ -1,0 +1,156 @@
+import express from "express";
+import dotenv from "dotenv";
+import multer from "multer";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import path from "path";
+import moment from "moment";
+import fileUpload from "express-fileupload";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
+import authRouter from "./Routes/AuthRoutes/AuthRoutes.js";
+import mentorRouter from "./Routes/MentorRoutes/MentorRoutes.js";
+import { BlobServiceClient } from "@azure/storage-blob";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { MentorRegistration } from "./Controllers/MentoControllers/MentorControllers.js";
+dotenv.config();
+const app = express();
+app.use(express.json());
+app.use(morgan("common"));
+app.use(cookieParser());
+app.use(cors());
+app.use(helmet());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  fileUpload({
+    createParentPath: true,
+  })
+);
+const port = process.env.PORT || 1337;
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
+// uploading to azure storage
+// Configure Multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); // Upload folder
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Add timestamp to filename
+  },
+});
+
+const upload = multer({ storage: storage });
+// Azure Blob Storage configuration
+const AZURE_STORAGE_CONNECTION_STRING =
+  process.env.AZURE_STORAGE_CONNECTION_STRING;
+const containerName = "practiwizcontainer/jobseekerresumes";
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  AZURE_STORAGE_CONNECTION_STRING
+);
+const containerClient = blobServiceClient.getContainerClient(containerName);
+// Get the directory name
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Function to upload file to Azure Blob Storage
+const uploadFileToAzure = async (filePath, fileName) => {
+  const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+  const fileStream = fs.createReadStream(filePath);
+  await blockBlobClient.uploadStream(fileStream);
+  return blockBlobClient.url;
+};
+
+// Backend checking routing
+app.get("/", async (req, res) => {
+  const time = new Date().getTime();
+  const date = new Date().toDateString();
+  return res.json({
+    success: `The server is working fine on the date ${date} and ${time}`,
+  });
+});
+// authentication all routes
+app.use("/api/v1/auth", authRouter);
+
+// mentor all routes
+app.use("/api/v1/mentor", mentorRouter);
+
+// Route to handle form data and file uploads starts here
+app.post(
+  "/api/v1/mentor/registration",
+  upload.single("file"),
+  async (req, res) => {
+    const response = await MentorRegistration();
+    console.log(response);
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+    try {
+      const filePath = path.join(__dirname, "uploads", req.file.filename);
+      const fileUrl = await uploadFileToAzure(filePath, req.file.filename);
+      // Optionally delete the local file after uploading to Azure
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting local file:", err);
+        } else {
+          console.log("Local file deleted");
+        }
+      });
+      return res.json({ success: "File uploaded successfully", fileUrl });
+    } catch (error) {
+      console.error("Error uploading file to Azure:", error);
+      return res.status(500).json({ error: "Error uploading file to Azure" });
+    }
+  }
+);
+// Route to handle form data and file uploads starts here
+// app.post("/api/v1/mentor/registration/test", async (req, res) => {
+//   console.log(req.file);
+// });
+
+// Route to handle file upload
+app.post(
+  "/api/v1/mentor/registration/test",
+  upload.single("file"),
+  (req, res) => {
+    try {
+      console.log("File received:", req.file);
+      res.status(200).json({ message: "File uploaded successfully" });
+    } catch (error) {
+      console.error("Error handling file:", error);
+      res.status(500).json({ message: "Error uploading file" });
+    }
+  }
+);
+// listening the port in the index.js
+app.listen(port, (req, res) => {
+  console.log(`Running on port http://localhost:${port}`);
+  console.log("Working fine on " + process.env.PORT);
+});
+
+
+const AreaOfExpWords = AreaOfexpertise.split(",");
+
+    for (let i = 0; i < AreaOfExpWords.length; i++) {
+      const word = AreaOfExpWords[i].trim();
+      const ExpQuery = `
+        INSERT INTO mentor_expertise_dtls 
+        (mentor_dtls_id, mentor_expertise, mentor_exp_cr_date, mentor_exp_update_date)
+        VALUES (@mentor_dtls_id, @mentor_expertise, @mentor_exp_cr_date, @mentor_exp_update_date)
+      `;
+      // Execute the query with parameters
+      await request.query({
+        text: ExpQuery,
+        values: {
+          mentor_dtls_id: 2,
+          mentor_expertise: word,
+          mentor_exp_cr_date: timestamp,
+          mentor_exp_update_date: timestamp,
+        },
+      });
+      console.log(`Inserted word: ${word}`);
+    }
