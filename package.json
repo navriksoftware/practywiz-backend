@@ -5,8 +5,7 @@
   "description": "This is the backend for Practiwiz",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node index.js"
   },
   "author": "Mahesh B",
   "license": "ISC",
