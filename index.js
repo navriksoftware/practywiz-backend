@@ -57,10 +57,11 @@ const corsOptions = {
   ],
 };
 
+
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// If you want to handle preflight requests manually (optional), you can use this:
+
 app.options("*", cors(corsOptions)); // This is usually redundant, as `cors()` already handles preflight requests.
 
 // Middleware setup
