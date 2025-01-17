@@ -26,10 +26,11 @@ export async function MentorUpdateMentorProfile1(req, res) {
     social_media_profile,
     mentor_country,
     mentor_city,
-    mentor_institute,
     mentor_academic_qualification,
   } = req.body.formData;
-  console.log(req.body.formData);
+  const { formValues } = req.body;
+
+  // console.log("Hello this is Mentor EDU details",JSON.stringify(formValues));
   const { mentorUserDtlsId } = req.body;
   try {
     sql.connect(config, (err) => {
@@ -56,7 +57,11 @@ export async function MentorUpdateMentorProfile1(req, res) {
               sql.VarChar,
               mentor_academic_qualification
             );
-            request.input("mentorInstitute", sql.VarChar, mentor_institute);
+            request.input(
+              "mentorInstitute",
+              sql.Text,
+              JSON.stringify(formValues)
+            );
             request.query(
               "update mentor_dtls set mentor_social_media_profile = @mentorLinkedinURL, mentor_country = @mentorCountry,mentor_academic_qualification = @mentorQualification,  mentor_city = @mentorCity, mentor_institute = @mentorInstitute where mentor_user_dtls_id = @mentorUserDtlsId",
               async (err, result) => {

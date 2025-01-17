@@ -26,7 +26,7 @@ import {
   mentorAccountCreatedEmailTemplate,
   mentorUpdatedRegAccountCreatedEmailTemplate,
 } from "../../EmailTemplates/AccountEmailTemplate/AccountEmailTemplate.js";
-import moment from "moment";
+// import moment, { max } from "moment";
 import { mentorApplicationEmail } from "../../EmailTemplates/MentorEmailTemplate/MentorEmailTemplate.js";
 // import { json } from "body-parser";
 dotenv.config();
@@ -301,17 +301,16 @@ export async function MentorUpdateAdditionalDetails(req, res, next) {
     guestLectures,
     CaseStudies,
     sessionsFreeOfCharge,
-    InstituteName,
     CountryName,
     CityName,
     Timezone,
     Availability,
+    mentorEducationDetails,
     userDtlsId,
     mentorDtlsId,
     mentorEmail,
     mentorName,
   } = req.body;
-  const timestamp = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
 
   try {
     sql.connect(config, (err, db) => {
@@ -331,7 +330,7 @@ export async function MentorUpdateAdditionalDetails(req, res, next) {
       request.input("guestlecturesinterest", sql.VarChar, guestLectures);
       request.input("casestudiesinterest", sql.VarChar, CaseStudies);
       request.input("sessionsfreecharge", sql.VarChar, sessionsFreeOfCharge);
-      request.input("Institute", sql.VarChar, InstituteName || "");
+      request.input("Institute", sql.Text, mentorEducationDetails);
       request.input("country", sql.VarChar, CountryName || "");
       request.input("City", sql.VarChar, CityName || "");
       request.input("timeslotJson", sql.Text, Availability);

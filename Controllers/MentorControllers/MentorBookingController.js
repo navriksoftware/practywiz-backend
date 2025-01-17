@@ -20,7 +20,10 @@ import {
   convertISTtoUTC,
   extractDateFromISOString,
 } from "../../Middleware/DateFunction.js";
-import { appointmentBookedTraineeEmailTemplate } from "../../EmailTemplates/MentorEmailTemplate/MentorBookingEmailTemplate.js";
+import {
+  appointmentBookedTraineeEmailTemplate,
+  mentorAppointmentBookedTraineeEmailTemplate,
+} from "../../EmailTemplates/MentorEmailTemplate/MentorBookingEmailTemplate.js";
 import { sendEmail } from "../../Middleware/AllFunctions.js";
 import { InsertNotificationHandler } from "../../Middleware/NotificationFunction.js";
 import { SuccessMsg } from "../../Messages/Messages.js";
@@ -271,6 +274,14 @@ export async function UpdateMentorBookingAppointment(req, res, next) {
                   slotTime,
                   joinURL
                 );
+                const msg2 = mentorAppointmentBookedTraineeEmailTemplate(
+                  mentorEmail,
+                  menteeName,
+                  mentorName,
+                  new Date(mentorBookingStartsTime).toLocaleDateString(),
+                  slotTime,
+                  joinURL
+                );
                 const mentorNotificationHandler = InsertNotificationHandler(
                   mentorUserDtlsId,
                   SuccessMsg,
@@ -294,6 +305,7 @@ export async function UpdateMentorBookingAppointment(req, res, next) {
                     slotTime
                 );
                 const emailResponse = await sendEmail(msg);
+                const emailResponse2 = await sendEmail(msg2);
                 return res.json({ success: "Appointment confirmed" });
               }
             }

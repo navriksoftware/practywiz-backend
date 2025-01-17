@@ -105,7 +105,9 @@ app.get("/test/db-connection", async (req, res) => {
         });
       }
       if (db) {
-        return res.json({ success: "Connected to database successfully" });
+        return res.json({
+          success: "Connected to database successfully " + db,
+        });
       }
     });
   } catch (error) {
