@@ -42,13 +42,26 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 1337;
 
-// Enable CORS with options
+// CORS configuration
 const corsOptions = {
-  origin: "*",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: ["Content-Type", "Authorization", "x-requested-with"],
+  origin: "*", // Allow all origins, or specify a specific domain
+  methods: "GET,HEAD,OPTIONS,POST,PUT,PATCH,DELETE",
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "x-requested-with",
+    "x-client-key",
+    "x-client-token",
+    "x-client-secret",
+    "Accept",
+  ],
 };
+
+// Apply CORS middleware
 app.use(cors(corsOptions));
+
+// If you want to handle preflight requests manually (optional), you can use this:
+app.options("*", cors(corsOptions)); // This is usually redundant, as `cors()` already handles preflight requests.
 
 // Middleware setup
 app.use(express.json());
