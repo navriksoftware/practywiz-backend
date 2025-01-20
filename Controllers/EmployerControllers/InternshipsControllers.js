@@ -19,6 +19,7 @@ import moment from "moment";
 import {
   CreateInternshipPostSqlQuery,
   FetchAllInternshipPostsSqlQuery,
+  Show10InternshipsSqlQuery,
 } from "../../SQLQueries/EmployerSQlQueries/InternshipSqlQueries.js";
 import { FetchInternshipPostDetailsSqlQuery } from "../../SQLQueries/EmployerSQlQueries/EmployerSqlQueries.js";
 
@@ -255,4 +256,34 @@ export async function fetchSingleInternshipPost(req, res, next) {
       });
     });
   } catch (error) {}
+}
+
+export async function fetch10InternshipsInHome(req, res, next) {
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) return res.json({ error: err.message });
+
+      const request = new sql.Request();
+
+      request.query(Show10InternshipsSqlQuery, (err, result) => {
+        if (err) return res.json({ error: err.message });
+
+        if (result.recordset.length > 0) {
+          return res.json({
+            success: true,
+            status: 200,
+            data: result.recordset,
+          });
+        } else {
+          return res.json({
+            success: false,
+            message: "No internship posts found",
+            data: [],
+          });
+        }
+      });
+    });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 }

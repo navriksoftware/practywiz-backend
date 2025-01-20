@@ -1,6 +1,7 @@
 import express from "express";
 import {
   CreateInternshipPost,
+  fetch10InternshipsInHome,
   fetchAllInternshipPosts,
   fetchSingleInternshipPost,
 } from "../../Controllers/EmployerControllers/InternshipsControllers.js";
@@ -14,4 +15,6 @@ router.post("/create-post", verifyUserToken, CreateInternshipPost);
 router.post("/fetch-internship-listing", fetchAllInternshipPosts);
 
 router.post("/fetch-internship-post", fetchSingleInternshipPost);
+
+router.get("/fetch-10-internships", fetch10InternshipsInHome);
 export default router;
