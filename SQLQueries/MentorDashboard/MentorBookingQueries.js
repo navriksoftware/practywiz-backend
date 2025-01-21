@@ -1,18 +1,8 @@
 // get the mentor approved or not approved booking session in the mentor dashboard
 export const MentorApprovedBookingQuery = ` SELECT 
     u.user_dtls_id,
-    u.user_firstname,
-    u.user_lastname,
-    u.user_phone_number,
-    u.user_type,
     m.mentor_dtls_id,
-    m.mentor_user_dtls_id,
     m.mentor_email,
-    m.mentor_profile_photo,
-    m.mentor_job_title,
-    m.mentor_company_name,
-    m.mentor_country,
-    m.mentor_approved_status,
     mba.mentor_booking_appt_id,
     mba.mentor_dtls_id AS booking_mentor_dtls_id,
     mba.mentee_user_dtls_id,
@@ -27,17 +17,29 @@ export const MentorApprovedBookingQuery = ` SELECT
     mba.mentor_amount_paid_status,
     mba.mentor_session_status,
     mba.mentor_rescheduled_times,
-    mba.trainee_session_status
+    mba.trainee_session_status,
+    mentee.mentee_profile_pic_url,    
+    mentee.mentee_type,
+    mentee_user.user_firstname as mentee_firstname,
+    mentee_user.user_lastname as mentee_lastname -- Fetch the mentee's first name
 FROM 
     dbo.users_dtls u
 INNER JOIN 
     dbo.mentor_dtls m ON u.user_dtls_id = m.mentor_user_dtls_id
 INNER JOIN 
     dbo.mentor_booking_appointments_dtls mba ON m.mentor_dtls_id = mba.mentor_dtls_id
+INNER JOIN 
+    dbo.mentee_dtls mentee ON mentee.mentee_user_dtls_id = mba.mentee_user_dtls_id
+INNER JOIN 
+    dbo.users_dtls mentee_user ON mentee_user.user_dtls_id = mentee.mentee_user_dtls_id -- Self-join to fetch mentee details
 WHERE 
     u.user_dtls_id = @mentorUserDtlsId
-    AND (mba.[mentor_booking_confirmed] = 'No' OR mba.[mentor_booking_confirmed] = 'Yes' and mba.[mentor_session_status] = 'upcoming' AND mba.[trainee_session_status] = 'upcoming')
-order by mentor_session_booking_date;
+    AND (mba.[mentor_booking_confirmed] = 'No' OR mba.[mentor_booking_confirmed] = 'Yes' 
+         AND mba.[mentor_session_status] = 'upcoming' 
+         AND mba.[trainee_session_status] = 'upcoming')
+    AND mba.[mentor_session_booking_date] > GETDATE()
+ORDER BY 
+    mba.mentor_session_booking_date;;
 `;
 // generate the meeting link when mentor approved the session
 export const UpdateMentorBookingAppointmentQuery = `update mentor_booking_appointments_dtls set mentor_booking_confirmed = 'Yes',

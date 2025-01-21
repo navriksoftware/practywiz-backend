@@ -11,7 +11,7 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import bcrypt from "bcrypt";
 import { google } from "googleapis";
-import fs, { access } from "fs";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -42,131 +42,122 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 1337;
 
-// Middleware to parse JSON bodies
+// CORS configuration
+const corsOptions = {
+  origin: "*", // Allow all origins, or specify a specific domain
+  methods: "GET,HEAD,OPTIONS,POST,PUT,PATCH,DELETE",
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "x-requested-with",
+    "x-client-key",
+    "x-client-token",
+    "x-client-secret",
+    "Accept",
+  ],
+};
+
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+
+app.options("*", cors(corsOptions)); // This is usually redundant, as `cors()` already handles preflight requests.
+
+// Middleware setup
 app.use(express.json());
-
-// HTTP request logger
-app.use(morgan("common"));
-
-// Parse cookies
 app.use(cookieParser());
-
-// Enable CORS
-app.use(cors());
-
-// Security middleware
 app.use(helmet());
-
-// Body parser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// Middleware for handling file uploads using express-fileupload
+app.use(morgan("common"));
 app.use(
   fileUpload({
     createParentPath: true,
   })
 );
 
-// Set up Multer for file uploads
+// File upload configuration using Multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Folder for uploads (ensure it exists)
+    cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Add timestamp to filename
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
-
 const upload = multer({ storage: storage });
 
-// Middleware to handle CORS issues
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
-
-// Endpoint to check server status
-app.get("/", async (req, res) => {
+// API routes
+app.get("/", (req, res) => {
   const time = new Date().getTime();
   const date = new Date().toDateString();
-  return res.json({
+  res.json({
     success: `The server is working fine on the date ${date} and ${time}`,
   });
 });
-// Endpoint to check server status
+
 app.get("/test/db-connection", async (req, res) => {
   try {
-    sql.connect(config, (err, db) => {
-      if (err) {
-        return res.json({
-          message: "There was an error connecting to database",
-          error: err.message,
-        });
-      }
-      if (db) {
-        return res.json({ success: "Connected to database successfully" });
-      }
-    });
-  } catch (error) {
-    return res.json({
-      message: "There was an error connecting to database",
-      error: err.message,
-    });
+    await sql.connect(config);
+    res.json({ success: "Connected to database successfully" });
+  } catch (err) {
+    res.json({ message: "Error connecting to database", error: err.message });
   }
 });
-// razorpay key
+
+// Razorpay key endpoint
 app.get("/api/get-razorpay-key", (req, res) => {
   res.send({ key: process.env.RAZORPAY_KEY_ID });
 });
-// Authentication routes
-app.use("/api/v1/auth", authRouter);
 
-// Mentor routes
+// Authentication and user-related routes
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/mentor", mentorRouter);
 app.use("/api/v1/mentor/booking/appointment", mentorBookingRouter);
 app.use("/api/v1/mentor/dashboard", mentorDashboardRouter);
 app.use("/api/v1/mentor/dashboard/update", mentorDashboardUpdateRoute);
 app.use("/api/v1/mentor/dashboard/case-study", mentorDashboardCaseStudyRouter);
 
-// mentee routes
 app.use("/api/v1/mentee", menteeRoute);
 app.use("/api/v1/mentee/dashboard", menteeDashboardRoute);
 app.use("/api/v1/mentee/dashboard/profile", menteeProfileDashboardRoute);
 
-// institute routes
 app.use("/api/v1/institute", instituteRoute);
 app.use("/api/v1/institute/dashboard", instituteDashboardRoute);
 
-// admin dashboard
 app.use("/api/v1/admin/dashboard", adminDashboardRoute);
 app.use("/api/v1/admin/dashboard/case-studies", adminCaseStudiesDashboardRoute);
 
-// case studies routes
 app.use("/api/v1/case-studies", caseStudiesRoute);
-
-// employer routes
 app.use("/api/v1/employer", employerRoute);
 app.use("/api/v1/employer/internship", internshipRoute);
 
-async function connectToDatabases() {
+// LinkedIn API
+app.post("/getLinkedInToken", async (req, res) => {
+  const { code } = req.body;
   try {
-    sql.connect(config, (err, db) => {
-      if (err) {
-        console.log(err.message);
+    const tokenResponse = await axios.post(
+      "https://www.linkedin.com/oauth/v2/accessToken",
+      null,
+      {
+        params: {
+          grant_type: "authorization_code",
+          code,
+          redirect_uri: `${process.env.FRONT_END_LINK}/auth/linkedin/callback`,
+          client_id: process.env.LINKEDIN_CLIENT_ID,
+          client_secret: process.env.LINKEDIN_CLIENT_SECRET,
+        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }
-      if (db) {
-        console.log(
-          `Connected to database successfully to ${db.config.database}`
-        );
-      }
-    });
+    );
+    res.json(tokenResponse.data);
   } catch (error) {
-    console.log(error.message);
+    res.status(500).json({ error: "Failed to fetch access token" });
   }
-}
-// connectToDatabases();
+});
 
+// Test email endpoint
 app.get("/test/email", async (req, res) => {
   const msg = accountCreatedEmailTemplate(
     "keeprememberall@gmail.com",
@@ -175,148 +166,43 @@ app.get("/test/email", async (req, res) => {
   );
   try {
     const emailRes = await sendEmail(msg);
-    return res.json({ success: true, message: emailRes });
+    res.json({ success: true, message: emailRes });
   } catch (error) {
-    return res.json({
-      message: "There was an error connecting to database",
-      error: err.message,
-    });
-  }
-});
-// app.get("/database", function (req, res) {
-//   try {
-//     sql.connect(config, (err, db) => {
-//       if (err) {
-//         console.log(err.message);
-//       }
-//       if (db) {
-//         console.log(
-//           `Connected to database successfully to ${db.config.database}`
-//         );
-//         const request = new sql.Request();
-//         request.query(
-//           'update mentor_dtls set mentor_domain = \'[ { \"value\": \"technology\", \"label\": \"Technology\" } ]\' where mentor_dtls_id = 19',
-//           (err, res) => {
-//             console.log(res);
-
-//           }
-//         );
-//       }
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// });
-// Endpoint to exchange the authorization code for an access token
-app.post("/getLinkedInToken", async (req, res) => {
-  const { code } = req.body;
-  try {
-    // Make a request to LinkedIn's OAuth 2.0 token endpoint
-    const tokenResponse = await axios.post(
-      "https://www.linkedin.com/oauth/v2/accessToken",
-      null,
-      {
-        params: {
-          grant_type: "authorization_code",
-          code: code,
-          redirect_uri: `${process.env.FRONT_END_LINK}/auth/linkedin/callback`, // Your LinkedIn
-          // Your LinkedIn app's redirect URI
-          client_id: `${process.env.LINKEDIN_CLIENT_ID}`, // Replace with your LinkedIn App's client_ids
-          client_secret: `${process.env.LINKEDIN_CLIENT_SECRET}`, // Replace with your LinkedIn App's client_secret
-        },
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
-
-    // Send access token back to frontend
-    res.json(tokenResponse.data);
-  } catch (error) {
-    console.error("Error response:", error.response?.data || error.message);
-    res.status(500).json({ error: "Failed to fetch access token" });
+    res.json({ error: "Error sending email", details: error.message });
   }
 });
 
-// Endpoint to fetch LinkedIn profile data
-app.get("/getLinkedInProfile", async (req, res) => {
-  const accessToken = req.headers.authorization.split(" ")[1]; // Extract Bearer token
+// Background database approval logic
+async function getAllNotApprovedMentorsListAdminDashboard() {
   try {
-    // Fetch LinkedIn profile data using the correct LinkedIn API endpoint
-    const profileResponse = await axios.get(
-      "https://api.linkedin.com/v2/userinfo",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+    const pool = await sql.connect(config);
+    const result = await pool
+      .request()
+      .query(autoApproveFetchAllNotApprovedMentorQuery);
+    if (result.recordset.length > 0) {
+      for (const record of result.recordset) {
+        if (parseInt(record.total_progress) >= 80) {
+          await pool
+            .request()
+            .input("mentorUserId", sql.Int, record.mentor_user_dtls_id)
+            .query(
+              "UPDATE mentor_dtls SET mentor_approved_status = 'Yes' WHERE mentor_user_dtls_id = @mentorUserId"
+            );
+        }
       }
-    );
-
-    // Send profile data back to frontend
-    res.json(profileResponse.data);
+    } else {
+      console.log("No mentor applications found for approval.");
+    }
   } catch (error) {
-    console.error("Error fetching profile data:", error.message);
-    res.status(500).json({ error: "Failed to fetch profile data" });
-  }
-});
-
-async function getAllNotApprovedMentorsListAdminDashboard(req, res, next) {
-  try {
-    sql.connect(config, (err, db) => {
-      if (err) {
-        return res.json({
-          error: err.message,
-        });
-      }
-      if (db) {
-        const request = new sql.Request();
-        request.query(
-          autoApproveFetchAllNotApprovedMentorQuery,
-          (err, result) => {
-            if (err) {
-              console.log(err.message);
-            }
-            if (result?.recordset.length > 0) {
-              for (const recordset of result.recordset) {
-                const total_progress = recordset.total_progress;
-                if (parseInt(total_progress) >= 80) {
-                  const mentorUserDtlsId = recordset.mentor_user_dtls_id;
-                  const request = new sql.Request();
-                  request.input("mentorUserId", sql.Int, mentorUserDtlsId);
-                  request.query(
-                    "update mentor_dtls set mentor_approved_status = 'Yes'  where mentor_user_dtls_id = @mentorUserId ",
-                    (err, result) => {
-                      if (err) {
-                        console.log(err.message);
-                      }
-                      if (result) {
-                        console.log(result);
-                      }
-                    }
-                  );
-                }
-              }
-            } else {
-              console.log({
-                error: "There are no current mentor applications.",
-              });
-            }
-          }
-        );
-      }
-    });
-  } catch (error) {
-    return console.log({
-      error: error.message,
-    });
+    console.error("Error approving mentors:", error.message);
   }
 }
-setInterval(() => {
-  connectToDatabases();
-  getAllNotApprovedMentorsListAdminDashboard();
-}, 86400);
 
-// Start the server
+setInterval(() => {
+  getAllNotApprovedMentorsListAdminDashboard();
+}, 86400 * 1000);
+
+// Start server
 app.listen(port, () => {
   console.log(`Running on port http://localhost:${port}`);
   console.log("Working fine on " + process.env.PORT);

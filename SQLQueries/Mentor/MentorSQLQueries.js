@@ -7,7 +7,9 @@ export const ShowTop10MentorsInHomeQuery = `SELECT TOP 10
     m.[mentor_profile_photo],
     m.[mentor_job_title],
     m.[mentor_company_name],
+    m.[mentor_area_expertise],
     m.[mentor_years_of_experience],
+    m.[mentor_domain],
     m.[mentor_headline],
     ISNULL(
         (SELECT COUNT(*) 
