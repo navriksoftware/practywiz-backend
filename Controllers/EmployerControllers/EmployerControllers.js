@@ -20,6 +20,7 @@ import moment from "moment";
 import {
   EmployerOrganizationDtlsSqlQuery,
   fetchEmployerSingleDashboardQuery,
+  GetAllApplicantsForInternshipSqlQuery,
   UpdateEMployerOrgDetailsQuery,
 } from "../../SQLQueries/EmployerSQlQueries/EmployerSqlQueries.js";
 
@@ -215,5 +216,35 @@ export async function UpdateEmployerOrganizationDetails(req, res) {
     });
   } catch (error) {
     return res.json({ error: error.message });
+  }
+}
+
+export async function GetAllApplicantsForInternship(req, res) {
+  const { internshipId } = req.body;
+  if (!internshipId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Internship ID is required" });
+  }
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) return res.json({ error: "There is some error while fetching" });
+      const request = new sql.Request();
+      request.input("internship_post_dtls_id", sql.Int, internshipId);
+      request.query(
+        GetAllApplicantsForInternshipSqlQuery,
+
+        (err, result) => {
+          if (err) return res.json({ error: err.message });
+          if (result && result.recordset && result.recordset.length > 0) {
+            return res.json({ success: result.recordset });
+          } else {
+            return res.json({ error: "No record found" });
+          }
+        }
+      );
+    });
+  } catch (error) {
+    return res.json({ error: "There is some error while fetching" });
   }
 }

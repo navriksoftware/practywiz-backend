@@ -206,3 +206,68 @@ ON
 WHERE 
     ei.[employer_internship_post_dtls_id] = @internshipPostId;
 `;
+
+export const GetAllApplicantsForInternshipSqlQuery = `
+SELECT 
+    us.[user_email] as mentee_email,
+    us.[user_firstname] as mentee_firstname,
+    us.[user_lastname] as mentee_lastname,
+    us.[user_phone_number] as mentee_phone_number,
+    us.[user_type] ,
+    m.[mentee_about],
+    m.[mentee_skills],
+    m.[mentee_gender],
+    m.[mentee_type],
+    m.[mentee_profile_pic_url],
+    m.[mentee_institute_details],
+    m.[mentee_certificate_details],
+    m.[mentee_experience_details],
+    m.[mentee_language],
+    m.[mentee_linkedin_url],
+    m.[mentee_twitter_url],
+    m.[mentee_instagram_url],
+    m.[mentee_dtls_update_date],
+    m.[mentee_additional_details],
+    ia.[internship_post_dtls_id],
+    ia.[mentee_user_dtls_id],
+    ia.[mentee_dtls_id],
+    ia.[mentee_resume_link],
+    ia.[mentee_internship_applied_status],
+    ia.[internship_applicant_dtls_cr_date],
+    ia.[internship_applicant_dtls_update_date],
+    ei.[employer_internship_post_position],
+    ei.[employer_internship_post_type],
+    ei.[employer_internship_post_part_full_time],
+    ei.[employer_internship_post_location],
+    ei.[employer_internship_post_duration],
+    ei.[employer_internship_post_stipend_type],
+    ei.[employer_internship_post_currency_type],
+    ei.[employer_internship_post_stipend_amount],
+    ei.[employer_internship_post_status],
+    eo.[employer_organization_name],
+    eo.[employer_organization_logo],
+    eo.[employer_organization_industry]
+FROM 
+    [dbo].[internship_applicants_dtls] ia
+INNER JOIN 
+    [dbo].[employer_internship_posts_dtls] ei 
+ON 
+    ia.[internship_post_dtls_id] = ei.[employer_internship_post_dtls_id]
+INNER JOIN 
+    [dbo].[employer_organization_dtls] eo
+ON 
+    ei.[employer_internship_post_org_dtls_id] = eo.[employer_organization_dtls_id]
+INNER JOIN
+    [dbo].[users_dtls] US
+ON 
+    ia.[mentee_user_dtls_id] = us.[user_dtls_id]
+INNER JOIN
+    [dbo].[mentee_dtls] m
+ON
+    ia.[mentee_dtls_id] = m.[mentee_dtls_id]
+
+WHERE 
+    ia.[internship_post_dtls_id] = @internship_post_dtls_id
+ORDER BY 
+    ia.[internship_applicant_dtls_cr_date] DESC
+`;

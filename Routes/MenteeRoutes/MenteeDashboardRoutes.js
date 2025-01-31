@@ -4,6 +4,7 @@ import {
   MenteeApprovedBookingAppointments,
   MenteeCompletedBookingAppointments,
   MenteeFeedbackSubmitHandler,
+  MenteefetchAppliedInternships,
   MenteeMarkAllMessageAsRead,
   MenteeMarkSingleMessageAsRead,
 } from "../../Controllers/MenteeControllers/MenteeDashboardControllers.js";
@@ -17,6 +18,9 @@ router.post("/appointments/completed", MenteeCompletedBookingAppointments);
 
 // submitting the mentor feedback
 router.post("/appointments/feedback/submit", MenteeFeedbackSubmitHandler);
+
+router.post("/applied-internships", MenteefetchAppliedInternships);
+// router.get("/applied-internships", MenteefetchAppliedInternships);
 
 router.post("/notification/mark-all-read", MenteeMarkAllMessageAsRead);
 router.post("/notification/mark-single-read", MenteeMarkSingleMessageAsRead);
