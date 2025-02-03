@@ -218,3 +218,39 @@ export const MarkMenteeAllMessagesAsReadQuery = `update notifications_dtls set n
 
 export const MarkMenteeSingleMessageAsReadQuery = `update notifications_dtls set notification_is_read = 1, notification_read_at =@timestamp where notification_user_dtls_id = @menteeUserDtlsId and notification_dtls_id = @menteeNotificationId
 `;
+
+export const GetMenteeAppliedInternshipsSqlQuery = `
+SELECT 
+    ia.[internship_post_dtls_id],
+    ia.[mentee_user_dtls_id],
+    ia.[mentee_dtls_id],
+    ia.[mentee_resume_link],
+    ia.[mentee_internship_applied_status],
+    ia.[internship_applicant_dtls_cr_date],
+    ia.[internship_applicant_dtls_update_date],
+    ei.[employer_internship_post_position],
+    ei.[employer_internship_post_type],
+    ei.[employer_internship_post_part_full_time],
+    ei.[employer_internship_post_location],
+    ei.[employer_internship_post_duration],
+    ei.[employer_internship_post_stipend_type],
+    ei.[employer_internship_post_currency_type],
+    ei.[employer_internship_post_stipend_amount],
+    ei.[employer_internship_post_status],
+    eo.[employer_organization_name],
+    eo.[employer_organization_logo],
+    eo.[employer_organization_industry]
+FROM 
+    [dbo].[internship_applicants_dtls] ia
+INNER JOIN 
+    [dbo].[employer_internship_posts_dtls] ei 
+ON 
+    ia.[internship_post_dtls_id] = ei.[employer_internship_post_dtls_id]
+INNER JOIN 
+    [dbo].[employer_organization_dtls] eo
+ON 
+    ei.[employer_internship_post_org_dtls_id] = eo.[employer_organization_dtls_id]
+WHERE 
+    ia.[mentee_user_dtls_id] = @mentee_user_dtls_id
+ORDER BY 
+    ia.[internship_applicant_dtls_cr_date] DESC`;
