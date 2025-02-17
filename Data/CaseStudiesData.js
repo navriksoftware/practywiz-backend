@@ -2,9 +2,8 @@ export const CaseStudiesData = [
   {
     id: 1,
     caseTopic: "Leadership in Crisis",
-    lession:
-      "The importance of clear communication during critical situations.",
-    fututreSkils: "Crisis management, leadership under pressure.",
+    lesson: "The importance of clear communication during critical situations.",
+    futureSkills: "Crisis management, leadership under pressure.",
     characters: "2",
     roles: [
       {
@@ -15,15 +14,18 @@ export const CaseStudiesData = [
     roleOfMainCharacter: "CEO",
     challenge: "Navigating the company through a major financial downturn.",
     videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
     price: "1500",
     rating: "4",
+    authorDesignation: "Executive Leadership Coach",
   },
   {
     id: 2,
     caseTopic: "Technical Debt Management",
-    lession:
+    lesson:
       "Strategies to handle and reduce technical debt in large codebases.",
-    fututreSkils: "Code refactoring, long-term system maintenance.",
+    futureSkills: "Code refactoring, long-term system maintenance.",
     characters: "3",
     roles: [
       {
@@ -36,15 +38,18 @@ export const CaseStudiesData = [
     challenge:
       "Balancing new feature development while reducing technical debt.",
     videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
     price: "1000",
     rating: "3",
+    authorDesignation: "Senior Software Architect",
   },
   {
     id: 3,
     caseTopic: "Agile Transformation",
-    lession:
+    lesson:
       "In this case study, we explore how Agile practices improved team efficiency.",
-    fututreSkils: "Agile project management, continuous improvement.",
+    futureSkills: "Agile project management, continuous improvement.",
     characters: "4",
     roles: [
       {
@@ -57,14 +62,17 @@ export const CaseStudiesData = [
     roleOfMainCharacter: "Scrum Master",
     challenge: "Managing a complex cross-functional Agile team.",
     videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
     price: "800",
     rating: "3.5",
+    authorDesignation: "Agile Transformation Coach",
   },
   {
     id: 4,
     caseTopic: "Remote Team Leadership",
-    lession: "Best practices for leading remote teams effectively.",
-    fututreSkils: "Remote communication, team collaboration.",
+    lesson: "Best practices for leading remote teams effectively.",
+    futureSkills: "Remote communication, team collaboration.",
     characters: "2",
     roles: [
       {
@@ -75,14 +83,17 @@ export const CaseStudiesData = [
     roleOfMainCharacter: "Team Lead",
     challenge: "Maintaining team productivity while working remotely.",
     videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
     price: "500",
     rating: "5",
+    authorDesignation: "Remote Work Strategist",
   },
   {
     id: 5,
     caseTopic: "Full-Stack Development Challenges",
-    lession: "Overcoming obstacles in full-stack development.",
-    fututreSkils: "Backend and frontend integration, API development.",
+    lesson: "Overcoming obstacles in full-stack development.",
+    futureSkills: "Backend and frontend integration, API development.",
     characters: "3",
     roles: [
       {
@@ -94,87 +105,571 @@ export const CaseStudiesData = [
     roleOfMainCharacter: "Full-Stack Developer",
     challenge: "Handling full-stack complexities and API integration.",
     videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
     price: "700",
     rating: "4.5",
+    authorDesignation: "Senior Full-Stack Developer",
   },
   {
     id: 6,
-    caseTopic: "Agile Software Development",
-    lession:
-      "Exploring the evolution of Agile methodologies in software teams.",
-    fututreSkils: "Agile practices, team collaboration.",
-    characters: "4",
-    roles: [
-      {
-        role1: "Scrum Master",
-        role2: "Product Owner",
-        role3: "Developer",
-        role4: "QA Engineer",
-      },
-    ],
-    roleOfMainCharacter: "Scrum Master",
-    challenge: "Coordinating work across multiple Agile teams.",
-    videoLink: "https://www.example.com/video3.mp4",
-    price: "1500",
-    rating: "1.7",
-  },
-  {
-    id: 7,
-    caseTopic: "Crisis Communication",
-    lession: "Understanding how to communicate effectively during a crisis.",
-    fututreSkils: "Crisis communication, team leadership.",
-    characters: "2",
-    roles: [
-      {
-        role1: "CEO",
-        role2: "PR Manager",
-      },
-    ],
-    roleOfMainCharacter: "CEO",
-    challenge: "Managing public relations during a company scandal.",
-    videoLink: "https://www.example.com/video1.mp4",
-    price: "600",
-    rating: "5",
-  },
-  {
-    id: 8,
-    caseTopic: "Complex Project Management",
-    lession: "Handling complex software projects with multiple stakeholders.",
-    fututreSkils: "Project management, stakeholder communication.",
+    caseTopic: "Data Security Implementation",
+    lesson: "Implementing robust security measures in enterprise applications.",
+    futureSkills: "Security protocols, encryption methods, compliance.",
     characters: "3",
     roles: [
       {
-        role1: "Project Manager",
-        role2: "Lead Developer",
-        role3: "Client Liaison",
+        role1: "Security Engineer",
+        role2: "System Administrator",
+        role3: "Compliance Officer",
       },
     ],
-    roleOfMainCharacter: "Project Manager",
-    challenge:
-      "Dealing with conflicting client requirements and tight deadlines.",
-    videoLink: "https://www.example.com/video2.mp4",
-    price: "1500",
-    rating: "0",
+    roleOfMainCharacter: "Security Engineer",
+    challenge: "Securing sensitive data while maintaining system performance.",
+    videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
+    price: "1200",
+    rating: "4.2",
+    authorDesignation: "Information Security Director",
   },
   {
-    id: 9,
-    caseTopic: "Scaling Agile Practices",
-    lession: "Implementing Agile practices in a growing organization.",
-    fututreSkils: "Agile at scale, cross-team collaboration.",
+    id: 7,
+    caseTopic: "Cloud Migration Strategy",
+    lesson: "Planning and executing successful cloud migration.",
+    futureSkills: "Cloud architecture, migration planning, risk management.",
     characters: "4",
     roles: [
       {
-        role1: "Agile Coach",
-        role2: "Product Owner",
-        role3: "Developer",
-        role4: "Scrum Master",
+        role1: "Cloud Architect",
+        role2: "DevOps Engineer",
+        role3: "Project Manager",
+        role4: "System Administrator",
       },
     ],
-    roleOfMainCharacter: "Agile Coach",
-    challenge:
-      "Scaling Agile methodologies across multiple teams and departments.",
+    roleOfMainCharacter: "Cloud Architect",
+    challenge: "Minimizing downtime during cloud migration.",
+    videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
+    price: "1600",
+    rating: "4.7",
+    authorDesignation: "Cloud Solutions Architect",
+  },
+  {
+    id: 8,
+    caseTopic: "Product Launch Strategy",
+    lesson:
+      "Successfully launching a new tech product in a competitive market.",
+    futureSkills: "Market analysis, product strategy, launch planning.",
+    characters: "3",
+    roles: [
+      {
+        role1: "Product Manager",
+        role2: "Marketing Director",
+        role3: "Sales Lead",
+      },
+    ],
+    roleOfMainCharacter: "Product Manager",
+    challenge: "Differentiating the product in a saturated market.",
+    videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
+    price: "900",
+    rating: "4.3",
+    authorDesignation: "Senior Product Manager",
+  },
+  {
+    id: 9,
+    caseTopic: "AI Implementation",
+    lesson: "Integrating AI solutions into existing business processes.",
+    futureSkills: "AI integration, process optimization, change management.",
+    characters: "3",
+    roles: [
+      {
+        role1: "AI Specialist",
+        role2: "Business Analyst",
+        role3: "Project Manager",
+      },
+    ],
+    roleOfMainCharacter: "AI Specialist",
+    challenge: "Ensuring smooth AI adoption across departments.",
     videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
+    price: "1800",
+    rating: "4.6",
+    authorDesignation: "AI Implementation Specialist",
+  },
+  {
+    id: 10,
+    caseTopic: "UX Design Innovation",
+    lesson: "Revolutionizing user experience through innovative design.",
+    futureSkills: "UX design, user research, prototyping.",
+    characters: "3",
+    roles: [
+      {
+        role1: "UX Designer",
+        role2: "Product Manager",
+        role3: "User Researcher",
+      },
+    ],
+    roleOfMainCharacter: "UX Designer",
+    challenge: "Creating intuitive interfaces for complex systems.",
+    videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
+    price: "1100",
+    rating: "4.4",
+    authorDesignation: "Senior UX Designer",
+  },
+  {
+    id: 11,
+    caseTopic: "Digital Marketing Strategy",
+    lesson: "Developing effective digital marketing campaigns.",
+    futureSkills: "Digital marketing, analytics, campaign management.",
+    characters: "3",
+    roles: [
+      {
+        role1: "Marketing Manager",
+        role2: "Content Strategist",
+        role3: "Analytics Specialist",
+      },
+    ],
+    roleOfMainCharacter: "Marketing Manager",
+    challenge: "Maximizing ROI on digital marketing investments.",
+    videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
+    price: "1300",
+    rating: "4.1",
+    authorDesignation: "Digital Marketing Director",
+  },
+  {
+    id: 12,
+    caseTopic: "Blockchain Integration",
+    lesson: "Implementing blockchain solutions in traditional systems.",
+    futureSkills: "Blockchain development, smart contracts, security.",
+    characters: "3",
+    roles: [
+      {
+        role1: "Blockchain Developer",
+        role2: "System Architect",
+        role3: "Security Specialist",
+      },
+    ],
+    roleOfMainCharacter: "Blockchain Developer",
+    challenge: "Ensuring seamless integration with legacy systems.",
+    videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
+    price: "2000",
+    rating: "4.8",
+    authorDesignation: "Blockchain Solutions Architect",
+  },
+  {
+    id: 13,
+    caseTopic: "DevOps Implementation",
+    lesson: "Streamlining development and operations processes.",
+    futureSkills: "CI/CD, automation, infrastructure as code.",
+    characters: "4",
+    roles: [
+      {
+        role1: "DevOps Engineer",
+        role2: "Developer",
+        role3: "Operations Manager",
+        role4: "Quality Analyst",
+      },
+    ],
+    roleOfMainCharacter: "DevOps Engineer",
+    challenge: "Automating deployment pipelines effectively.",
+    videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
+    price: "1700",
+    rating: "4.5",
+    authorDesignation: "DevOps Team Lead",
+  },
+  {
+    id: 14,
+    caseTopic: "Data Analytics Project",
+    lesson: "Leveraging big data for business insights.",
+    futureSkills: "Data analysis, visualization, statistical modeling.",
+    characters: "3",
+    roles: [
+      {
+        role1: "Data Analyst",
+        role2: "Business Intelligence Manager",
+        role3: "Data Engineer",
+      },
+    ],
+    roleOfMainCharacter: "Data Analyst",
+    challenge: "Converting complex data into actionable insights.",
+    videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
+    price: "1400",
+    rating: "4.3",
+    authorDesignation: "Data Analytics Manager",
+  },
+  {
+    id: 15,
+    caseTopic: "Mobile App Development",
+    lesson: "Creating successful cross-platform mobile applications.",
+    futureSkills: "Mobile development, UI/UX design, app optimization.",
+    characters: "4",
+    roles: [
+      {
+        role1: "Mobile Developer",
+        role2: "UI Designer",
+        role3: "Backend Developer",
+        role4: "QA Engineer",
+      },
+    ],
+    roleOfMainCharacter: "Mobile Developer",
+    challenge: "Ensuring consistent performance across platforms.",
+    videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
+    price: "1600",
+    rating: "4.4",
+    authorDesignation: "Mobile Development Lead",
+  },
+  {
+    id: 16,
+    caseTopic: "Cybersecurity Incident Response",
+    lesson: "Managing and responding to security breaches effectively.",
+    futureSkills: "Incident response, security protocols, risk management.",
+    characters: "3",
+    roles: [
+      {
+        role1: "Security Officer",
+        role2: "Network Administrator",
+        role3: "Forensics Specialist",
+      },
+    ],
+    roleOfMainCharacter: "Security Officer",
+    challenge: "Minimizing damage from security incidents.",
+    videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
+    price: "1900",
+    rating: "4.7",
+    authorDesignation: "Chief Information Security Officer",
+  },
+  {
+    id: 17,
+    caseTopic: "E-commerce Platform Migration",
+    lesson: "Successfully transitioning to a new e-commerce platform.",
+    futureSkills: "E-commerce development, data migration, system integration.",
+    characters: "4",
+    roles: [
+      {
+        role1: "E-commerce Manager",
+        role2: "Developer",
+        role3: "Data Migration Specialist",
+        role4: "UX Designer",
+      },
+    ],
+    roleOfMainCharacter: "E-commerce Manager",
+    challenge: "Ensuring zero downtime during platform migration.",
+    videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
     price: "1500",
-    rating: "2",
+    rating: "4.2",
+    authorDesignation: "E-commerce Solutions Architect",
+  },
+  {
+    id: 18,
+    caseTopic: "Machine Learning Implementation",
+    lesson: "Deploying machine learning models in production.",
+    futureSkills: "ML deployment, model optimization, scalability.",
+    characters: "3",
+    roles: [
+      {
+        role1: "ML Engineer",
+        role2: "Data Scientist",
+        role3: "Infrastructure Engineer",
+      },
+    ],
+    roleOfMainCharacter: "ML Engineer",
+    challenge: "Scaling ML models for production use.",
+    videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
+    price: "2100",
+    rating: "4.6",
+    authorDesignation: "Machine Learning Team Lead",
+  },
+  {
+    id: 19,
+    caseTopic: "API Design and Integration",
+    lesson: "Creating scalable and secure APIs.",
+    futureSkills: "API design, security, documentation.",
+    characters: "3",
+    roles: [
+      {
+        role1: "API Developer",
+        role2: "Technical Writer",
+        role3: "Security Specialist",
+      },
+    ],
+    roleOfMainCharacter: "API Developer",
+    challenge: "Designing maintainable and secure APIs.",
+    videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
+    price: "1300",
+    rating: "4.4",
+    authorDesignation: "API Architecture Lead",
+  },
+  {
+    id: 20,
+    caseTopic: "Database Optimization",
+    lesson: "Improving database performance and scalability.",
+    futureSkills:
+      "Database optimization, query tuning, performance monitoring.",
+    characters: "3",
+    roles: [
+      {
+        role1: "Database Administrator",
+        role2: "Performance Engineer",
+        role3: "System Analyst",
+      },
+    ],
+    roleOfMainCharacter: "Database Administrator",
+    challenge: "Optimizing database performance under heavy load.",
+    videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
+    price: "1800",
+    rating: "4.5",
+    authorDesignation: "Senior Database Architect",
+  },
+  {
+    id: 21,
+    caseTopic: "IoT System Implementation",
+    lesson: "Deploying IoT solutions in enterprise environments.",
+    futureSkills: "IoT architecture, sensor integration, data processing.",
+    characters: "4",
+    roles: [
+      {
+        role1: "IoT Engineer",
+        role2: "Network Specialist",
+        role3: "Data Analyst",
+        role4: "Security Expert",
+      },
+    ],
+    roleOfMainCharacter: "IoT Engineer",
+    challenge: "Managing large-scale IoT device networks.",
+    videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
+    price: "2200",
+    rating: "4.3",
+    authorDesignation: "IoT Solutions Architect",
+  },
+  {
+    id: 22,
+    caseTopic: "Quality Assurance Strategy",
+    lesson: "Implementing effective QA processes.",
+    futureSkills: "Test automation, quality metrics, process improvement.",
+    characters: "3",
+    roles: [
+      {
+        role1: "QA Manager",
+        role2: "Test Automation Engineer",
+        role3: "Developer",
+      },
+    ],
+    roleOfMainCharacter: "QA Manager",
+    challenge: "Maintaining quality standards in rapid development.",
+    videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
+    price: "1400",
+    rating: "4.2",
+    authorDesignation: "Quality Assurance Director",
+  },
+  {
+    id: 23,
+    caseTopic: "Microservices Architecture",
+    lesson: "Transitioning from monolithic to microservices architecture.",
+    futureSkills: "Microservices design, service mesh, containerization.",
+    characters: "4",
+    roles: [
+      {
+        role1: "Solution Architect",
+        role2: "DevOps Engineer",
+        role3: "Developer",
+        role4: "System Administrator",
+      },
+    ],
+    roleOfMainCharacter: "Solution Architect",
+    challenge: "Managing microservices complexity and dependencies.",
+    videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
+    price: "2000",
+    rating: "4.7",
+    authorDesignation: "Microservices Architecture Lead",
+  },
+  {
+    id: 24,
+    caseTopic: "Customer Experience Enhancement",
+    lesson: "Improving digital customer experience.",
+    futureSkills: "UX research, customer journey mapping, analytics.",
+    characters: "3",
+    roles: [
+      {
+        role1: "CX Manager",
+        role2: "UX Designer",
+        role3: "Analytics Specialist",
+      },
+    ],
+    roleOfMainCharacter: "CX Manager",
+    challenge: "Enhancing customer satisfaction through digital channels.",
+    videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
+    price: "1600",
+    rating: "4.4",
+    authorDesignation: "Customer Experience Director",
+  },
+  {
+    id: 25,
+    caseTopic: "Enterprise Resource Planning",
+    lesson: "Implementing ERP solutions effectively.",
+    futureSkills: "ERP implementation, process integration, change management.",
+    characters: "4",
+    roles: [
+      {
+        role1: "ERP Consultant",
+        role2: "Business Analyst",
+        role3: "Project Manager",
+        role4: "System Integrator",
+      },
+    ],
+    roleOfMainCharacter: "ERP Consultant",
+    challenge: "Streamlining business processes through ERP.",
+    videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
+    price: "2300",
+    rating: "4.6",
+    authorDesignation: "ERP Implementation Specialist",
+  },
+  {
+    id: 26,
+    caseTopic: "Network Infrastructure Upgrade",
+    lesson: "Modernizing enterprise network infrastructure.",
+    futureSkills: "Network architecture, security, performance optimization.",
+    characters: "3",
+    roles: [
+      {
+        role1: "Network Architect",
+        role2: "Security Engineer",
+        role3: "System Administrator",
+      },
+    ],
+    roleOfMainCharacter: "Network Architect",
+    challenge: "Upgrading network while maintaining operations.",
+    videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
+    price: "1900",
+    rating: "4.5",
+    authorDesignation: "Network Infrastructure Director",
+  },
+  {
+    id: 27,
+    caseTopic: "Business Intelligence Implementation",
+    lesson: "Deploying BI solutions for data-driven decisions.",
+    futureSkills: "BI tools, data visualization, analytics.",
+    characters: "3",
+    roles: [
+      {
+        role1: "BI Analyst",
+        role2: "Data Engineer",
+        role3: "Business Analyst",
+      },
+    ],
+    roleOfMainCharacter: "BI Analyst",
+    challenge: "Creating actionable insights from complex data.",
+    videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
+    price: "1700",
+    rating: "4.3",
+    authorDesignation: "Business Intelligence Manager",
+  },
+  {
+    id: 28,
+    caseTopic: "Content Management System Migration",
+    lesson: "Successfully migrating to a new CMS platform.",
+    futureSkills: "CMS implementation, content strategy, user training.",
+    characters: "3",
+    roles: [
+      {
+        role1: "CMS Specialist",
+        role2: "Content Manager",
+        role3: "Technical Lead",
+      },
+    ],
+    roleOfMainCharacter: "CMS Specialist",
+    challenge: "Ensuring smooth content transition and user adoption.",
+    videoLink: "https://www.example.com/video1.mp4",
+    imageLink:
+      "https://cdn.pixabay.com/photo/2017/01/10/01/32/study-1968077_1280.jpg",
+    price: "1500",
+    rating: "4.4",
+    authorDesignation: "CMS Implementation Lead",
+  },
+  {
+    id: 29,
+    caseTopic: "Digital Workplace Transformation",
+    lesson: "Creating an effective digital workplace environment.",
+    futureSkills:
+      "Digital transformation, collaboration tools, change management.",
+    characters: "4",
+    roles: [
+      {
+        role1: "Digital Workplace Manager",
+        role2: "IT Specialist",
+        role3: "Change Manager",
+        role4: "Training Coordinator",
+      },
+    ],
+    roleOfMainCharacter: "Digital Workplace Manager",
+    challenge: "Implementing effective digital workplace solutions.",
+    videoLink: "https://www.example.com/video2.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/473264068/photo/case-study.jpg?s=1024x1024&w=is&k=20&c=R5CinqqoQcf7uKWCc-NfhTZTsheJoTCDDyU9hFePoBo=",
+    price: "1800",
+    rating: "4.5",
+    authorDesignation: "Digital Transformation Director",
+  },
+  {
+    id: 30,
+    caseTopic: "IT Service Management",
+    lesson: "Implementing ITIL best practices.",
+    futureSkills: "ITSM processes, service delivery, incident management.",
+    characters: "3",
+    roles: [
+      {
+        role1: "ITSM Manager",
+        role2: "Service Desk Lead",
+        role3: "Process Analyst",
+      },
+    ],
+    roleOfMainCharacter: "ITSM Manager",
+    challenge: "Streamlining IT service delivery processes.",
+    videoLink: "https://www.example.com/video3.mp4",
+    imageLink:
+      "https://media.istockphoto.com/id/2169695734/photo/best-wording-inside-magnifier-glass-among-good-and-better-wording-for-focus-product-and.jpg?s=612x612&w=0&k=20&c=DznDz-nMng9x4WqEsifCIAe5vPK99rD6fWP9zrMQyNM=",
+    price: "1600",
+    rating: "4.6",
+    authorDesignation: "IT Service Management Director",
   },
 ];

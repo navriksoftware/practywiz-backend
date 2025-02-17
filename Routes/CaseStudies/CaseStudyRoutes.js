@@ -11,6 +11,7 @@ import {
 import {
   generateQuestionsWithLangchain,
   generateFollowUpQuestions,
+  checkFullAnalysisResult,
 } from "../../Controllers/CaseStydiesControllers/langchainController.js";
 
 let router = routers.Router();
@@ -31,5 +32,7 @@ router.get("/purchased-case-studies/:id", fetchPurchasedCaseStudyById);
 router.post("/generate-questions", generateQuestionsWithLangchain);
 
 router.post("/generate-follow-up-question", generateFollowUpQuestions);
+
+router.post("/check-full-analysis-questions-result", checkFullAnalysisResult);
 
 export default router;
