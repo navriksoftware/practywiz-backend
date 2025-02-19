@@ -37,7 +37,14 @@ WHERE
     AND (mba.[mentor_booking_confirmed] = 'No' OR mba.[mentor_booking_confirmed] = 'Yes' 
          AND mba.[mentor_session_status] = 'upcoming' 
          AND mba.[trainee_session_status] = 'upcoming')
-    AND mba.[mentor_session_booking_date] > GETDATE()
+  
+     AND mba.[mentor_session_booking_date] > CAST(GETDATE() AS DATE)
+    OR (
+        mba.[mentor_session_booking_date] = CAST(GETDATE() AS DATE)  -- If session is today
+        AND mba.[mentor_booking_starts_time] > CAST(GETDATE() AS TIME)
+       
+    )
+    
 ORDER BY 
     mba.mentor_session_booking_date;;
 `;
@@ -64,7 +71,9 @@ export const FetchMentorBookingAppointmentQuery = `SELECT
     md.[mentor_user_dtls_id],
     mdu.[user_email] AS mentor_email,
     mdu.[user_firstname] AS mentor_firstname,
-    mdu.[user_lastname] AS mentor_lastname
+    mdu.[user_lastname] AS mentor_lastname,
+    ud.[user_phone_number] As mentee_phonenumber,
+    mdu.[user_phone_number] As mentor_phonenumber
 FROM 
     [dbo].[mentor_booking_appointments_dtls] mba
 JOIN 

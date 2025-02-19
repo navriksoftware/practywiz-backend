@@ -28,6 +28,7 @@ import {
 } from "../../EmailTemplates/AccountEmailTemplate/AccountEmailTemplate.js";
 // import moment, { max } from "moment";
 import { mentorApplicationEmail } from "../../EmailTemplates/MentorEmailTemplate/MentorEmailTemplate.js";
+import {sendWhatsAppMessage} from "../../WhtasappMessages/SuccessMessageFunction.js";
 // import { json } from "body-parser";
 dotenv.config();
 
@@ -236,6 +237,7 @@ export async function MentorUpdatedRegistration(req, res, next) {
                       lowEmail,
                       mentor_firstname + " " + mentor_lastname
                     );
+
                     const accessToken = jwt.sign(
                       {
                         user_id: userDtlsId,
@@ -286,7 +288,7 @@ export async function MentorUpdatedRegistration(req, res, next) {
     );
   });
 }
-
+//mentor registration step 2 (your super powers & availability)
 export async function MentorUpdateAdditionalDetails(req, res, next) {
   const {
     jobtitle,
@@ -306,6 +308,7 @@ export async function MentorUpdateAdditionalDetails(req, res, next) {
     Timezone,
     Availability,
     mentorEducationDetails,
+    mentorPhoneNumber,
     userDtlsId,
     mentorDtlsId,
     mentorEmail,
@@ -351,8 +354,14 @@ export async function MentorUpdateAdditionalDetails(req, res, next) {
             AccountCreatedMessage
           );
           const msg = mentorApplicationEmail(mentorEmail, mentorName);
+
           const response = await sendEmail(msg);
           if (response === "True" || response === "true" || response === true) {
+            sendWhatsAppMessage(
+              mentorPhoneNumber,
+              mentorName,
+              "mentor_approval_success"
+            );
             return res.json({
               success: "Thank you for applying the mentor application",
             });

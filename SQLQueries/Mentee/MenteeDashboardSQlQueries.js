@@ -124,7 +124,16 @@ ON
     md.[mentor_user_dtls_id] = ud.[user_dtls_id]  -- Assuming user_dtls_id is the primary key in users_dtls
 WHERE 
     mba.[mentee_user_dtls_id] = @menteeUserDtlsId 
-    AND (mba.[mentor_booking_confirmed] = 'No' OR mba.[mentor_booking_confirmed] = 'Yes' AND mba.[mentor_session_status] = 'upcoming' AND mba.[trainee_session_status] = 'upcoming') AND mba.[mentor_session_booking_date] > GETDATE()
+   AND (mba.[mentor_booking_confirmed] = 'No' 
+    OR mba.[mentor_booking_confirmed] = 'Yes' 
+    AND mba.[mentor_session_status] = 'upcoming' 
+    AND mba.[trainee_session_status] = 'upcoming')
+    -- Future date check
+    AND mba.[mentor_session_booking_date] > CAST(GETDATE() AS DATE)
+    OR (
+        mba.[mentor_session_booking_date] = CAST(GETDATE() AS DATE)  -- If session is today
+         AND mba.[mentor_booking_starts_time] > CAST(GETDATE() AS TIME)
+    )
 order by mentor_session_booking_date;
 
 `;

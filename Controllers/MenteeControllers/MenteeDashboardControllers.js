@@ -64,9 +64,11 @@ export async function MenteeApprovedBookingAppointments(req, res) {
       request.input("menteeUserDtlsId", sql.Int, userDtlsId);
       request.query(MenteeApprovedBookingQuery, (err, result) => {
         if (err) return res.json({ error: err.message });
+
         if (result && result.recordset && result.recordset.length > 0) {
           return res.json({ success: result.recordset });
         } else {
+          console.log("by");
           return res.json({ error: "No record found" });
         }
       });

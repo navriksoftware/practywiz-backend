@@ -16,6 +16,7 @@ import { fileURLToPath } from "url";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import authRouter from "./Routes/AuthRoutes/AuthRoutes.js";
+import VerifyOTP from "./Routes/VerifyOTPRoutes/VerifyOTPRoutes.js"
 import mentorRouter from "./Routes/MentorRoutes/MentorRoutes.js";
 import mentorBookingRouter from "./Routes/MentorRoutes/MentorBookingRoute.js";
 import menteeRoute from "./Routes/MenteeRoutes/MenteeRoutes.js";
@@ -36,6 +37,7 @@ import { InsertNotificationHandler } from "./Middleware/NotificationFunction.js"
 import { accountCreatedEmailTemplate } from "./EmailTemplates/AccountEmailTemplate/AccountEmailTemplate.js";
 import { sendEmail } from "./Middleware/AllFunctions.js";
 import { autoApproveFetchAllNotApprovedMentorQuery } from "./SQLQueries/AdminDashboard/AdminSqlQueries.js";
+import { ApprovedAccountMessgsendtoMentor } from "./WhtasappMessages/SuccessMessageFunction.js";
 
 dotenv.config();
 
@@ -113,6 +115,7 @@ app.get("/api/get-razorpay-key", (req, res) => {
 
 // Authentication and user-related routes
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/otpvarification", VerifyOTP);
 app.use("/api/v1/mentor", mentorRouter);
 app.use("/api/v1/mentor/booking/appointment", mentorBookingRouter);
 app.use("/api/v1/mentor/dashboard", mentorDashboardRouter);
@@ -188,6 +191,9 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
             .query(
               "UPDATE mentor_dtls SET mentor_approved_status = 'Yes' WHERE mentor_user_dtls_id = @mentorUserId"
             );
+
+          //Whatsappnotification smed to mentor for account is approved now
+          ApprovedAccountMessgsendtoMentor(record.mentor_phone_number, record.mentor_firstname, "mentor_approved_success");
         }
       }
     } else {

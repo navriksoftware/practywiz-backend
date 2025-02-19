@@ -220,91 +220,55 @@ export async function MentorUpdateMentorProfile3(req, res) {
   }
 }
 
+
 function updateMentorTimestamp(availabilityData, mentorDtlsId) {
   sql.connect(config, (err, conn) => {
     if (err) return res.json({ error: err.message });
     if (conn) {
       availabilityData.forEach((item) => {
         item.days.forEach(async (day) => {
-          console.log(`Day: ${day}`);
-          let FromTime = `${item.startHour}:${item.startMinute.substring(
-            0,
-            2
-          )}${item.startPeriod}`;
-          let ToTime = `${item.endHour}:${item.endMinute.substring(0, 2)}${
-            item.endPeriod
-          }`;
+         
+          let FromTime = `${item.startHour}:${item.startMinute.substring(0, 2)}${item.startPeriod}`;
+          let ToTime = `${item.endHour}:${item.endMinute.substring(0, 2)}${item.endPeriod}`;
           let mentorRecStartDate = `${item.fromDate}`;
           let mentorRecEndDate = `${item.toDate}`;
           let mentorTimeSlotDuration = `${item.duration}`;
           let mentorRecType = "Daily";
-          console.log(mentorTimeSlotDuration);
-          try {
-            // Create a new SQL request for checking
-            const checkRequest = new sql.Request();
-            const checkQuery = `
-              SELECT COUNT(*) AS count 
-              FROM mentor_timeslots_dtls 
-              WHERE mentor_dtls_id = @mentorDtlsId 
-                AND mentor_timeslot_day = @day 
-                AND mentor_timeslot_from = @FromTime 
-                AND mentor_timeslot_to = @ToTime`;
 
-            const checkResult = await checkRequest
+          try {
+            // DELETE existing records before inserting new data
+            const deleteRequest = new sql.Request();
+            const deleteQuery = `
+              DELETE FROM mentor_timeslots_dtls 
+              WHERE mentor_dtls_id = @mentorDtlsId AND mentor_timeslot_day = @day`;
+
+            await deleteRequest
+              .input("mentorDtlsId", sql.Int, mentorDtlsId)
+              .input("day", sql.VarChar, day)
+              .query(deleteQuery);
+
+            
+
+            // INSERT new records
+            const insertRequest = new sql.Request();
+            const insertQuery = `
+              INSERT INTO mentor_timeslots_dtls 
+              (mentor_dtls_id, mentor_timeslot_day, mentor_timeslot_from, mentor_timeslot_to, 
+              mentor_timeslot_rec_indicator, mentor_timeslot_rec_end_timeframe, mentor_timeslot_duration, mentor_timeslot_rec_start_timeframe) 
+              VALUES (@mentorDtlsId, @day, @FromTime, @ToTime, @mentorRecType, @mentorRecEndDate, @mentorTimeSlotDuration, @mentorRecStartDate)`;
+
+            await insertRequest
               .input("mentorDtlsId", sql.Int, mentorDtlsId)
               .input("day", sql.VarChar, day)
               .input("FromTime", sql.VarChar, FromTime)
               .input("ToTime", sql.VarChar, ToTime)
-              .query(checkQuery);
+              .input("mentorRecType", sql.VarChar, mentorRecType)
+              .input("mentorRecEndDate", sql.VarChar, mentorRecEndDate)
+              .input("mentorTimeSlotDuration", sql.VarChar, mentorTimeSlotDuration)
+              .input("mentorRecStartDate", sql.VarChar, mentorRecStartDate)
+              .query(insertQuery);
 
-            if (checkResult.recordset[0].count > 0) {
-              console.log("Record already exists.");
-              const updateRequest = new sql.Request();
-              const updateQuery = `
-            UPDATE mentor_timeslots_dtls
-            SET mentor_timeslot_status = 'unarchieve'
-            WHERE mentor_dtls_id = @mentorDtlsId AND mentor_timeslot_day = @day
-            AND mentor_timeslot_from = @FromTime AND mentor_timeslot_to = @ToTime
-            AND mentor_timeslot_rec_indicator = @recurrenceType`;
-
-              const updateResult = await updateRequest
-                .input("mentorDtlsId", sql.Int, mentorDtlsId)
-                .input("day", sql.VarChar, day)
-                .input("FromTime", sql.VarChar, FromTime)
-                .input("ToTime", sql.VarChar, ToTime)
-                .input("recurrenceType", sql.VarChar, mentorRecType)
-                .query(updateQuery);
-              if (updateResult.rowsAffected[0] > 0) {
-                console.log("Timeslot unarchived successfully.");
-              } else {
-                console.log("No matching record found to unarchive.");
-              }
-            } else {
-              // Create a new SQL request for inserting
-              const insertRequest = new sql.Request();
-              const insertQuery = `
-                INSERT INTO mentor_timeslots_dtls 
-                (mentor_dtls_id, mentor_timeslot_day, mentor_timeslot_from, mentor_timeslot_to, 
-                mentor_timeslot_rec_indicator, mentor_timeslot_rec_end_timeframe, mentor_timeslot_duration, mentor_timeslot_rec_start_timeframe) 
-                VALUES (@mentorDtlsId, @day, @FromTime, @ToTime, @mentorRecType, @mentorRecEndDate, @mentorTimeSlotDuration, @mentorRecStartDate)`;
-
-              await insertRequest
-                .input("mentorDtlsId", sql.Int, mentorDtlsId)
-                .input("day", sql.VarChar, day)
-                .input("FromTime", sql.VarChar, FromTime)
-                .input("ToTime", sql.VarChar, ToTime)
-                .input("mentorRecType", sql.VarChar, mentorRecType)
-                .input("mentorRecEndDate", sql.VarChar, mentorRecEndDate)
-                .input(
-                  "mentorTimeSlotDuration",
-                  sql.Int,
-                  mentorTimeSlotDuration
-                )
-                .input("mentorRecStartDate", sql.VarChar, mentorRecStartDate)
-                .query(insertQuery);
-
-              console.log("Data inserted successfully:", item);
-            }
+            
           } catch (error) {
             console.error("Error processing query:", error.message);
           }
@@ -313,6 +277,100 @@ function updateMentorTimestamp(availabilityData, mentorDtlsId) {
     }
   });
 }
+
+// function updateMentorTimestamp(availabilityData, mentorDtlsId) {
+//   sql.connect(config, (err, conn) => {
+//     if (err) return res.json({ error: err.message });
+//     if (conn) {
+//       availabilityData.forEach((item) => {
+//         item.days.forEach(async (day) => {
+//           console.log(`Day: ${day}`);
+//           let FromTime = `${item.startHour}:${item.startMinute.substring(
+//             0,
+//             2
+//           )}${item.startPeriod}`;
+//           let ToTime = `${item.endHour}:${item.endMinute.substring(0, 2)}${
+//             item.endPeriod
+//           }`;
+//           let mentorRecStartDate = `${item.fromDate}`;
+//           let mentorRecEndDate = `${item.toDate}`;
+//           let mentorTimeSlotDuration = `${item.duration}`;
+//           let mentorRecType = "Daily";
+         
+//           try {
+//             // Create a new SQL request for checking
+//             const checkRequest = new sql.Request();
+//             const checkQuery = `
+//               SELECT COUNT(*) AS count 
+//               FROM mentor_timeslots_dtls 
+//               WHERE mentor_dtls_id = @mentorDtlsId 
+//                 AND mentor_timeslot_day = @day 
+//                 AND mentor_timeslot_from = @FromTime 
+//                 AND mentor_timeslot_to = @ToTime`;
+
+//             const checkResult = await checkRequest
+//               .input("mentorDtlsId", sql.Int, mentorDtlsId)
+//               .input("day", sql.VarChar, day)
+//               .input("FromTime", sql.VarChar, FromTime)
+//               .input("ToTime", sql.VarChar, ToTime)
+//               .query(checkQuery);
+
+//             if (checkResult.recordset[0].count > 0) {
+//               console.log("Record already exists.");
+//               const updateRequest = new sql.Request();
+//               const updateQuery = `
+//             UPDATE mentor_timeslots_dtls
+//             SET mentor_timeslot_status = 'unarchieve'
+//             WHERE mentor_dtls_id = @mentorDtlsId AND mentor_timeslot_day = @day
+//             AND mentor_timeslot_from = @FromTime AND mentor_timeslot_to = @ToTime
+//             AND mentor_timeslot_rec_indicator = @recurrenceType`;
+
+//               const updateResult = await updateRequest
+//                 .input("mentorDtlsId", sql.Int, mentorDtlsId)
+//                 .input("day", sql.VarChar, day)
+//                 .input("FromTime", sql.VarChar, FromTime)
+//                 .input("ToTime", sql.VarChar, ToTime)
+//                 .input("recurrenceType", sql.VarChar, mentorRecType)
+//                 .query(updateQuery);
+//               if (updateResult.rowsAffected[0] > 0) {
+//                 console.log("Timeslot unarchived successfully.");
+//               } else {
+//                 console.log("No matching record found to unarchive.");
+//               }
+//             } else {
+//               // Create a new SQL request for inserting
+//               const insertRequest = new sql.Request();
+//               const insertQuery = `
+//                 INSERT INTO mentor_timeslots_dtls 
+//                 (mentor_dtls_id, mentor_timeslot_day, mentor_timeslot_from, mentor_timeslot_to, 
+//                 mentor_timeslot_rec_indicator, mentor_timeslot_rec_end_timeframe, mentor_timeslot_duration, mentor_timeslot_rec_start_timeframe) 
+//                 VALUES (@mentorDtlsId, @day, @FromTime, @ToTime, @mentorRecType, @mentorRecEndDate, @mentorTimeSlotDuration, @mentorRecStartDate)`;
+
+//               await insertRequest
+//                 .input("mentorDtlsId", sql.Int, mentorDtlsId)
+//                 .input("day", sql.VarChar, day)
+//                 .input("FromTime", sql.VarChar, FromTime)
+//                 .input("ToTime", sql.VarChar, ToTime)
+//                 .input("mentorRecType", sql.VarChar, mentorRecType)
+//                 .input("mentorRecEndDate", sql.VarChar, mentorRecEndDate)
+//                 .input(
+//                   "mentorTimeSlotDuration",
+//                   sql.Int,
+//                   mentorTimeSlotDuration
+//                 )
+//                 .input("mentorRecStartDate", sql.VarChar, mentorRecStartDate)
+//                 .query(insertQuery);
+
+//               console.log("Data inserted successfully:", item);
+//             }
+//           } catch (error) {
+//             console.error("Error processing query:", error.message);
+//           }
+//         });
+//       });
+//     }
+//   });
+// }
 
 export async function MentorUpdateMentorProfile4(req, res) {
   const {
