@@ -147,7 +147,8 @@ SET
     [employer_organization_website] = @organization_website,
     [employer_organization_linkedin] = @organization_linkedin,
     [employer_organization_designation] = @organization_employee_designation,
-    [employer_organization_complete_address] = @organization_address
+    [employer_organization_complete_address] = @organization_address,
+    [employer_organization_logo] = @organization_logo_url
 
 WHERE 
     [employer_organization_user_dtls_id] = @employerUserDtlsId;
