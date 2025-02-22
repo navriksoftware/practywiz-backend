@@ -14,6 +14,7 @@ import {
   AccountCreatedMessage,
   SuccessMsg,
 } from "../../Messages/Messages.js";
+import {sendWhatsAppMessage} from "../../WhtasappMessages/SuccessMessageFunction.js";
 
 dotenv.config();
 
@@ -122,6 +123,11 @@ export async function MenteeRegistration(req, res, next) {
                     response === "true" ||
                     response === true
                   ) {
+                    sendWhatsAppMessage(
+                      mentee_phone,
+                      mentee_firstname,
+                      "mentee_acct_create_success"
+                    );
                     return res.json({
                       success: "Thank you for registering as a mentee",
                     });

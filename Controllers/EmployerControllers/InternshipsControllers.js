@@ -17,6 +17,7 @@ import {
 } from "../../Messages/Messages.js";
 import moment from "moment";
 import {
+  ApplyInternshipSqlQuery,
   CreateInternshipPostSqlQuery,
   FetchAllInternshipPostsSqlQuery,
   Show10InternshipsSqlQuery,
@@ -279,6 +280,47 @@ export async function fetch10InternshipsInHome(req, res, next) {
             success: false,
             message: "No internship posts found",
             data: [],
+          });
+        }
+      });
+    });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
+}
+
+export async function ApplyInternship(req, res) {
+  const {
+    mentee_user_dtls_id,
+    mentee_dtls_id,
+    internship_post_dtls_id,
+    resume,
+  } = req.body;
+  console.log(req.body);
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) return res.json({ error: err.message });
+      const request = new sql.Request();
+      request.input("mentee_user_dtls_id", sql.Int, mentee_user_dtls_id);
+      request.input("mentee_dtls_id", sql.Int, mentee_dtls_id);
+      request.input(
+        "internship_post_dtls_id",
+        sql.Int,
+        internship_post_dtls_id
+      );
+      request.input("mentee_resume_link", sql.VarChar, "false");
+      request.input("mentee_internship_applied_status", sql.VarChar, "applied");
+      request.query(ApplyInternshipSqlQuery, (err, result) => {
+        if (err) return res.json({ error: err.message });
+        if (result) {
+          const menteeNotificationHandler = InsertNotificationHandler(
+            mentee_user_dtls_id,
+            SuccessMsg,
+            InternshipHeading,
+            InternshipPostMessage
+          );
+          return res.json({
+            success: "Successfully applied for the internship",
           });
         }
       });

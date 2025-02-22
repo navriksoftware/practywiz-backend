@@ -41,33 +41,99 @@ export const getCartTotalAmount = async (req, res) => {
 };
 
 // Function to fetch all purchased case studies
-export const fetchPurchasedCaseStudies = (req, res) => {
+export async function fetchPurchasedCaseStudies(req, res) {
   try {
-    res.json(PurchasedCaseStudyData); // Return JSON response
+    sql.connect(config, (err, db) => {
+      if (err) {
+        return res.json({
+          error: err.message,
+        });
+      }
+      if (db) {
+        const request = new sql.Request();
+
+        // Fetch the entire table
+        request.query("SELECT * FROM case_study_details", (err, results) => {
+          if (err) {
+            return res.json({
+              error: err.message,
+            });
+          }
+          if (results.recordset.length > 0) {
+            // Return the entire table data
+            return res.json({
+              success: true,
+              data: results.recordset,
+            });
+          } else {
+            // Handle case where the table is empty
+            return res.json({
+              success: false,
+              message: "No case studies found in the database.",
+            });
+          }
+        });
+      }
+    });
   } catch (error) {
-    console.error("Error fetching purchased case studies:", error);
-    res.status(500).json({
-      message: "Server error while fetching purchased case studies data.",
+    return res.json({
+      error: error.message,
     });
   }
-};
+}
 
 // Function to fetch a purchased case study by ID
-export const fetchPurchasedCaseStudyById = (req, res) => {
+export const fetchPurchasedCaseStudyById = async (req, res) => {
   try {
+    // Parse the ID from the request parameters
     const id = parseInt(req.params.id, 10);
-    const data = PurchasedCaseStudyData.find(
-      (caseStudy) => caseStudy.id === id
-    );
 
-    if (data) {
-      res.json(data);
-    } else {
-      res.status(404).json({ message: "Purchased case study not found." });
+    // Validate the ID
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid case study ID." });
     }
+
+    // Connect to the database
+    sql.connect(config, (err, db) => {
+      if (err) {
+        return res.json({
+          error: err.message,
+        });
+      }
+      if (db) {
+        const request = new sql.Request();
+
+        // Input the ID into the query
+        request.input("case_study_id", sql.Int, id);
+
+        // Query the database for the specific case study
+        request.query(
+          "SELECT * FROM case_study_details WHERE case_study_id = @case_study_id",
+          (err, results) => {
+            if (err) {
+              return res.json({
+                error: err.message,
+              });
+            }
+
+            // Check if the case study exists
+            if (results.recordset.length > 0) {
+              return res.json({
+                success: true,
+                data: results.recordset[0],
+              });
+            } else {
+              return res.status(404).json({
+                message: "Case study not found.",
+              });
+            }
+          }
+        );
+      }
+    });
   } catch (error) {
     console.error("Error fetching the purchased case study:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error while fetching the purchased case study.",
     });
   }

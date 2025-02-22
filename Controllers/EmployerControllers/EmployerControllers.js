@@ -20,8 +20,10 @@ import moment from "moment";
 import {
   EmployerOrganizationDtlsSqlQuery,
   fetchEmployerSingleDashboardQuery,
+  GetAllApplicantsForInternshipSqlQuery,
   UpdateEMployerOrgDetailsQuery,
 } from "../../SQLQueries/EmployerSQlQueries/EmployerSqlQueries.js";
+import { uploadFileToAzureStorage } from "../../Middleware/azureBlobUploader.js";
 
 dotenv.config();
 
@@ -169,6 +171,7 @@ export async function getEmployeeDashboardDetails(req, res) {
 }
 
 export async function UpdateEmployerOrganizationDetails(req, res) {
+  const logoFile = req.files?.organization_logo;
   const {
     organization_name,
     organization_description,
@@ -179,8 +182,16 @@ export async function UpdateEmployerOrganizationDetails(req, res) {
     organization_linkedin,
     organization_employee_designation,
     organization_address,
-  } = req.body.data;
-  const { employerUserDtlsId } = req.body;
+    employerUserDtlsId,
+  } = req.body;
+  const imageData = req.files;
+  var organization_logo_url = "";
+  if (imageData) {
+    const blobName = `${employerUserDtlsId}-${req.files.image.name}`;
+    organization_logo_url = `https://practiwizstorage.blob.core.windows.net/practiwizcontainer/mentorprofilepictures/${blobName}`;
+    uploadMentorPhotoToAzure(imageData, blobName);
+  }
+
   try {
     sql.connect(config, (err, db) => {
       if (err) return res.json({ error: err.message });
@@ -203,6 +214,11 @@ export async function UpdateEmployerOrganizationDetails(req, res) {
         organization_employee_designation
       );
       request.input("organization_address", sql.Text, organization_address);
+      request.input(
+        "organization_logo_url",
+        sql.VarChar,
+        organization_logo_url
+      );
 
       request.query(UpdateEMployerOrgDetailsQuery, (err, result) => {
         if (err) return res.json({ error: err.message });
@@ -215,5 +231,35 @@ export async function UpdateEmployerOrganizationDetails(req, res) {
     });
   } catch (error) {
     return res.json({ error: error.message });
+  }
+}
+
+export async function GetAllApplicantsForInternship(req, res) {
+  const { internshipId } = req.body;
+  if (!internshipId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Internship ID is required" });
+  }
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) return res.json({ error: "There is some error while fetching" });
+      const request = new sql.Request();
+      request.input("internship_post_dtls_id", sql.Int, internshipId);
+      request.query(
+        GetAllApplicantsForInternshipSqlQuery,
+
+        (err, result) => {
+          if (err) return res.json({ error: err.message });
+          if (result && result.recordset && result.recordset.length > 0) {
+            return res.json({ success: result.recordset });
+          } else {
+            return res.json({ error: "No record found" });
+          }
+        }
+      );
+    });
+  } catch (error) {
+    return res.json({ error: "There is some error while fetching" });
   }
 }
