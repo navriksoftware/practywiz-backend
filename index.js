@@ -194,6 +194,7 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
 
           //Whatsappnotification smed to mentor for account is approved now
           ApprovedAccountMessgsendtoMentor(record.mentor_phone_number, record.mentor_firstname, "mentor_approved_success");
+
         }
       }
     } else {
@@ -205,7 +206,7 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
 }
 
 setInterval(() => {
-  getAllNotApprovedMentorsListAdminDashboard();
+  getAllNotApprovedMentorsListAdminDashboard();// need to change the time interval according to the requirement
 }, 86400 * 1000);
 
 // Start server

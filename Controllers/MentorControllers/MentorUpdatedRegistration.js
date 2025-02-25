@@ -28,7 +28,7 @@ import {
 } from "../../EmailTemplates/AccountEmailTemplate/AccountEmailTemplate.js";
 // import moment, { max } from "moment";
 import { mentorApplicationEmail } from "../../EmailTemplates/MentorEmailTemplate/MentorEmailTemplate.js";
-import {sendWhatsAppMessage} from "../../WhtasappMessages/SuccessMessageFunction.js";
+import { sendWhatsAppMessage } from "../../WhtasappMessages/SuccessMessageFunction.js";
 // import { json } from "body-parser";
 dotenv.config();
 
@@ -142,7 +142,7 @@ export async function MentorUpdatedRegistration(req, res, next) {
                 "mentor_profile_photo",
                 sql.VarChar,
                 filename ||
-                  "https://practiwizstorage.blob.core.windows.net/practiwizcontainer/blue-circle-with-white-user_78370-4707.webp"
+                "https://practiwizstorage.blob.core.windows.net/practiwizcontainer/blue-circle-with-white-user_78370-4707.webp"
               );
               request.input(
                 "mentor_social_media_profile",
@@ -237,6 +237,9 @@ export async function MentorUpdatedRegistration(req, res, next) {
                       lowEmail,
                       mentor_firstname + " " + mentor_lastname
                     );
+                    const response = await sendEmail(msg);
+                    //message send to mentor for Account created successfully & 80% prfile need to complete for approval  
+                    sendWhatsAppMessage(mentor_phone_number, mentor_firstname, "mentor_acct_create_success_meg");
 
                     const accessToken = jwt.sign(
                       {
@@ -263,21 +266,6 @@ export async function MentorUpdatedRegistration(req, res, next) {
                       token: token,
                       accessToken: accessToken,
                     });
-                    // const response = await sendEmail(msg);
-                    // if (
-                    //   response === "True" ||
-                    //   response === "true" ||
-                    //   response === true
-                    // ) {
-                    //   return res.json({ success: "success" });
-                    // }
-                    // if (
-                    //   response === "False" ||
-                    //   response === "false" ||
-                    //   response === false
-                    // ) {
-                    return res.json({ success: "success" });
-                    // }
                   }
                 }
               );
@@ -354,14 +342,14 @@ export async function MentorUpdateAdditionalDetails(req, res, next) {
             AccountCreatedMessage
           );
           const msg = mentorApplicationEmail(mentorEmail, mentorName);
-
+          sendWhatsAppMessage(
+            mentorPhoneNumber,
+            mentorName,
+            "mentor_approval_success"
+          );
           const response = await sendEmail(msg);
           if (response === "True" || response === "true" || response === true) {
-            sendWhatsAppMessage(
-              mentorPhoneNumber,
-              mentorName,
-              "mentor_approval_success"
-            );
+
             return res.json({
               success: "Thank you for applying the mentor application",
             });
@@ -409,24 +397,24 @@ function arrayFunctions(array, mentorDtlsId, day, timestamp) {
           }
           request.query(
             "INSERT INTO mentor_timeslots_dtls (mentor_dtls_id,mentor_timeslot_day,mentor_timeslot_from,mentor_timeslot_to,mentor_timeslot_rec_indicator,mentor_timeslot_rec_end_timeframe,mentor_timeslot_rec_cr_date,mentor_timeslot_rec_update_date,mentor_timeslot_duration) VALUES('" +
-              mentorDtlsId +
-              "','" +
-              day +
-              "','" +
-              FromTime +
-              "','" +
-              ToTime +
-              "','" +
-              mentorRecType +
-              "','" +
-              mentorRecEndDate +
-              "','" +
-              timestamp +
-              "','" +
-              timestamp +
-              "','" +
-              mentorTimeSlotDuration +
-              "')",
+            mentorDtlsId +
+            "','" +
+            day +
+            "','" +
+            FromTime +
+            "','" +
+            ToTime +
+            "','" +
+            mentorRecType +
+            "','" +
+            mentorRecEndDate +
+            "','" +
+            timestamp +
+            "','" +
+            timestamp +
+            "','" +
+            mentorTimeSlotDuration +
+            "')",
             (err, success) => {
               if (err) {
                 console.log(err.message);
@@ -456,31 +444,30 @@ function updateMentorTimestamp(availabilityData, mentorDtlsId) {
             0,
             2
           )}${item.startPeriod}`;
-          let ToTime = `${item.endHour}:${item.endMinute.substring(0, 2)}${
-            item.endPeriod
-          }`;
+          let ToTime = `${item.endHour}:${item.endMinute.substring(0, 2)}${item.endPeriod
+            }`;
           let mentorRecStartDate = `${item.fromDate}`;
           let mentorRecEndDate = `${item.toDate}`;
           let mentorTimeSlotDuration = `${item.duration}`;
           let mentorRecType = "Daily";
           request.query(
             "INSERT INTO mentor_timeslots_dtls (mentor_dtls_id,mentor_timeslot_day,mentor_timeslot_from,mentor_timeslot_to,mentor_timeslot_rec_indicator,mentor_timeslot_rec_end_timeframe,mentor_timeslot_duration,mentor_timeslot_rec_start_timeframe) VALUES('" +
-              mentorDtlsId +
-              "','" +
-              day +
-              "','" +
-              FromTime +
-              "','" +
-              ToTime +
-              "','" +
-              mentorRecType +
-              "','" +
-              mentorRecEndDate +
-              "','" +
-              mentorTimeSlotDuration +
-              "','" +
-              mentorRecStartDate +
-              "')",
+            mentorDtlsId +
+            "','" +
+            day +
+            "','" +
+            FromTime +
+            "','" +
+            ToTime +
+            "','" +
+            mentorRecType +
+            "','" +
+            mentorRecEndDate +
+            "','" +
+            mentorTimeSlotDuration +
+            "','" +
+            mentorRecStartDate +
+            "')",
             (err, success) => {
               if (err) {
                 console.log(err.message);
@@ -531,103 +518,4 @@ export async function MentorOnboardingFeedbackController(req, res, next) {
   }
 }
 
-// export async function MentorUpdateAdditionalDetails(req, res, next) {
-//   const {
-//     mentorDomain,
-//     jobtitle,
-//     experience,
-//     companyName,
-//     passionateAbout,
-//     AreaOfexpertise,
-//     areaofmentorship,
-//     headline,
-//     Timezone,
-//     Mon,
-//     Tue,
-//     Wed,
-//     Thu,
-//     Fri,
-//     Sat,
-//     Sun,
-//     userDtlsId,
-//     mentorDtlsId,
-//     mentorEmail,
-//     mentorName,
-//   } = req.body;
-//   const timestamp = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
-//   try {
-//     sql.connect(config, (err, db) => {
-//       if (err) return res.json({ error: "There is some error while applying" });
-//       const request = new sql.Request();
-//       request.input("Mentor_Domain", sql.VarChar, mentorDomain);
-//       request.input("jobtitle", sql.VarChar, jobtitle);
-//       request.input("experience", sql.VarChar, experience);
-//       request.input("companyName", sql.VarChar, companyName);
-//       request.input("passionateAbout", sql.VarChar, passionateAbout);
-//       request.input("AreaOfexpertise", sql.VarChar, AreaOfexpertise);
-//       request.input("areaofmentorship", sql.VarChar, areaofmentorship || "");
-//       request.input("headline", sql.VarChar, headline);
-//       request.input("Timezone", sql.VarChar, Timezone);
-//       request.input("mentor_dtls_id", sql.Int, mentorDtlsId);
-//       request.query(MentorRegistrationStep2SqlQuery, async (err, result) => {
-//         if (err)
-//           return res.json({
-//             error: err.message,
-//           });
-//         if (result) {
-//           // adding area of expertise word in to table
-//           if (Mon !== "undefined") {
-//             const monDayParsedArray = JSON.parse(Mon);
-//             arrayFunctions(monDayParsedArray, mentorDtlsId, "Mon", timestamp);
-//           }
-//           if (Tue !== "undefined") {
-//             const tueDayParsedArray = JSON.parse(Tue);
-//             arrayFunctions(tueDayParsedArray, mentorDtlsId, "Tue", timestamp);
-//           }
-//           if (Wed !== "undefined") {
-//             const wedDayParsedArray = JSON.parse(Wed);
-//             arrayFunctions(wedDayParsedArray, mentorDtlsId, "Wed", timestamp);
-//           }
-//           if (Thu !== "undefined") {
-//             const thuDayParsedArray = JSON.parse(Thu);
-//             arrayFunctions(thuDayParsedArray, mentorDtlsId, "Wed", timestamp);
-//           }
-//           if (Fri !== "undefined") {
-//             const friDayParsedArray = JSON.parse(Fri);
-//             arrayFunctions(friDayParsedArray, mentorDtlsId, "Fri", timestamp);
-//           }
-//           if (Sat !== "undefined") {
-//             const satDayParsedArray = JSON.parse(Sat);
-//             arrayFunctions(satDayParsedArray, mentorDtlsId, "Sat", timestamp);
-//           }
-//           if (Sun !== "undefined") {
-//             const sunDayParsedArray = JSON.parse(Sun);
-//             arrayFunctions(sunDayParsedArray, mentorDtlsId, "Sun", timestamp);
-//           }
-//           const mentorNotificationHandler = InsertNotificationHandler(
-//             userDtlsId,
-//             SuccessMsg,
-//             AccountCreatedHeading,
-//             AccountCreatedMessage
-//           );
-//           const msg = mentorApplicationEmail(mentorEmail, mentorName);
-//           const response = await sendEmail(msg);
-//           if (response === "True" || response === "true" || response === true) {
-//             return res.json({
-//               success: "Thank you for applying the mentor application",
-//             });
-//           }
-//           if (
-//             response === "False" ||
-//             response === "false" ||
-//             response === false
-//           ) {
-//             return res.json({
-//               success: "Thank you for applying the mentor application",
-//             });
-//           }
-//         }
-//       });
-//     });
-//   } catch (error) {}
-// }
+
