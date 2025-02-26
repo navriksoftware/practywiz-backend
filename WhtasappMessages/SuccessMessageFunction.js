@@ -30,7 +30,7 @@ const sendWhatsAppMessage = async (phoneNumber, firstName, template) => {
       }),
     });
 
-    console.log("Message sent successfully:", response.data);
+    // console.log("Message sent successfully:", response.data);
   } catch (error) {
     console.error(
       "Error sending message:",
@@ -71,7 +71,7 @@ const menteePaymentReceivedMessage = async (menteePhoneNo, menteeName, sessionDa
       }),
     });
 
-    console.log("Message sent successfully:", response.data);
+    // console.log("Message sent successfully:", response.data);
   } catch (error) {
     console.error(
       "Error sending message:",
@@ -113,7 +113,7 @@ const ApprovalReqToMentorMessage = async (mentorPhoneNo, mentorName, menteeName,
       }),
     });
 
-    console.log("Message sent successfully:", response.data);
+    // console.log("Message sent successfully:", response.data);
   } catch (error) {
     console.error(
       "Error sending message:",
@@ -156,7 +156,7 @@ const SessionApprovedToMenteeMessage = async (menteePhoneNo, menteeName, mentorN
       }),
     });
 
-    console.log("Message sent successfully:", response.data);
+    // console.log("Message sent successfully:", response.data);
   } catch (error) {
     console.error(
       "Error sending message:",
@@ -199,7 +199,7 @@ const SessionApprovedToMentorMessage = async (mentorPhoneNo, menteeName, mentorN
       }),
     });
 
-    console.log("Message sent successfully:", response.data);
+    // console.log("Message sent successfully:", response.data);
   } catch (error) {
     console.error(
       "Error sending message:",
@@ -237,7 +237,7 @@ const ApprovedAccountMessgsendtoMentor = async (mentorPhoneNo, mentorName, templ
       }),
     });
 
-    console.log("Message sent successfully:", response.data);
+    // console.log("Message sent successfully:", response.data);
   } catch (error) {
     console.error(
       "Error sending message:",
@@ -281,7 +281,7 @@ const RemainderMessgSendToMentor = async (mentorPhoneNo, menteeName, mentorName,
       }),
     });
 
-    console.log("Message sent successfully:", response.data);
+    // console.log("Message sent successfully:", response.data);
   } catch (error) {
     console.error(
       "Error sending message:",
@@ -324,7 +324,7 @@ const RemainderMessgSendToMentee = async (mentorPhoneNo, menteeName, mentorName,
       }),
     });
 
-    console.log("Message sent successfully:", response.data);
+    // console.log("Message sent successfully:", response.data);
   } catch (error) {
     console.error(
       "Error sending message:",
