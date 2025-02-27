@@ -167,7 +167,7 @@ export async function MentorRegistration(req, res, next) {
         request.input("mentor_session_price", sql.VarChar, Pricing);
         request.input("mentor_currency", sql.VarChar, Currency);
         request.input("City", sql.VarChar, City);
-        request.input("Institute", sql.VarChar, Institute);
+        request.input("Institute", sql.Text, Institute);
         request.input("areaOfExpertise", sql.Text, AreaOfexpertise);
         request.input("passionAbout", sql.Text, passionateAbout);
         request.input("mentorDomain", sql.VarChar, Mentor_Domain);

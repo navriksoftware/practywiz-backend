@@ -2,6 +2,7 @@ import express from "express";
 import {
   ApplyInternship,
   CreateInternshipPost,
+  employerProfileSettingUpdate,
   fetch10InternshipsInHome,
   fetchAllInternshipPosts,
   fetchSingleInternshipPost,
@@ -18,6 +19,9 @@ router.post("/fetch-internship-listing", fetchAllInternshipPosts);
 router.post("/fetch-internship-post", fetchSingleInternshipPost);
 
 router.get("/fetch-10-internships", fetch10InternshipsInHome);
+
+//employer routes for profile settings update
+router.post("/employer-profileSettings", employerProfileSettingUpdate);
 
 router.post("/apply-internship", ApplyInternship);
 export default router;

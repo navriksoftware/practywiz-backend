@@ -23,8 +23,8 @@ export const accountCreatedEmailTemplate = (email, username, url) => {
   >
     <div style="text-align: center; margin-bottom: 30px;">
       <img
-        src="https://res.cloudinary.com/droa7dncb/image/upload/v1665987569/practiwiz-logo3_xifxbc.png"
-        alt="Practiwiz Logo"
+        src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
+        alt="Practywiz Logo"
         style="max-width: 160px; margin-bottom: 20px;"
       />
       <h2
@@ -35,7 +35,7 @@ export const accountCreatedEmailTemplate = (email, username, url) => {
           margin: 0;
         "
       >
-        Welcome to Practiwiz
+        Welcome to Practywiz
       </h2>
       <hr style="width: 80px; border: 1px solid #1abc9c; margin: 20px auto;" />
     </div>
@@ -44,7 +44,7 @@ export const accountCreatedEmailTemplate = (email, username, url) => {
     </p>
 
     <p style="font-size: 16px; line-height: 1.8; color: #555;">
-      Congratulations! Your account has been successfully activated on <b>Practiwiz</b>.
+      Congratulations! Your account has been successfully activated on <b>Practywiz</b>.
     </p>
 
     <p style="font-size: 16px; line-height: 1.8; color: #555;">
@@ -78,19 +78,19 @@ export const accountCreatedEmailTemplate = (email, username, url) => {
 
     <p style="font-size: 16px; line-height: 1.8; color: #555;">
       If you have any questions, feel free to reach out to us at 
-      <a href="mailto:wecare@practiwiz.com" style="color: #1abc9c; text-decoration: none;">
-        wecare@practiwiz.com
+      <a href="mailto:wecare@practywiz.com" style="color: #1abc9c; text-decoration: none;">
+        wecare@practywiz.com
       </a>. We're here to help!
     </p>
 
     <p style="font-size: 16px; line-height: 1.8; color: #555; margin-top: 40px;">
-      Best Regards,<br />The Practiwiz Team
+      Best Regards,<br />The Practywiz Team
     </p>
 
     <div style="text-align: center; margin-top: 40px;">
       <img
         src="https://via.placeholder.com/150x50?text=Practiwiz+Footer+Logo"
-        alt="Practiwiz Footer Logo"
+        alt="Practywiz Footer Logo"
         style="max-width: 120px;"
       />
     </div>
@@ -131,7 +131,7 @@ export const mentorAccountCreatedEmailTemplate = (
       <img
         src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
 
-        alt="Practiwiz Logo"
+        alt="Practywiz Logo"
         style="max-width: 160px; margin-bottom: 20px;"
       />
       <h2
@@ -196,7 +196,7 @@ export const mentorAccountCreatedEmailTemplate = (
 
     <p style="font-size: 16px; line-height: 1.8; color: #555;">
       If you have any questions, feel free to reach out to us at 
-      <a href="mailto:wecare@practiwiz.com" style="color: #1abc9c; text-decoration: none;">
+      <a href="mailto:wecare@practywiz.com" style="color: #1abc9c; text-decoration: none;">
         wecare@practywiz.com
       </a>. We're here to help!
     </p>
@@ -208,7 +208,7 @@ export const mentorAccountCreatedEmailTemplate = (
     <div style="text-align: center; margin-top: 40px;">
       <img
         src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-        alt="Practiwiz Footer Logo"
+        alt="Practywiz Footer Logo"
         style="max-width: 120px;"
       />
     </div>
@@ -245,7 +245,7 @@ export const mentorUpdatedRegAccountCreatedEmailTemplate = (
       <img
         src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
 
-        alt="Practiwiz Logo"
+        alt="Practywiz Logo"
         style="max-width: 160px; margin-bottom: 20px;"
       />
       <h2
@@ -301,7 +301,7 @@ export const mentorUpdatedRegAccountCreatedEmailTemplate = (
 
     <p style="font-size: 16px; line-height: 1.8; color: #555;">
       If you have any questions, feel free to reach out to us at 
-      <a href="mailto:wecare@practiwiz.com" style="color: #1abc9c; text-decoration: none;">
+      <a href="mailto:wecare@practywiz.com" style="color: #1abc9c; text-decoration: none;">
         wecare@practywiz.com
       </a>. We're here to help!
     </p>
@@ -313,7 +313,7 @@ export const mentorUpdatedRegAccountCreatedEmailTemplate = (
     <div style="text-align: center; margin-top: 40px;">
       <img
         src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-        alt="Practiwiz Footer Logo"
+        alt="Practywiz Footer Logo"
         style="max-width: 120px;"
       />
     </div>
@@ -345,7 +345,7 @@ export const passwordUpdateEmailTemplate = (email, username) => {
             padding-bottom: 30px;
           "
         >
-          Welcome to the Practiwiz Training Programme
+          Welcome to the Practywiz Training Programme
         </h2>
         <p>Hi <b>${username}</b>,</p>
         <p>
@@ -362,11 +362,11 @@ export const passwordUpdateEmailTemplate = (email, username) => {
           If you have any questions or would like us to help you with anything
           else, please don't hesitate to reach out <b>support@practiwiz.com</b>.
         </p>
-        <p>Thanks, Practiwiz</p>
+        <p>Thanks, Practywiz</p>
         <img
           width="300px"
           height="100px"
-          src="https://res.cloudinary.com/droa7dncb/image/upload/v1665987569/practiwiz-logo3_xifxbc.png"
+          src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
           alt="Logo"
         />
       </div>
@@ -400,7 +400,7 @@ export const resetPasswordEmailTemplate = (email, username, url) => {
             padding-bottom: 30px;
           "
         >
-          Welcome to the Practiwiz Training Programme
+          Welcome to the Practywiz Training Programme
         </h2>
         <p>Hi <b>${username}</b>,</p>
         <p>
@@ -409,7 +409,7 @@ export const resetPasswordEmailTemplate = (email, username, url) => {
         </p>
         <p>
           Please visit this click on the reset button to reset your password on
-          <b>Practiwiz</b>
+          <b>Practywiz</b>
         </p>
         <button
           style="
@@ -434,14 +434,14 @@ export const resetPasswordEmailTemplate = (email, username, url) => {
         <p>${url}</p>
         <p>After 15 minutes this link will be expired.</p>
         <p>
-          If you have any questions, send an email to wecare@practiwiz.com  and we'll be happy
+          If you have any questions, send an email to wecare@practywiz.com  and we'll be happy
           to help.
         </p>
-        <p>Thanks, Practiwiz</p>
+        <p>Thanks, Practywiz</p>
         <img
           width="300px"
           height="100px"
-          src="https://res.cloudinary.com/droa7dncb/image/upload/v1665987569/practiwiz-logo3_xifxbc.png"
+          src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
           alt="Logo"
         />
       </div>

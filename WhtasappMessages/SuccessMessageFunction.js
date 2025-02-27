@@ -237,7 +237,7 @@ const ApprovedAccountMessgsendtoMentor = async (mentorPhoneNo, mentorName, templ
       }),
     });
 
-    // console.log("Message sent successfully:", response.data);
+    console.log("Message sent successfully:", response.data);
   } catch (error) {
     console.error(
       "Error sending message:",

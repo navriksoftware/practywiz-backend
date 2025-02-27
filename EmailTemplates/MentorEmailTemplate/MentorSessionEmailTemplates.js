@@ -31,7 +31,7 @@ export const traineeBookingRemainderEmailTemplate = (
     <div style="text-align: center; margin-bottom: 30px;">
       <img
         src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-        alt="Practiwiz Logo"
+        alt="Practywiz Logo"
         style="max-width: 160px; margin-bottom: 20px;"
       />
       <h2
@@ -42,7 +42,7 @@ export const traineeBookingRemainderEmailTemplate = (
           margin: 0;
         "
       >
-        Welcome to the Practiwiz
+        Welcome to the Practywiz
       </h2>
       <hr style="width: 80px; border: 1px solid #1abc9c; margin: 20px auto;" />
     </div>
@@ -82,17 +82,17 @@ export const traineeBookingRemainderEmailTemplate = (
       If you experience any issues joining the session, please reach out to us via email.
     </p>
     <p style="font-size: 16px; color: #333333; line-height: 1.6;">
-      For additional assistance or inquiries, email us at <a href="mailto:wecare@practiwiz.com" style="color: #008080; text-decoration: none;">wecare@practiwiz.com</a>. We’re here to help.
+      For additional assistance or inquiries, email us at <a href="mailto:wecare@practywiz.com" style="color: #008080; text-decoration: none;">wecare@practywiz.com</a>. We’re here to help.
     </p>
 
     <p style="font-size: 16px; color: #333333; line-height: 1.6;">
-      Thanks,<br />The Practiwiz Team
+      Thanks,<br />The Practywiz Team
     </p>
 
     <div style="text-align: center; margin-top: 40px;">
       <img
         src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-        alt="Practiwiz Footer Logo"
+        alt="Practywiz Footer Logo"
         style="max-width: 120px;"
       />
     </div>
@@ -134,7 +134,7 @@ export const mentorBookingRemainderEmailTemplate = (
     <div style="text-align: center; margin-bottom: 30px;">
       <img
         src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-        alt="Practiwiz Logo"
+        alt="Practywiz Logo"
         style="max-width: 160px; margin-bottom: 20px;"
       />
       <h2
@@ -145,7 +145,7 @@ export const mentorBookingRemainderEmailTemplate = (
           margin: 0;
         "
       >
-        Welcome to the Practiwiz
+        Welcome to the Practywiz
       </h2>
       <hr style="width: 80px; border: 1px solid #1abc9c; margin: 20px auto;" />
     </div>
@@ -185,17 +185,17 @@ export const mentorBookingRemainderEmailTemplate = (
       If you experience any issues joining the session, please reach out to us via email.
     </p>
     <p style="font-size: 16px; color: #333333; line-height: 1.6;">
-      For additional assistance or inquiries, email us at <a href="mailto:wecare@practiwiz.com" style="color: #008080; text-decoration: none;">wecare@practiwiz.com</a>. We’re here to help.
+      For additional assistance or inquiries, email us at <a href="mailto:wecare@practywiz.com" style="color: #008080; text-decoration: none;">wecare@practywiz.com</a>. We’re here to help.
     </p>
 
     <p style="font-size: 16px; color: #333333; line-height: 1.6;">
-      Thanks,<br />The Practiwiz Team
+      Thanks,<br />The Practywiz Team
     </p>
 
     <div style="text-align: center; margin-top: 40px;">
       <img
         src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-        alt="Practiwiz Footer Logo"
+        alt="Practywiz Footer Logo"
         style="max-width: 120px;"
       />
     </div>

@@ -34,3 +34,5 @@ export const CaseStudyPurchasedMessage =
 export const MentorEmailAlertMessage =
   "Please fill the mentor application, To approve as a mentor.";
 export const InternshipPostMessage = "Successfully you have created the internship post "
+export const EmployerProfileChangedMessage =
+  "Successfully you have updated the Employer profile details.";

@@ -180,6 +180,7 @@ VALUES (
     GETDATE()  -- Automatically set update date
 )`;
 
+
 // export const GetAppliedInternshipsSqlQuery = `
 // SELECT
 //     ia.[internship_post_dtls_id],

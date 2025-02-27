@@ -11,8 +11,11 @@ import { InsertNotificationHandler } from "../../Middleware/NotificationFunction
 import {
   AccountCreatedHeading,
   AccountCreatedMessage,
+  EmployerProfileChangedMessage,
+  InfoMsg,
   InternshipHeading,
   InternshipPostMessage,
+  MentorProfileHeading,
   SuccessMsg,
 } from "../../Messages/Messages.js";
 import moment from "moment";
@@ -256,7 +259,7 @@ export async function fetchSingleInternshipPost(req, res, next) {
         }
       });
     });
-  } catch (error) {}
+  } catch (error) { }
 }
 
 export async function fetch10InternshipsInHome(req, res, next) {
@@ -327,5 +330,78 @@ export async function ApplyInternship(req, res) {
     });
   } catch (error) {
     return res.json({ error: error.message });
+  }
+}
+
+export async function employerProfileSettingUpdate(req, res) {
+  try {
+    // Extracting data correctly
+    const { employerDtlsId, fromdata } = req.body;
+    if (!employerDtlsId || !fromdata) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const {
+      organization_name,
+      organization_description,
+      company_size,
+      organization_city,
+      industry,
+      organization_website,
+      organization_linkedin,
+    } = fromdata;
+
+
+
+    // Connect to the database
+    let pool = await sql.connect(config);
+    let request = pool.request();
+
+    request.input("employer_ID", sql.Int, employerDtlsId);
+
+    // Checking if the employer exists
+    let result = await request.query(
+      "SELECT employer_organization_dtls_id FROM employer_organization_dtls WHERE employer_organization_user_dtls_id = @employer_ID"
+    );
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: "Employer not found" });
+    }
+
+    // Adding necessary input parameters
+    request.input("employer_Org_name", sql.Text, organization_name);
+    request.input("employer_Org_Dec", sql.Text, organization_description);
+    request.input("employer_Company_size", sql.VarChar, company_size);
+    request.input("employer_Org_City", sql.VarChar, organization_city);
+    request.input("employer_industry", sql.VarChar, industry);
+    request.input("employer_Org_website", sql.VarChar, organization_website);
+    request.input("employer_Org_linkedin", sql.VarChar, organization_linkedin);
+
+    // Update employer details
+    await request.query(`
+      UPDATE employer_organization_dtls 
+      SET 
+        employer_organization_name = @employer_Org_name,
+        employer_organization_desc = @employer_Org_Dec,
+        employer_organization_industry = @employer_industry,
+        employer_organization_location = @employer_Org_City,
+        employer_organization_no_of_emp = @employer_Company_size,
+        employer_organization_dtls_update_date = GETDATE(),
+        employer_organization_website = @employer_Org_website,
+        employer_organization_linkedin = @employer_Org_linkedin
+      WHERE 
+        employer_organization_user_dtls_id = @employer_ID
+    `);
+
+    const notificationHandler = await InsertNotificationHandler(
+      employerDtlsId,
+      InfoMsg,
+      MentorProfileHeading,
+      EmployerProfileChangedMessage
+    );
+
+    return res.json({ success: "Successfully updated employer details" });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 }

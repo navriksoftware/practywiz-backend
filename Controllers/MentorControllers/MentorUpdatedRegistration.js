@@ -238,8 +238,9 @@ export async function MentorUpdatedRegistration(req, res, next) {
                       mentor_firstname + " " + mentor_lastname
                     );
                     const response = await sendEmail(msg);
+                    const name = mentor_firstname + " " + mentor_lastname;
                     //message send to mentor for Account created successfully & 80% prfile need to complete for approval  
-                    sendWhatsAppMessage(mentor_phone_number, mentor_firstname, "mentor_acct_create_success_meg");
+                    sendWhatsAppMessage(mentor_phone_number, name, "mentor_acct_create_success_meg");
 
                     const accessToken = jwt.sign(
                       {
