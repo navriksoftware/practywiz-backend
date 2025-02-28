@@ -24,7 +24,7 @@ export const caseStudyConsultantEmailTemplate = (name, email, phone) => {
         <div style="text-align: center; margin-bottom: 30px;">
           <img
             src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-            alt="Practiwiz Logo"
+            alt="Practywiz Logo"
             style="max-width: 160px; margin-bottom: 20px;"
           />
           <h2
@@ -74,7 +74,7 @@ export const caseStudyConsultantEmailTemplate = (name, email, phone) => {
         <div style="text-align: center; margin-top: 40px;">
           <img
             src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-            alt="Practiwiz Footer Logo"
+            alt="Practywiz Footer Logo"
             style="max-width: 120px;"
           />
         </div>
@@ -110,7 +110,7 @@ export const caseStudyAuthorAutoReplyTemplate = (name, email) => {
         <div style="text-align: center; margin-bottom: 30px;">
           <img
             src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-            alt="Practiwiz Logo"
+            alt="Practywiz Logo"
             style="max-width: 160px; margin-bottom: 20px;"
           />
           <h2
@@ -127,11 +127,11 @@ export const caseStudyAuthorAutoReplyTemplate = (name, email) => {
         </div>
 
         <p style="font-size: 16px; line-height: 1.5; color: #333333;">
-          Hi <b>${name}</b>,
+          Hi <b style="text-transform: uppercase;">${name}</b>,
         </p>
         
         <p style="font-size: 16px; line-height: 1.5; color: #333333;">
-          Thank you for your interest in authoring a case study with Practiwiz. We appreciate your willingness to share your corporate experience.
+          Thank you for your interest in authoring a case study with Practywiz. We appreciate your willingness to share your corporate experience.
         </p>
         
         <p style="font-size: 16px; line-height: 1.5; color: #333333;">
@@ -144,13 +144,13 @@ export const caseStudyAuthorAutoReplyTemplate = (name, email) => {
         
         <p style="font-size: 16px; line-height: 1.5; color: #333333; margin-top: 30px;">
           Best Regards,<br />
-          The Practiwiz Team
+          The Practywiz Team
         </p>
         
         <div style="text-align: center; margin-top: 40px;">
           <img
             src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-            alt="Practiwiz Footer Logo"
+            alt="Practywiz Footer Logo"
             style="max-width: 120px;"
           />
         </div>
