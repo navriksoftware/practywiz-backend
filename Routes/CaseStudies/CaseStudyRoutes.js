@@ -14,6 +14,8 @@ import {
   checkFullAnalysisResult,
 } from "../../Controllers/CaseStydiesControllers/langchainController.js";
 
+import { connectWithCaseStudyConsultant } from "../../Controllers/CaseStydiesControllers/CaseStudiesController.js";
+
 let router = routers.Router();
 
 //login
@@ -34,5 +36,7 @@ router.post("/generate-questions", generateQuestionsWithLangchain);
 router.post("/generate-follow-up-question", generateFollowUpQuestions);
 
 router.post("/check-full-analysis-questions-result", checkFullAnalysisResult);
+
+router.post("/connect-with-consultant", connectWithCaseStudyConsultant);
 
 export default router;

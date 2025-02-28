@@ -12,10 +12,13 @@ export async function sendEmail(msg) {
   const errorEmail = "False";
   try {
     await sgMail.send(msg);
-    console.log("Email sent");
+    console.log("Email sent to: ", msg.to);
     return successEmail;
   } catch (error) {
-    console.log(error);
+    console.error(error.toString());
+    if (error.response) {
+      console.error(error.response.body);
+    }
     console.log("Email not sent");
     return errorEmail;
   }

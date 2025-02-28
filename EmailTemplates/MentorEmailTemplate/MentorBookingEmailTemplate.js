@@ -9,7 +9,7 @@ export const appointmentBookedTraineeEmailTemplate = (
 ) => {
   return {
     to: `${menteeEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Mentorship Appointment Scheduled",
     html: `
  <section
@@ -91,7 +91,7 @@ export const mentorAppointmentBookedTraineeEmailTemplate = (
 ) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Mentorship Appointment Scheduled",
     html: ` <section
   style="

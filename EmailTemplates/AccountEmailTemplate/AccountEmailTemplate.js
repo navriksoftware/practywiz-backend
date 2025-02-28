@@ -1,7 +1,7 @@
 export const accountCreatedEmailTemplate = (email, username, url) => {
   return {
     to: `${email}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: `Account created successfully`,
     html: `
   <section
@@ -108,7 +108,7 @@ export const mentorAccountCreatedEmailTemplate = (
 ) => {
   return {
     to: `${email}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: `Account created successfully`,
     html: ` <section
   style="
@@ -222,7 +222,7 @@ export const mentorUpdatedRegAccountCreatedEmailTemplate = (
 ) => {
   return {
     to: `${email}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: `Account created successfully`,
     html: ` <section
   style="
@@ -324,7 +324,7 @@ export const mentorUpdatedRegAccountCreatedEmailTemplate = (
 export const passwordUpdateEmailTemplate = (email, username) => {
   return {
     to: `${email}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: `Password changed successfully`,
     html: `
 <section>
@@ -379,7 +379,7 @@ export const passwordUpdateEmailTemplate = (email, username) => {
 export const resetPasswordEmailTemplate = (email, username, url) => {
   return {
     to: `${email}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: `Reset your password`,
     html: `
  <section>

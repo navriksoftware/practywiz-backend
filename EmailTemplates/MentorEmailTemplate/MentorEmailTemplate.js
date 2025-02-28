@@ -2,7 +2,7 @@
 export const mentorApplicationEmail = (mentorEmail, mentorName) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Thank you for your mentor application!",
     html: `
 <section
@@ -106,7 +106,7 @@ export const mentorApplicationEmail = (mentorEmail, mentorName) => {
 export const mentorApprovedEmailTemplateOld = (mentorEmail, username) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Congratulations! You're our next mentor!",
     html: `
    <section
@@ -198,7 +198,7 @@ export const mentorApprovedEmailTemplateOld = (mentorEmail, username) => {
 export const mentorApprovedEmailTemplate = (mentorEmail, username) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "You are ready to start your mentorship journey🎉🎊",
     html: `
 <section
@@ -285,7 +285,7 @@ export const mentorApprovedEmailTemplate = (mentorEmail, username) => {
 export const mentorDisApproveEmail = (mentorEmail, username) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "We are sorry to inform you...",
     html: `
       <section>
@@ -356,7 +356,7 @@ export const mentorApplicationFillEmailAlertTemplate = (
 ) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Progress your mentor application.....",
     html: `<section
   style="
