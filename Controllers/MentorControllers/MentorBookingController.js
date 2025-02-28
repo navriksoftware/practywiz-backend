@@ -32,7 +32,7 @@ import {
   SessionApprovedToMenteeMessage,
   SessionApprovedToMentorMessage,menteePaymentReceivedMessage } from "../../WhtasappMessages/SuccessMessageFunction.js";
 
-dotenv.config();
+ dotenv.config();
 
 //create razor pay order
 export async function createMentorRazorPayOrder(req, res, next) {
@@ -315,25 +315,25 @@ export async function UpdateMentorBookingAppointment(req, res, next) {
                   SuccessMsg,
                   "Appointment confirmed",
                   "You have confirmed your appointment with " +
-                    menteeName +
-                    " on " +
-                    new Date(mentorBookingStartsTime).toLocaleDateString() +
-                    " at " +
-                    slotTime
+                  menteeName +
+                  " on " +
+                  new Date(mentorBookingStartsTime).toLocaleDateString() +
+                  " at " +
+                  slotTime
                 );
                 const menteeNotificationHandler = InsertNotificationHandler(
                   menteeUserDtlsId,
                   SuccessMsg,
                   "Appointment confirmed by Mentor",
                   "Mentor has confirmed your appointment with " +
-                    mentorName +
-                    " on " +
-                    new Date(mentorBookingStartsTime).toLocaleDateString() +
-                    " at " +
-                    slotTime
+                  mentorName +
+                  " on " +
+                  new Date(mentorBookingStartsTime).toLocaleDateString() +
+                  " at " +
+                  slotTime
                 );
                 const SessionDate =formatDate(mentorBookingStartsTime);
-              
+
                 SessionApprovedToMenteeMessage(
                   menteePhoneNo,
                   menteeName,
@@ -343,17 +343,17 @@ export async function UpdateMentorBookingAppointment(req, res, next) {
                   endtime,
                   joinURL,
                   "session_approved_to_mentee ");
-                  SessionApprovedToMentorMessage(
-                    mentorPhoneNo,
-                    mentorName,
-                    menteeName,
-                    SessionDate,
-                    starttime,
-                    endtime,
-                    joinURL,
-                    "mentor_session_approved_details "
-                  );
-               
+                SessionApprovedToMentorMessage(
+                  mentorPhoneNo,
+                  mentorName,
+                  menteeName,
+                  SessionDate,
+                  starttime,
+                  endtime,
+                  joinURL,
+                  "mentor_session_approved_details "
+                );
+
 
                 const emailResponse = await sendEmail(msg);
                 const emailResponse2 = await sendEmail(msg2);

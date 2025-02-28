@@ -167,7 +167,7 @@ export async function MentorRegistration(req, res, next) {
         request.input("mentor_session_price", sql.VarChar, Pricing);
         request.input("mentor_currency", sql.VarChar, Currency);
         request.input("City", sql.VarChar, City);
-        request.input("Institute", sql.VarChar, Institute);
+        request.input("Institute", sql.Text, Institute);
         request.input("areaOfExpertise", sql.Text, AreaOfexpertise);
         request.input("passionAbout", sql.Text, passionateAbout);
         request.input("mentorDomain", sql.VarChar, Mentor_Domain);
@@ -217,33 +217,6 @@ export async function MentorRegistration(req, res, next) {
               AccountCreatedHeading,
               AccountCreatedMessage
             );
-            sendWhatsAppMessage(phoneNumber, firstName, "mentor_acct_create_success");
-
-            // const WhatsAppMessageSend = await axios({
-            //   url: "https://graph.facebook.com/v21.0/581414571714157/messages",
-            //   method: "post",
-            //   headers: {
-            //     Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
-            //     "Content-Type": "application/json",
-            //   },
-            //   data: JSON.stringify({
-            //     messaging_product: "whatsapp",
-            //     to: phoneNumber,
-            //     type: "template",
-            //     template: {
-            //       name: "pz_mentor_reg1",
-            //       language: {
-            //         code: "en_US",
-            //       },
-            //       components: [
-            //         {
-            //           type: "body",
-            //           parameters: [{ type: "text", text: firstName }],
-            //         },
-            //       ],
-            //     },
-            //   }),
-            // });
             const msg = mentorApplicationEmail(
               email,
               firstName + " " + lastName
@@ -268,7 +241,6 @@ export async function MentorRegistration(req, res, next) {
               });
             }
 
-            //send the whatsapp message (Account created successfully)
           } else {
             console.error("No record inserted or returned.");
             return res.json({ err: "No record inserted or returned." });

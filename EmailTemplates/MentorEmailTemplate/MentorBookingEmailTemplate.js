@@ -9,7 +9,7 @@ export const appointmentBookedTraineeEmailTemplate = (
 ) => {
   return {
     to: `${menteeEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Mentorship Appointment Scheduled",
     html: `
  <section
@@ -31,8 +31,8 @@ export const appointmentBookedTraineeEmailTemplate = (
   >
     <div style="text-align: center; margin-bottom: 30px;">
       <img
-        src="https://res.cloudinary.com/droa7dncb/image/upload/v1665987569/practiwiz-logo3_xifxbc.png"
-        alt="Practiwiz Logo"
+        src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
+        alt="Practywiz Logo"
         style="max-width: 160px; margin-bottom: 20px;"
       />
       <h2
@@ -43,7 +43,7 @@ export const appointmentBookedTraineeEmailTemplate = (
           margin: 0;
         "
       >
-        Welcome to Practiwiz
+        Welcome to Practywiz
       </h2>
       <hr style="width: 80px; border: 1px solid #1abc9c; margin: 20px auto;" />
     </div>
@@ -65,10 +65,10 @@ export const appointmentBookedTraineeEmailTemplate = (
       <a href="${joinURL}" style="color: #ffffff; background-color: #00796b; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">Join Your Session</a>
     </p>
     <p style="font-size: 16px; line-height: 1.5; color: #333333;">
-      If you have any questions, feel free to reach out to us at <a href="mailto:wecare@practiwiz.com" style="color: #00796b; text-decoration: none;">wecare@practiwiz.com</a>, and we'll be happy to assist you.
+      If you have any questions, feel free to reach out to us at <a href="mailto:wecare@practywiz.com" style="color: #00796b; text-decoration: none;">wecare@practywiz.com</a>, and we'll be happy to assist you.
     </p>
     <p style="font-size: 16px; line-height: 1.5; color: #333333;">
-      Thank you for choosing Practiwiz!
+      Thank you for choosing Practywiz!
     </p>
     <div style="text-align: center; margin-top: 30px;">
     
@@ -91,7 +91,7 @@ export const mentorAppointmentBookedTraineeEmailTemplate = (
 ) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Mentorship Appointment Scheduled",
     html: ` <section
   style="
@@ -112,8 +112,8 @@ export const mentorAppointmentBookedTraineeEmailTemplate = (
   >
     <div style="text-align: center; margin-bottom: 30px;">
       <img
-        src="https://res.cloudinary.com/droa7dncb/image/upload/v1665987569/practiwiz-logo3_xifxbc.png"
-        alt="Practiwiz Logo"
+        src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
+        alt="Practywiz Logo"
         style="max-width: 160px; margin-bottom: 20px;"
       />
       <h2
@@ -146,10 +146,10 @@ export const mentorAppointmentBookedTraineeEmailTemplate = (
       <a href="${joinURL}" style="color: #ffffff; background-color: #00796b; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">Join Your Session</a>
     </p>
     <p style="font-size: 16px; line-height: 1.5; color: #333333;">
-      If you have any questions, feel free to reach out to us at <a href="mailto:wecare@practiwiz.com" style="color: #00796b; text-decoration: none;">wecare@practiwiz.com</a>, and we'll be happy to assist you.
+      If you have any questions, feel free to reach out to us at <a href="mailto:wecare@practywiz.com" style="color: #00796b; text-decoration: none;">wecare@practywiz.com</a>, and we'll be happy to assist you.
     </p>
     <p style="font-size: 16px; line-height: 1.5; color: #333333;">
-      Thank you for choosing Practiwiz!
+      Thank you for choosing Practywiz!
     </p>
     <div style="text-align: center; margin-top: 30px;">
     

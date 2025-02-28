@@ -38,6 +38,7 @@ import { accountCreatedEmailTemplate } from "./EmailTemplates/AccountEmailTempla
 import { sendEmail } from "./Middleware/AllFunctions.js";
 import { autoApproveFetchAllNotApprovedMentorQuery } from "./SQLQueries/AdminDashboard/AdminSqlQueries.js";
 import { ApprovedAccountMessgsendtoMentor } from "./WhtasappMessages/SuccessMessageFunction.js";
+import { mentorApprovedEmailTemplate } from "./EmailTemplates/MentorEmailTemplate/MentorEmailTemplate.js";
 
 dotenv.config();
 
@@ -182,9 +183,15 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
     const result = await pool
       .request()
       .query(autoApproveFetchAllNotApprovedMentorQuery);
+    console.log(result.recordset);
+
+
     if (result.recordset.length > 0) {
       for (const record of result.recordset) {
+
         if (parseInt(record.total_progress) >= 80) {
+          const name = record.mentor_firstname + " " + record.mentor_lastname;
+
           await pool
             .request()
             .input("mentorUserId", sql.Int, record.mentor_user_dtls_id)
@@ -192,8 +199,13 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
               "UPDATE mentor_dtls SET mentor_approved_status = 'Yes' WHERE mentor_user_dtls_id = @mentorUserId"
             );
 
-          //Whatsappnotification smed to mentor for account is approved now
-          ApprovedAccountMessgsendtoMentor(record.mentor_phone_number, record.mentor_firstname, "mentor_approved_success");
+
+
+          //Whatsappnotification send to mentor for account is approved now
+          ApprovedAccountMessgsendtoMentor(record.mentor_phone_number, name, "mentor_approved_success");
+
+          // email send to mentor for account is approved now
+          mentorApprovedEmailTemplate(record.mentor_email, name)
         }
       }
     } else {
@@ -205,7 +217,7 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
 }
 
 setInterval(() => {
-  getAllNotApprovedMentorsListAdminDashboard();
+  getAllNotApprovedMentorsListAdminDashboard();// need to change the time interval according to the requirement
 }, 86400 * 1000);
 
 // Start server

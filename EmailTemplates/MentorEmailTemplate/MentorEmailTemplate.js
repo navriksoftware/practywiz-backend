@@ -2,7 +2,7 @@
 export const mentorApplicationEmail = (mentorEmail, mentorName) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Thank you for your mentor application!",
     html: `
 <section
@@ -24,8 +24,8 @@ export const mentorApplicationEmail = (mentorEmail, mentorName) => {
   >
     <div style="text-align: center; margin-bottom: 30px;">
       <img
-        src="https://res.cloudinary.com/droa7dncb/image/upload/v1665987569/practiwiz-logo3_xifxbc.png"
-        alt="Practiwiz Logo"
+        src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
+        alt="Practywiz Logo"
         style="max-width: 160px; margin-bottom: 20px;"
       />
       <h2
@@ -36,7 +36,7 @@ export const mentorApplicationEmail = (mentorEmail, mentorName) => {
           margin: 0;
         "
       >
-        Welcome to Practiwiz
+        Welcome to Practywiz
       </h2>
       <hr style="width: 80px; border: 1px solid #1abc9c; margin: 20px auto;" />
     </div>
@@ -45,7 +45,7 @@ export const mentorApplicationEmail = (mentorEmail, mentorName) => {
     </p>
 
     <p style="font-size: 16px; line-height: 1.8; color: #555;">
-      Thank you for submitting your mentor application to join the <b>Practiwiz</b> team. We’re excited about the possibility of working together to empower and guide our learners.
+      Thank you for submitting your mentor application to join the <b>Practywiz</b> team. We’re excited about the possibility of working together to empower and guide our learners.
     </p>
 
     <p style="font-size: 16px; line-height: 1.8; color: #555;">
@@ -80,19 +80,19 @@ export const mentorApplicationEmail = (mentorEmail, mentorName) => {
 
     <p style="font-size: 16px; line-height: 1.8; color: #555;">
       If you have any questions or need further information, feel free to contact us at 
-      <a href="mailto:wecare@practiwiz.com" style="color: #1abc9c; text-decoration: none;">
-        wecare@practiwiz.com
+      <a href="mailto:wecare@practywiz.com" style="color: #1abc9c; text-decoration: none;">
+        wecare@practywiz.com
       </a>. We're here to assist you!
     </p>
 
     <p style="font-size: 16px; line-height: 1.8; color: #555; margin-top: 40px;">
-      Best Regards,<br />The Practiwiz Team
+      Best Regards,<br />The Practywiz Team
     </p>
 
     <div style="text-align: center; margin-top: 40px;">
       <img
         src="https://via.placeholder.com/150x50?text=Practiwiz+Footer+Logo"
-        alt="Practiwiz Footer Logo"
+        alt="Practywiz Footer Logo"
         style="max-width: 120px;"
       />
     </div>
@@ -106,7 +106,7 @@ export const mentorApplicationEmail = (mentorEmail, mentorName) => {
 export const mentorApprovedEmailTemplateOld = (mentorEmail, username) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Congratulations! You're our next mentor!",
     html: `
    <section
@@ -128,8 +128,8 @@ export const mentorApprovedEmailTemplateOld = (mentorEmail, username) => {
   >
     <div style="text-align: center; margin-bottom: 30px;">
       <img
-        src="https://res.cloudinary.com/droa7dncb/image/upload/v1665987569/practiwiz-logo3_xifxbc.png"
-        alt="Practiwiz Logo"
+        src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
+        alt="Practywiz Logo"
         style="max-width: 160px; margin-bottom: 20px;"
       />
       <h2
@@ -140,7 +140,7 @@ export const mentorApprovedEmailTemplateOld = (mentorEmail, username) => {
           margin: 0;
         "
       >
-        Welcome to Practiwiz
+        Welcome to Practywiz
       </h2>
       <hr style="width: 80px; border: 1px solid #1abc9c; margin: 20px auto;" />
     </div>
@@ -162,7 +162,7 @@ export const mentorApprovedEmailTemplateOld = (mentorEmail, username) => {
       To kick things off, we recommend joining a live tutorial session. This will unlock all the tools you need to begin your mentoring journey and start earning.
     </p>
     <p style="font-size: 16px; color: #333333; line-height: 1.6;">
-      At <b>Practiwiz</b>, we’re dedicated to supporting both mentors and students. Our platform empowers you to share your knowledge effectively, and we’re here to ensure your success every step of the way.
+      At <b>Practywiz</b>, we’re dedicated to supporting both mentors and students. Our platform empowers you to share your knowledge effectively, and we’re here to ensure your success every step of the way.
     </p>
     <p style="font-size: 16px; color: #333333; line-height: 1.6;">
       Remember, once you start hosting sessions, you can increase your earnings by gaining referrals.
@@ -170,7 +170,7 @@ export const mentorApprovedEmailTemplateOld = (mentorEmail, username) => {
     
     <!-- Support Section -->
     <p style="font-size: 16px; color: #333333; line-height: 1.6;">
-      If you have any questions or need support, don’t hesitate to reach out to us at <a href="mailto:wecare@practiwiz.com" style="color: #008080; text-decoration: none;">wecare@practiwiz.com</a>. We’re here to help!
+      If you have any questions or need support, don’t hesitate to reach out to us at <a href="mailto:wecare@practywiz.com" style="color: #008080; text-decoration: none;">wecare@practywiz.com</a>. We’re here to help!
     </p>
     
     <!-- Closing and Signature -->
@@ -178,13 +178,13 @@ export const mentorApprovedEmailTemplateOld = (mentorEmail, username) => {
       Best of luck in your mentorship journey!
     </p>
     <p style="font-size: 16px; line-height: 1.8; color: #333333; margin-top: 40px;">
-      Best Regards,<br />The Practiwiz Team
+      Best Regards,<br />The Practywiz Team
     </p>
 
     <div style="text-align: center; margin-top: 40px;">
       <img
         src="https://via.placeholder.com/150x50?text=Practiwiz+Footer+Logo"
-        alt="Practiwiz Footer Logo"
+        alt="Practywiz Footer Logo"
         style="max-width: 120px;"
       />
     </div>
@@ -198,7 +198,7 @@ export const mentorApprovedEmailTemplateOld = (mentorEmail, username) => {
 export const mentorApprovedEmailTemplate = (mentorEmail, username) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "You are ready to start your mentorship journey🎉🎊",
     html: `
 <section
@@ -285,7 +285,7 @@ export const mentorApprovedEmailTemplate = (mentorEmail, username) => {
 export const mentorDisApproveEmail = (mentorEmail, username) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "We are sorry to inform you...",
     html: `
       <section>
@@ -306,7 +306,7 @@ export const mentorDisApproveEmail = (mentorEmail, username) => {
             padding-bottom: 30px;
           "
         >
-          Welcome to the Practiwiz Training Programme
+          Welcome to the Practywiz Training Programme
         </h2>
         <p>Hi <b>${username}</b>,</p>
         <p>
@@ -318,7 +318,7 @@ export const mentorDisApproveEmail = (mentorEmail, username) => {
         <p>
           We're sorry for any inconvenience this may cause. If you have any
           questions about the process or requirements for mentoring please get
-          in touch with us at contact at support@practiwiz.com .
+          in touch with us at contact at wecare@practywiz.com .
         </p>
         <p>
           I know this may not be the answer you wanted to hear but I hope it's
@@ -333,14 +333,14 @@ export const mentorDisApproveEmail = (mentorEmail, username) => {
           being a part of our team!
         </p>
         <p>
-          If you have any questions, send an email to wecare@practiwiz.com  and we'll be happy
+          If you have any questions, send an email to wecare@practywiz.com  and we'll be happy
           to help.
         </p>
-        <p>Thanks, Practiwiz</p>
+        <p>Thanks, Practywiz</p>
         <img
           width="300px"
           height="100px"
-          src="https://res.cloudinary.com/droa7dncb/image/upload/v1665987569/practiwiz-logo3_xifxbc.png"
+          src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
           alt="Logo"
         />
       </div>
@@ -356,7 +356,7 @@ export const mentorApplicationFillEmailAlertTemplate = (
 ) => {
   return {
     to: `${mentorEmail}`, // Change to your recipient
-    from: "no-reply@practiwiz.com", // Change to your verified sender
+    from: "no-reply@practywiz.com", // Change to your verified sender
     subject: "Progress your mentor application.....",
     html: `<section
   style="

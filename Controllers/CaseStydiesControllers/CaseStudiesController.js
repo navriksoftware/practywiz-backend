@@ -9,6 +9,11 @@ import { CaseStudiesData } from "../../Data/CaseStudiesData.js";
 import PurchasedCaseStudyData from "../../Data/CaseStudyPurchased.js";
 import Razorpay from "razorpay";
 import { RazorpayBookingOrderQuery } from "../../SQLQueries/MentorSQLQueries.js";
+import { sendEmail } from "../../Middleware/AllFunctions.js";
+import {
+  caseStudyConsultantEmailTemplate,
+  caseStudyAuthorAutoReplyTemplate,
+} from "../../EmailTemplates/CaseStudyEmailTemplate/CaseStudyConsultantEmailTemplate.js";
 
 dotenv.config();
 
@@ -237,3 +242,51 @@ export const PayCaseStudyAmount = async (req, res) => {
       .json({ success: false, message: "Error verifying payment" });
   }
 };
+
+// Handle case study consultant connection request
+export async function connectWithCaseStudyConsultant(req, res) {
+  const { name, email, phone } = req.body;
+
+  // Validate required fields
+  if (!name || !email) {
+    return res.status(400).json({
+      error: "Please provide your name and email address.",
+    });
+  }
+
+  try {
+    // Send notification email to case study consultant
+    const consultantEmailTemplate = caseStudyConsultantEmailTemplate(
+      name,
+      email,
+      phone || "Not provided"
+    );
+
+    // Send auto-reply email to the potential author
+    const authorEmailTemplate = caseStudyAuthorAutoReplyTemplate(name, email);
+
+    // Send both emails
+    const consultantEmailResult = await sendEmail(consultantEmailTemplate);
+    const authorEmailResult = await sendEmail(authorEmailTemplate);
+
+    // Check if emails were sent successfully
+    if (consultantEmailResult === "True" && authorEmailResult === "True") {
+      return res.status(200).json({
+        success:
+          "Your request has been sent successfully. Our case study consultant will contact you soon!",
+      });
+    } else {
+      // If email sending failed
+      return res.status(500).json({
+        error:
+          "There was an issue sending your request. Please try again later.",
+      });
+    }
+  } catch (error) {
+    console.error("Case study consultant connection error:", error);
+    return res.status(500).json({
+      error:
+        "There was an error processing your request. Please try again later.",
+    });
+  }
+}
