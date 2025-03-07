@@ -263,3 +263,38 @@ export async function GetAllApplicantsForInternship(req, res) {
     return res.json({ error: "There is some error while fetching" });
   }
 }
+
+export async function updateApplicantStatus(req, res) {
+  const { internshipId, applicantId, status } = req.body;
+  if (!internshipId || !applicantId || !status) {
+    return res.status(400).json({
+      success: false,
+      message: "Internship ID, Applicant ID and Status is required",
+    });
+  }
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) return res.json({ error: "There is some error while updating" });
+      const request = new sql.Request();
+      request.input("internshipId", sql.Int, internshipId);
+      request.input("applicantId", sql.Int, applicantId);
+      request.input("status", sql.VarChar, status);
+      request.query(
+        `
+        UPDATE [dbo].[internship_applicants_dtls]
+        SET [mentee_internship_applied_status] = @status
+        WHERE [internship_post_dtls_id] = @internshipId
+        AND [mentee_dtls_id] = @applicantId
+      `,
+        (err, result) => {
+          if (err) return res.json({ error: err.message });
+          if (result) {
+            return res.json({ success: "Successfully updated the status" });
+          }
+        }
+      );
+    });
+  } catch (error) {
+    return res.json({ error: "There is some error while updating" });
+  }
+}
