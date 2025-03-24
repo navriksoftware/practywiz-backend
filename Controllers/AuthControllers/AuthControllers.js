@@ -12,6 +12,7 @@ import { sendEmail } from "../../Middleware/AllFunctions.js";
 import {
   mentorAccountCreatedEmailTemplate,
   passwordUpdateEmailTemplate,
+  resetPasswordEmailTemplate,
 } from "../../EmailTemplates/AccountEmailTemplate/AccountEmailTemplate.js";
 import { InsertNotificationHandler } from "../../Middleware/NotificationFunction.js";
 import {
@@ -324,6 +325,7 @@ export async function changeUserPassword(req, res, next) {
 //forgot password from the page
 export async function forgotPassword(req, res) {
   const email = req.body.email;
+  console.log(email);
   if (!email) return res.json({ error: "Please enter an email address" });
   sql.connect(config, async (err) => {
     if (err)
@@ -353,7 +355,7 @@ export async function forgotPassword(req, res) {
             { expiresIn: "1h" }
           );
           const url = `${process.env.FRONT_END_LINK}/user/activate/reset-password/${forgotPasswordToken}`;
-          const msg = resetPasswordEmailTemplates(
+          const msg = resetPasswordEmailTemplate(
             email,
             fullName.toUpperCase(),
             url
