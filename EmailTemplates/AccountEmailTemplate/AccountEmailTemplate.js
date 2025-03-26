@@ -382,70 +382,56 @@ export const resetPasswordEmailTemplate = (email, username, url) => {
     from: "no-reply@practywiz.com", // Change to your verified sender
     subject: `Reset your password`,
     html: `
- <section>
-      <div
-        style="
-          font-size: 19px;
-          font-family: poppins;
-          max-width: 700px;
-          margin: auto;
-          padding: 50px 20px;
-        "
-      >
-        <h2
-          style="
-            text-transform: uppercase;
-            color: teal;
-            text-align: center;
-            padding-bottom: 30px;
-          "
-        >
-          Welcome to the Practywiz Training Programme
-        </h2>
-        <p>Hi <b>${username}</b>,</p>
-        <p>
-          We're sorry to see that you've forgotten your password. Let us know if
-          you forgot it, or if you just want to change your password.
-        </p>
-        <p>
-          Please visit this click on the reset button to reset your password on
-          <b>Practywiz</b>
-        </p>
-        <button
-          style="
-            background-color: #085cca;
-            border: none;
-            color: white;
-            padding: 10px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            border-radius: 7px;
-          "
-        >
-          <a
-            style="text-decoration: none; font-size: 17px; color: white"
-            href="${url}"
-            >Reset Password</a
-          >
-        </button>
-        <p>or if it doesn't work try the link below</p>
-        <p>${url}</p>
-        <p>After 15 minutes this link will be expired.</p>
-        <p>
-          If you have any questions, send an email to wecare@practywiz.com  and we'll be happy
-          to help.
-        </p>
-        <p>Thanks, Practywiz</p>
-        <img
-          width="300px"
-          height="100px"
-          src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
-          alt="Logo"
-        />
-      </div>
-    </section>
-    `,
+          <section>
+            <div
+              style="
+                font-size: 19px;
+                font-family: Poppins, sans-serif;
+                max-width: 700px;
+                margin: auto;
+                padding: 50px 20px;
+              "
+            >
+              <p>Hi <b>${username}</b>,</p>
+              <p>
+                We received a request to reset your password for your Practywiz account. If you made this request, click the button below to reset your           password.
+              </p>
+              <p>
+                If you didn't request a password reset, please ignore this email. Your account is secure.
+              </p>
+              <a
+                href="${url}"
+                style="
+                  background-color: #085cca;
+                  border: none;
+                  color: white;
+                  padding: 12px 30px;
+                  text-align: center;
+                  text-decoration: none;
+                  display: inline-block;
+                  font-size: 16px;
+                  border-radius: 7px;
+                  margin: 20px 0;
+                "
+              >
+                Reset Your Password
+              </a>
+              <p>If the button above doesn't work, copy and paste the following link into your browser:</p>
+              <p><a href="${url}" style="color: #085cca; word-wrap: break-word;">${url}</a></p>
+              <p>This link will expire in 15 minutes.</p>
+              <p>
+                Need help? Contact us at 
+                <a href="mailto:wecare@practywiz.com" style="color: #085cca;">wecare@practywiz.com</a>.
+              </p>
+              <p>Best regards,</p>
+              <p>The Practywiz Team</p>
+              <img
+                width="300px"
+                height="100px"
+                src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
+                alt="Practywiz Logo"
+              />
+            </div>
+          </section>`,
   };
 };
