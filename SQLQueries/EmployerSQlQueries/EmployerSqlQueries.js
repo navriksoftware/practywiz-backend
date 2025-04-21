@@ -185,6 +185,7 @@ SELECT
     ei.[employer_internship_post_status],
     ei.[employer_internship_post_cr_date],
     ei.[employer_internship_post_update_date],
+    ei.[employer_internship_post_domain],
     eo.[employer_organization_dtls_id],
     eo.[employer_organization_user_dtls_id],
     eo.[employer_organization_email],

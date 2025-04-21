@@ -21,6 +21,7 @@ import mentorRouter from "./Routes/MentorRoutes/MentorRoutes.js";
 import mentorBookingRouter from "./Routes/MentorRoutes/MentorBookingRoute.js";
 import menteeRoute from "./Routes/MenteeRoutes/MenteeRoutes.js";
 import instituteRoute from "./Routes/InstituteRoutes/InstituteRoutes.js";
+import facultyRoutes from "./Routes/FacultyRoutes/FacultyRoutes.js";
 import mentorDashboardRouter from "./Routes/MentorRoutes/MentorDashboard.js";
 import adminDashboardRoute from "./Routes/AdminDashboard/AdminDashboardRoutes.js";
 import adminCaseStudiesDashboardRoute from "./Routes/AdminDashboard/AdminDashboardCaseStudiesRoutes.js";
@@ -130,6 +131,8 @@ app.use("/api/v1/mentee/dashboard/profile", menteeProfileDashboardRoute);
 app.use("/api/v1/institute", instituteRoute);
 app.use("/api/v1/institute/dashboard", instituteDashboardRoute);
 
+app.use("/api/v1/faculty", facultyRoutes);
+
 app.use("/api/v1/admin/dashboard", adminDashboardRoute);
 app.use("/api/v1/admin/dashboard/case-studies", adminCaseStudiesDashboardRoute);
 
@@ -218,7 +221,7 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
 
 setInterval(() => {
   getAllNotApprovedMentorsListAdminDashboard();// need to change the time interval according to the requirement
-}, 86400 * 1000);
+}, 43200 * 1000);
 
 // Start server
 app.listen(port, () => {

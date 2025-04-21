@@ -105,7 +105,7 @@ SELECT
     mba.mentor_booking_time,
     mba.mentor_session_status,
     mba.mentor_booking_confirmed,
-    mentee.mentee_profile,
+    mentee.mentee_profile_pic_url,
     mentee.mentee_type,
     uma.user_firstname as mentee_firstname,
     uma.user_lastname as mentee_lastname,
