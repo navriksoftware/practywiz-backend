@@ -259,7 +259,7 @@ export async function fetchSingleInternshipPost(req, res, next) {
         }
       });
     });
-  } catch (error) { }
+  } catch (error) {}
 }
 
 export async function fetch10InternshipsInHome(req, res, next) {
@@ -351,8 +351,6 @@ export async function employerProfileSettingUpdate(req, res) {
       organization_linkedin,
     } = fromdata;
 
-
-
     // Connect to the database
     let pool = await sql.connect(config);
     let request = pool.request();
@@ -404,4 +402,57 @@ export async function employerProfileSettingUpdate(req, res) {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
+}
+
+export async function internshipStatusChange(req, res) {
+  const { status, id } = req.body;
+  console.log("This is internship status", status);
+  console.log("user id is ", id);
+
+  return res
+    .status(200)
+    .json({ success: "Status has been changed Successfully" });
+  // return res.status(400).json({ error: "something went wrong" });
+}
+
+export async function EditInternshipPost(req, res) {
+  const {
+    internshipProfile,
+    internshipType,
+    internshipOpening,
+    partFullTime,
+    StartTimeFrom,
+    endTimeTo,
+    internshipPostTimezone,
+    InternshipLocation,
+    internshipStart,
+    internshipDuration,
+    internshipStipendType,
+    stipendCurrencyType,
+    stipendAmount,
+    stipendTime,
+    internshipPPOcheckbox,
+    internshipRequirementsDeatils,
+    internshipResponsibilities,
+    supervisionType,
+    internshipSatrtBy,
+    employer_internship_post_support,
+    employer_internship_post_project,
+    employer_internship_post_contribution,
+    taskCategory,
+    businessObjective,
+    projectPlan,
+  } = req.body.payload;
+  const {
+    internshipPostId,
+    employerUserDtlsId,
+    internshipSkills,
+    internshipPerks,
+    internshipDomain,
+    employerOrgDtlsId,
+  } = req.body;
+
+  console.log("body data", req.body.payload);
+
+  return res.status(200).json({ success: "Post Edited Successfully" });
 }
