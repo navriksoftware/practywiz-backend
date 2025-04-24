@@ -1,7 +1,12 @@
 import express from "express";
-import { CreateClass,fetchFacultyclassDetails,fetchFacultyDetailsDashboard, fetchFacultySingleclassDetails,BulkMenteeRegistration } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
-
-
+import {
+  CreateClass,
+  fetchFacultyclassDetails,
+  fetchFacultyDetailsDashboard,
+  fetchFacultySingleclassDetails,
+  BulkMenteeRegistration,
+  fetchStudentListofClass,
+} from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
 const router = express.Router();
 
@@ -24,11 +29,12 @@ router.post("/class/singledetail", fetchFacultySingleclassDetails);
 // Route to update existing class details
 router.post("/class/update", CreateClass);
 
+router.post("/class/studentlist", fetchStudentListofClass);
+
 // ==================== Notification Routes ====================
 
 // Route to get bulk-register-mentees/student by faculty
 router.post("/bulk-register-mentees", BulkMenteeRegistration);
-
 
 // ==================== Case Study Routes ====================
 
@@ -38,18 +44,14 @@ router.post("/case-study/list", CreateClass);
 // Route to add a non-Practiwiz case study
 router.post("/case-study/add-external", CreateClass);
 
-
 // ==================== Profile Routes ====================
 
 // Route to update or fetch mentor profile details
 router.post("/profile/details", CreateClass);
 
-
 // ==================== Notification Routes ====================
 
 // Route to get dashboard notifications
 router.post("/notifications", CreateClass);
-
-
 
 export default router;

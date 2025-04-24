@@ -1,4 +1,3 @@
-
 export const createClassQuery = `INSERT INTO [dbo].[class_dtls]
 (
     [class_name],
@@ -60,7 +59,6 @@ ON
 WHERE 
     u.[user_dtls_id] = @FacultyUserId`;
 
-
 export const fetchFacultyClassQuery = `SELECT 
     
       [class_dtls_id],
@@ -94,3 +92,46 @@ FROM
 
 WHERE 
     [class_dtls_id] = @single_classId`;
+
+export const MenteeRegisterByFacultyQuery = `
+          INSERT INTO [dbo].[mentee_dtls] (
+            [mentee_user_dtls_id],
+            [mentee_about],
+            [mentee_skills],
+            [mentee_gender],
+            [mentee_type],
+            [mentee_profile_pic_url],
+            [mentee_institute_details],
+            [mentee_roll_no]
+        ) OUTPUT INSERTED.mentee_dtls_id VALUES (
+            @menteeUserDtlsId,
+            @menteeAbout,
+            @menteeSkills,
+            @menteeGender,
+            @menteeType,
+            @menteeProfilePic,
+            @menteeInstitute,
+            @menteeRollNumber
+        );
+`;
+
+export const fetchStudentListofClassQuery = `
+SELECT 
+     u.[user_dtls_id],
+     u.[user_email],
+     u.[user_firstname],
+     u.[user_lastname],
+     u.[user_phone_number],
+     m.[mentee_dtls_id],
+     m.[mentee_about],
+     m.[mentee_skills],
+     m.[mentee_gender],
+     m.[mentee_profile_pic_url],
+     m.[mentee_institute_details],
+     m.[mentee_roll_no],
+     m.[mentee_institute_code]
+FROM [dbo].[class_mentee_mapping] cm
+JOIN [dbo].[mentee_dtls] m ON cm.[mentee_dtls_id] = m.[mentee_dtls_id]
+JOIN [dbo].[users_dtls] u ON m.[mentee_user_dtls_id] = u.[user_dtls_id]
+WHERE cm.[class_dtls_id] = @classId
+`;
