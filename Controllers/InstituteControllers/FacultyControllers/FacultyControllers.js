@@ -352,7 +352,7 @@ import {
   createClassQuery,
   fetchFacultyClassQuery,
   fetchFacultySingleClassQuery,
-  fetchFacultySingleDashboardQuery,
+  fetchFacultySingleDashboardQuery, fetchFacultySingleClassUpdateQuery,
   fetchStudentListofClassQuery,
   MenteeRegisterByFacultyQuery,
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
@@ -1077,6 +1077,46 @@ export async function BulkMenteeRegistration(req, res, next) {
     return res.status(500).json({ error: "Failed to process student data" });
   }
 }
+
+export async function UpdateclassDetails(req, res, next) {
+  const { singleClassId, formData } = req.body;
+  const { Name,
+    SubjectCode,
+    SubjectName,
+    SemisterEnd,
+    } = formData;
+
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) {
+        console.log(err.message);
+        return res.json({ error: err.message });
+      }
+      const request = new sql.Request();
+      request.input("single_ClassId", sql.Int, singleClassId);
+      request.input("class_name", sql.VarChar, Name);
+      request.input("class_subject", sql.VarChar, SubjectName);
+      request.input("class_subject_code", sql.VarChar, SubjectCode);
+      request.input("class_sem_end_date", sql.Date, SemisterEnd);
+      
+
+      request.query(fetchFacultySingleClassUpdateQuery, (err, result) => {
+        if (err) return res.json({ error: err.message });
+        if (result) {
+          return res.status(200).json({
+            success: true,
+            message: "Class updated successfully",
+          });
+        }
+      });
+    });
+  } catch (error) {  return res.status(500).json({
+    success: false,
+    message: "Error updating class",
+    error: error.message,
+  });}
+}
+
 
 // Handle cleanup when the process exits
 process.on("exit", () => {

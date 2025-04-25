@@ -93,6 +93,18 @@ FROM
 WHERE 
     [class_dtls_id] = @single_classId`;
 
+
+export const fetchFacultySingleClassUpdateQuery = `UPDATE [dbo].[class_dtls]
+SET 
+    [class_name] = @class_name,
+    [class_subject] = @class_subject,
+    [class_subject_code] = @class_subject_code,
+    [class_sem_end_date] = @class_sem_end_date,
+    [class_dtls_update_date] = GETDATE()
+    
+WHERE 
+    [class_dtls_id] = @single_ClassId`;
+
 export const MenteeRegisterByFacultyQuery = `
           INSERT INTO [dbo].[mentee_dtls] (
             [mentee_user_dtls_id],

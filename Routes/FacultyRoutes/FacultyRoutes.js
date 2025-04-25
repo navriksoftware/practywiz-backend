@@ -4,7 +4,7 @@ import {
   fetchFacultyclassDetails,
   fetchFacultyDetailsDashboard,
   fetchFacultySingleclassDetails,
-  BulkMenteeRegistration,
+  BulkMenteeRegistration, UpdateclassDetails,
   fetchStudentListofClass,
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
@@ -27,7 +27,7 @@ router.post("/class/get", fetchFacultyclassDetails);
 router.post("/class/singledetail", fetchFacultySingleclassDetails);
 
 // Route to update existing class details
-router.post("/class/update", CreateClass);
+router.post("/class/singledetail-Update", UpdateclassDetails);
 
 router.post("/class/studentlist", fetchStudentListofClass);
 
@@ -39,7 +39,7 @@ router.post("/bulk-register-mentees", BulkMenteeRegistration);
 // ==================== Case Study Routes ====================
 
 // Route to fetch available case studies (Practiwiz and others)
-router.post("/case-study/list", CreateClass);
+// router.post("/case-study/list", fetchAvailableCaseStudiesForfaculty);
 
 // Route to add a non-Practiwiz case study
 router.post("/case-study/add-external", CreateClass);

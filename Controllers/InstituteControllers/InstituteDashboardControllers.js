@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import { sendEmail } from "../../Middleware/AllFunctions.js";
 import moment from "moment";
 import { InsertNotificationHandler } from "../../Middleware/NotificationFunction.js";
-import { fetchfacultyDetailsDashboardQuery, fetchInstituteSingleDashboardQuery,fetchSinglefacultyDetailsQuery } from "../../SQLQueries/Institute/InstituteDashboardSqlQueries.js";
+import { fetchCaseStudiesListForInstituteQuery, fetchfacultyDetailsDashboardQuery, fetchInstituteSingleDashboardQuery,fetchSinglefacultyDetailsQuery } from "../../SQLQueries/Institute/InstituteDashboardSqlQueries.js";
 dotenv.config();
 
 export async function fetchInstituteDetailsDashboard(req, res, next) {
@@ -59,6 +59,25 @@ export async function fetchInstituteSingleFacultyDetails(req, res, next) {
       const request = new sql.Request();
       request.input("faculty_id", sql.Int, facultyid);
       request.query(fetchSinglefacultyDetailsQuery, (err, result) => {
+        if (err) return res.json({ error: err.message });
+        if (result) {
+          return res.json({ success: result.recordset });
+        }
+      });
+    });
+  } catch (error) {}
+}
+export async function fetchCaseStudiesListInstitute(req, res, next) {
+  const { instituteId } = req.body;
+   try {
+    sql.connect(config, (err, db) => {
+      if (err) {
+        console.log(err.message);
+        return res.json({ error: err.message });
+      }
+      const request = new sql.Request();
+      request.input("institute_Id", sql.Int, instituteId);
+      request.query(fetchCaseStudiesListForInstituteQuery, (err, result) => {
         if (err) return res.json({ error: err.message });
         if (result) {
           return res.json({ success: result.recordset });
