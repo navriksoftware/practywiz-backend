@@ -147,5 +147,4 @@ INNER JOIN
     ON a.institute_case_assign_case_study_id = b.case_study_id
 WHERE 
     a.institute_case_assign_institute_dtls_id = @institute_Id;
-
 `;

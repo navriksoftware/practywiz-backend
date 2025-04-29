@@ -6,6 +6,7 @@ import {
   fetchFacultySingleclassDetails,
   BulkMenteeRegistration, UpdateclassDetails,
   fetchStudentListofClass,
+  fetchAvailableCaseStudiesForfaculty
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
 const router = express.Router();
@@ -39,7 +40,7 @@ router.post("/bulk-register-mentees", BulkMenteeRegistration);
 // ==================== Case Study Routes ====================
 
 // Route to fetch available case studies (Practiwiz and others)
-// router.post("/case-study/list", fetchAvailableCaseStudiesForfaculty);
+router.post("/case-study/list", fetchAvailableCaseStudiesForfaculty);
 
 // Route to add a non-Practiwiz case study
 router.post("/case-study/add-external", CreateClass);

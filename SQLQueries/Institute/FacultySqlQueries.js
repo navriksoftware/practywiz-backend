@@ -147,3 +147,35 @@ JOIN [dbo].[mentee_dtls] m ON cm.[mentee_dtls_id] = m.[mentee_dtls_id]
 JOIN [dbo].[users_dtls] u ON m.[mentee_user_dtls_id] = u.[user_dtls_id]
 WHERE cm.[class_dtls_id] = @classId
 `;
+
+export const AvailableCaseStudiesForfacultyQuery = `SELECT 
+    a.institute_case_assign_dtls_id,
+    a.institute_case_assign_institute_dtls_id,
+    a.institute_case_assign_case_study_id,
+    a.institute_case_assign_faculty_dtls_id,
+    a.institute_case_assign_cr_date,
+    a.institute_case_assign_update_date,
+    
+    b.case_study_title,
+    b.case_study_categories,
+    b.case_study_lesson,
+    b.case_study_future_skills,
+    b.case_study_num_characters,
+    b.case_study_roles,
+    b.case_study_main_character_role,
+    b.case_study_challenge,
+    b.case_study_content,
+    b.case_study_questions,
+    b.case_study_video_link,
+    b.case_study_image_link,
+    b.case_study_price,
+    b.case_study_rating
+
+FROM 
+    dbo.institute_case_assign_dtls AS a
+INNER JOIN 
+    dbo.case_study_details AS b
+    ON a.institute_case_assign_case_study_id = b.case_study_id
+WHERE 
+    a.institute_case_assign_faculty_dtls_id = @faculty_Id;
+`;

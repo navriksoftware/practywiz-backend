@@ -355,6 +355,7 @@ import {
   fetchFacultySingleDashboardQuery, fetchFacultySingleClassUpdateQuery,
   fetchStudentListofClassQuery,
   MenteeRegisterByFacultyQuery,
+  AvailableCaseStudiesForfacultyQuery,
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -1116,6 +1117,33 @@ export async function UpdateclassDetails(req, res, next) {
     error: error.message,
   });}
 }
+
+
+export async function fetchAvailableCaseStudiesForfaculty(req, res, next) {
+  const {facultyId} = req.body;
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) {
+        console.log(err.message);
+        return res.json({ error: err.message });
+      }
+      const request = new sql.Request();
+      request.input("faculty_Id", sql.Int, facultyId);
+      request.query(AvailableCaseStudiesForfacultyQuery, (err, result) => {
+        if (err) return res.json({ error: err.message });
+        if (result) {
+          return res.json({ success: result.recordset });
+        }
+      });
+    });
+  } catch (error) {  return res.status(500).json({
+    success: false,
+    message: "Error updating class",
+    error: error.message,
+  });}
+}
+
+
 
 
 // Handle cleanup when the process exits
