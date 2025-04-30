@@ -356,6 +356,8 @@ import {
   fetchStudentListofClassQuery,
   MenteeRegisterByFacultyQuery,
   AvailableCaseStudiesForfacultyQuery,
+  insertNonPractywizCaseStudyQuery,
+  getNonPractywizCaseStudiesByFacultyQuery
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -1142,6 +1144,61 @@ export async function fetchAvailableCaseStudiesForfaculty(req, res, next) {
     error: error.message,
   });}
 }
+
+// Add Non-Practywiz Case Study
+export async function addNonPractywizCaseStudy(req, res) {
+  try {
+    const { title, author, category, questions, facultyId } = req.body;
+
+    // Input validation
+    if (!title || !author || !category || !questions || !facultyId) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    await poolConnect;
+    const request = pool.request();
+    request.input("title", sql.VarChar(255), title);
+    request.input("author", sql.VarChar(255), author);
+    request.input("category", sql.VarChar(255), category);
+    request.input("questions", sql.Text, JSON.stringify(questions));
+    request.input("facultyId", sql.Int, facultyId);
+
+    await request.query(insertNonPractywizCaseStudyQuery);
+
+    return res.status(200).json({ message: "Case study added successfully" });
+  } catch (error) {
+    console.error("Error in addNonPractywizCaseStudy:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+// Get Non-Practywiz Case Studies by Faculty
+export async function getNonPractywizCaseStudiesByFaculty(req, res) {
+  try {
+    const { facultyId } = req.body;
+    if (!facultyId) {
+      return res.status(400).json({ error: "facultyId is required" });
+    }
+
+    await poolConnect;
+    const request = pool.request();
+    request.input("facultyId", sql.Int, facultyId);
+
+    const result = await request.query(getNonPractywizCaseStudiesByFacultyQuery);
+
+    // Parse questions JSON for each record
+    const caseStudies = result.recordset.map(cs => ({
+      ...cs,
+      non_practywiz_case_question: JSON.parse(cs.non_practywiz_case_question)
+    }));
+
+    return res.status(200).json({ success: caseStudies });
+  } catch (error) {
+    console.error("Error in getNonPractywizCaseStudiesByFaculty:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 
 
 

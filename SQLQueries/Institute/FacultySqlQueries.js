@@ -179,3 +179,17 @@ INNER JOIN
 WHERE 
     a.institute_case_assign_faculty_dtls_id = @faculty_Id;
 `;
+
+
+export const insertNonPractywizCaseStudyQuery = `
+  INSERT INTO non_practywiz_case_dtls
+    (non_practywiz_case_title, non_practywiz_case_author, non_practywiz_case_category, non_practywiz_case_question, non_practywiz_case_faculty_dtls_id)
+  VALUES
+    (@title, @author, @category, @questions, @facultyId)
+`;
+
+export const getNonPractywizCaseStudiesByFacultyQuery = `
+  SELECT * FROM non_practywiz_case_dtls
+  WHERE non_practywiz_case_faculty_dtls_id = @facultyId
+  ORDER BY non_practywiz_case_cr_date DESC
+`;
