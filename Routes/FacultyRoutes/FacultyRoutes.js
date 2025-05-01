@@ -6,7 +6,9 @@ import {
   fetchFacultySingleclassDetails,
   BulkMenteeRegistration, UpdateclassDetails,
   fetchStudentListofClass,
-  fetchAvailableCaseStudiesForfaculty,
+  fetchAvailableCaseStudiesForfaculty, getCaseStudyData,
+  getClassListData
+  , fetchStudentListofClasses,assignCaseStudyToClass,
   addNonPractywizCaseStudy,
   getNonPractywizCaseStudiesByFaculty
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
@@ -55,10 +57,15 @@ router.post("/case-study/add-non-practywiz-case", addNonPractywizCaseStudy);
 router.post("/case-study/list-non-practywiz-case", getNonPractywizCaseStudiesByFaculty);
 
 
-// ==================== Profile Routes ====================
+// Route to get the data of signle case by id  case study 
+router.post("/case-studies/fetch-caseData", getCaseStudyData);
+// Route to get the data of classlist by id  of faculty
+router.post("/case-studies/fetch-classlist", getClassListData);
+// Route to get the data of  class student by id  of classid
+router.post("/Student/fetch-student", fetchStudentListofClasses);
+// Route to assign a case study to a class by faculty
+router.post("/case-study/assign-case-study", assignCaseStudyToClass);
 
-// Route to update or fetch mentor profile details
-router.post("/profile/details", CreateClass);
 
 // ==================== Notification Routes ====================
 

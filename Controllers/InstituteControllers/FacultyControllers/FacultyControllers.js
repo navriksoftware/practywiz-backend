@@ -357,7 +357,11 @@ import {
   MenteeRegisterByFacultyQuery,
   AvailableCaseStudiesForfacultyQuery,
   insertNonPractywizCaseStudyQuery,
-  getNonPractywizCaseStudiesByFacultyQuery
+  getNonPractywizCaseStudiesByFacultyQuery,
+  fetchCaseStudyClassDataQuery,
+  fetchClassListDataQuery,
+  fetchStudentListDataQuery,
+  assignCaseStudyToClassQuery
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -1087,7 +1091,7 @@ export async function UpdateclassDetails(req, res, next) {
     SubjectCode,
     SubjectName,
     SemisterEnd,
-    } = formData;
+  } = formData;
 
   try {
     sql.connect(config, (err, db) => {
@@ -1101,7 +1105,7 @@ export async function UpdateclassDetails(req, res, next) {
       request.input("class_subject", sql.VarChar, SubjectName);
       request.input("class_subject_code", sql.VarChar, SubjectCode);
       request.input("class_sem_end_date", sql.Date, SemisterEnd);
-      
+
 
       request.query(fetchFacultySingleClassUpdateQuery, (err, result) => {
         if (err) return res.json({ error: err.message });
@@ -1113,16 +1117,18 @@ export async function UpdateclassDetails(req, res, next) {
         }
       });
     });
-  } catch (error) {  return res.status(500).json({
-    success: false,
-    message: "Error updating class",
-    error: error.message,
-  });}
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error updating class",
+      error: error.message,
+    });
+  }
 }
 
 
 export async function fetchAvailableCaseStudiesForfaculty(req, res, next) {
-  const {facultyId} = req.body;
+  const { facultyId } = req.body;
   try {
     sql.connect(config, (err, db) => {
       if (err) {
@@ -1138,13 +1144,174 @@ export async function fetchAvailableCaseStudiesForfaculty(req, res, next) {
         }
       });
     });
-  } catch (error) {  return res.status(500).json({
-    success: false,
-    message: "Error updating class",
-    error: error.message,
-  });}
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error updating class",
+      error: error.message,
+    });
+  }
 }
+export async function getCaseStudyData(req, res, next) {
+  const { caseStudyId } = req.body;
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) {
+        console.log(err.message);
+        return res.json({ error: err.message });
+      }
+      const request = new sql.Request();
+      request.input("caseStudy_Id", sql.Int, caseStudyId);
+      request.query(fetchCaseStudyClassDataQuery, (err, result) => {
+        if (err) return res.json({ error: err.message });
+        if (result) {
+          return res.json({ success: result.recordset });
+        }
+      });
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error updating class",
+      error: error.message,
+    });
+  }
+}
+export async function getClassListData(req, res, next) {
+  const { facultyID } = req.body;
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) {
+        console.log(err.message);
+        return res.json({ error: err.message });
+      }
+      const request = new sql.Request();
+      request.input("faculty_Id", sql.Int, facultyID);
+      request.query(fetchClassListDataQuery, (err, result) => {
+        if (err) return res.json({ error: err.message });
+        if (result) {
+          return res.json({ success: result.recordset });
+        }
+      });
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error updating class",
+      error: error.message,
+    });
+  }
+}
+export async function fetchStudentListofClasses(req, res, next) {
+  const { selectedClasses } = req.body; // Expecting an array like ["101", "102", "103"]
 
+  if (!Array.isArray(selectedClasses) || selectedClasses.length === 0) {
+    return res.status(400).json({ error: "selectedClasses must be a non-empty array" });
+  }
+
+  try {
+    sql.connect(config, async (err, db) => {
+      if (err) {
+        console.log(err.message);
+        return res.status(500).json({ error: err.message });
+      }
+
+      let allStudents = [];
+
+      // Loop over selectedClasses and fetch data for each
+      for (const classId of selectedClasses) {
+        const request = new sql.Request();
+        request.input("class_id", sql.Int, classId);
+
+        try {
+          const result = await request.query(fetchStudentListDataQuery);
+
+          if (result?.recordset?.length) {
+            allStudents = allStudents.concat(result.recordset);
+          }
+        } catch (queryErr) {
+          console.log(`Error fetching for classId ${classId}:`, queryErr.message);
+        }
+      }
+
+      return res.status(200).json({ success: allStudents });
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching student list",
+      error: error.message,
+    });
+  }
+}
+export async function assignCaseStudyToClass(req, res, next) {
+  const {
+    caseStudyId,
+    facultyID,
+    selectedClasses,
+    startDateTime,
+    deadline,
+    factTiming,
+    analysisTiming,
+    classStart,
+    classEnd,
+    factQuestions,
+    analysisQuestions,
+    questionType,
+    owned_by
+  } = req.body;
+ console.log("Assigning case study to classes:", req.body);
+  if (!Array.isArray(selectedClasses) || selectedClasses.length === 0) {
+    return res
+      .status(400)
+      .json({ success: false, message: "selectedClasses must be a non-empty array" });
+  }
+
+  try {
+    // Ensure DB connection
+     sql.connect(config);
+
+    const allResults = [];
+
+    for (const classId of selectedClasses) {
+      const request = new sql.Request();
+
+      request.input("class_id", sql.Int, parseInt(classId));
+      request.input("caseStudy_Id", sql.Int, parseInt(caseStudyId));
+      request.input("faculty_Id", sql.Int, facultyID);
+      request.input("startDateTime", sql.DateTime, startDateTime);
+      request.input("deadline", sql.DateTime, deadline);
+      request.input("factTiming", sql.Int, parseInt(factTiming));
+      request.input("analysisTiming", sql.Int, parseInt(analysisTiming));
+      request.input("classStart", sql.DateTime, classStart);
+      request.input("classEnd", sql.DateTime, classEnd);
+      request.input("factQuestions", sql.Int, parseInt(factQuestions));
+      request.input("analysisQuestions", sql.Int, parseInt(analysisQuestions));
+      request.input("questionType", sql.Bit, parseInt(questionType));
+      request.input("owned_by_who", sql.Bit, parseInt(owned_by)); // Assuming owned_by is a string
+      try {
+        const result = await request.query(assignCaseStudyToClassQuery);
+        allResults.push({ classId, data: result.recordset });
+      } catch (queryErr) {
+        console.error(`Query error for classId ${classId}:`, queryErr.message);
+        allResults.push({ classId, error: queryErr.message });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Case study assigned to all selected classes",
+      results: allResults,
+    });
+  } catch (error) {
+    console.error("DB Error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Error assigning case study",
+      error: error.message,
+    });
+  }
+}
 // Add Non-Practywiz Case Study
 export async function addNonPractywizCaseStudy(req, res) {
   try {
@@ -1198,6 +1365,7 @@ export async function getNonPractywizCaseStudiesByFaculty(req, res) {
     return res.status(500).json({ error: error.message });
   }
 }
+
 
 
 

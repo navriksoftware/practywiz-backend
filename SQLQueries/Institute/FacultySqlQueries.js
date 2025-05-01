@@ -180,6 +180,117 @@ WHERE
     a.institute_case_assign_faculty_dtls_id = @faculty_Id;
 `;
 
+export const fetchCaseStudyClassDataQuery = `SELECT 
+   
+    cs.[case_study_id],
+    cs.[case_study_categories],
+    cs.[case_study_title],
+    cs.[case_study_lesson],
+    cs.[case_study_future_skills],
+    cs.[case_study_num_characters],
+    cs.[case_study_roles],
+    cs.[case_study_main_character_role],
+    cs.[case_study_challenge],
+    cs.[case_study_content],
+    cs.[case_study_questions],
+    cs.[case_study_video_link],
+    cs.[case_study_image_link],
+    cs.[case_study_price],
+    cs.[case_study_rating]
+FROM 
+   
+    [dbo].[case_study_details] cs
+WHERE 
+   
+    cs.[case_study_id] = @caseStudy_Id;
+`;
+export const fetchClassListDataQuery = `SELECT
+    c.[class_dtls_id],
+    c.[class_name],
+    c.[class_subject],
+    c.[class_subject_code],
+    c.[class_sem_end_date],
+    c.[class_faculty_dtls_id],
+    c.[class_dtls_cr_date],
+    c.[class_dtls_update_date],
+    c.[class_status]
+FROM
+
+    [dbo].[class_dtls] c    
+WHERE
+    c.[class_faculty_dtls_id] = @faculty_Id
+    
+   `;
+export const fetchStudentListDataQuery = `SELECT
+  cm.class_dtls_id,
+  cd.class_name,
+  cd.class_subject,
+  cd.class_subject_code,
+  cd.class_faculty_dtls_id,
+
+  m.mentee_dtls_id,
+  m.mentee_about,
+  m.mentee_skills,
+  m.mentee_gender,
+  m.mentee_type,
+  m.mentee_profile_pic_url,
+  m.mentee_institute_details,
+  m.mentee_language,
+  m.mentee_roll_no,
+
+  u.user_dtls_id,
+  u.user_firstname,
+  u.user_lastname,
+  u.user_email,
+  u.user_phone_number
+
+FROM class_mentee_mapping cm
+JOIN mentee_dtls m ON cm.mentee_dtls_id = m.mentee_dtls_id
+JOIN users_dtls u ON m.mentee_user_dtls_id = u.user_dtls_id
+JOIN class_dtls cd ON cm.class_dtls_id = cd.class_dtls_id
+WHERE cm.class_dtls_id =@class_id;
+ 
+
+    
+   `;
+
+export const assignCaseStudyToClassQuery = `
+   Insert into faculty_case_assign_dtls (
+       [faculty_case_assign_faculty_dtls_id]
+       ,[faculty_case_assign_class_dtls_id]
+      ,[faculty_case_assign_case_study_id]
+      ,[faculty_case_assign_start_date]
+      ,[faculty_case_assign_end_date]
+      ,[faculty_case_assign_owned_by_practywiz]
+      ,[faculty_case_assign_fact_question_time]
+      ,[faculty_case_assign_analysis_question_time]
+      ,[faculty_case_assign_class_start_date]
+      ,[faculty_case_assign_class_end_date]
+      ,[faculty_case_assign_fact_question_qty]
+      ,[faculty_case_assign_analysis_question_qty]
+      ,[faculty_case_assign_question_distribution]
+      ,[faculty_case_assign_cr_date]
+      ,faculty_case_assign_update_date
+      ) VALUES(
+       @faculty_Id,
+       @class_id,
+       @caseStudy_Id,
+       @startDateTime,
+       @deadline,
+       @owned_by_who,
+       @factTiming,
+       @analysisTiming,
+       @classStart,
+       @classEnd,
+       @factQuestions,
+       @analysisQuestions,
+       @questionType,
+         GETDATE(),
+         GETDATE()
+       )
+   `;
+
+
 
 export const insertNonPractywizCaseStudyQuery = `
   INSERT INTO non_practywiz_case_dtls
