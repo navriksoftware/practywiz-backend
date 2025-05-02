@@ -10,7 +10,7 @@ import {
   getClassListData
   , fetchStudentListofClasses,assignCaseStudyToClass,
   addNonPractywizCaseStudy,
-  getNonPractywizCaseStudiesByFaculty
+  getNonPractywizCaseStudiesByFaculty,fetchAssignCaseStudiesDetails
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
 const router = express.Router();
@@ -19,6 +19,8 @@ const router = express.Router();
 
 // Route to fetch user dashboard details
 router.post("/dashboard/details", fetchFacultyDetailsDashboard);
+// Route to fetch assigned case Studies
+router.post("/dashboard/get-assigned-cases", fetchAssignCaseStudiesDetails);
 
 // ==================== Class Routes ====================
 

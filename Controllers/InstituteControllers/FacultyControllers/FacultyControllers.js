@@ -1,346 +1,3 @@
-// import bcrypt from "bcrypt";
-// import jwt from "jsonwebtoken";
-// import sql from "mssql";
-// import config from "../../../Config/dbConfig.js";
-// import dotenv from "dotenv";
-// // import { sendEmail } from "../../Middleware/AllFunctions.js";
-// import moment from "moment";
-// import {
-//   createClassQuery,
-//   fetchFacultyClassQuery,
-//   fetchFacultySingleClassQuery,
-//   fetchFacultySingleDashboardQuery,
-//   MenteeRegisterByFacultyQuery,
-// } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
-// import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
-
-// dotenv.config();
-
-// export async function fetchFacultyDetailsDashboard(req, res, next) {
-//   const { FacultyUserId } = req.body;
-//   console.log(FacultyUserId);
-//   try {
-//     sql.connect(config, (err, db) => {
-//       if (err) {
-//         console.log(err.message);
-//         return res.json({ error: err.message });
-//       }
-//       const request = new sql.Request();
-//       request.input("FacultyUserId", sql.Int, FacultyUserId);
-//       request.query(fetchFacultySingleDashboardQuery, (err, result) => {
-//         if (err) return res.json({ error: err.message });
-//         if (result) {
-//           return res.status(200).json({ success: result.recordset });
-//         }
-//       });
-//     });
-//   } catch (error) {}
-// }
-// export async function CreateClass(req, res) {
-//   console.log("CreateClass API called");
-//   const { Name, SubjectCode, SubjectName, SemisterEnd, facultyId } = req.body;
-//   console.log("Request body:", req.body);
-
-//   try {
-//     sql.connect(config, (err, db) => {
-//       if (err) {
-//         return res.json({
-//           error: err.message,
-//         });
-//       }
-//       if (db) {
-//         const request = new sql.Request();
-//         request.input("class_name", sql.VarChar, Name);
-//         request.input("subject_code", sql.VarChar, SubjectCode);
-//         request.input("subject_name", sql.VarChar, SubjectName);
-//         request.input("semister_end", sql.Date, SemisterEnd);
-//         request.input("faculty_id", sql.Int, facultyId);
-
-//         request.query(createClassQuery, (err, result) => {
-//           if (err) {
-//             console.log("Error in query execution:", err);
-//             return res.json({
-//               error: err.message,
-//             });
-//           } else {
-//             console.log("Class created successfully:", result);
-//             return res.status(200).json({
-//               message: "Class created successfully",
-//             });
-//           }
-//         });
-//       }
-//     });
-//   } catch (error) {
-//     return res.json({
-//       error: error.message,
-//     });
-//   }
-// }
-
-// export async function fetchFacultyclassDetails(req, res, next) {
-//   const { FacultyUserId } = req.body;
-//   console.log(FacultyUserId);
-//   try {
-//     sql.connect(config, (err, db) => {
-//       if (err) {
-//         console.log(err.message);
-//         return res.json({ error: err.message });
-//       }
-//       const request = new sql.Request();
-//       request.input("FacultyUserId", sql.Int, FacultyUserId);
-//       request.query(fetchFacultyClassQuery, (err, result) => {
-//         if (err) return res.json({ error: err.message });
-//         if (result) {
-//           return res.status(200).json({ success: result.recordset });
-//         }
-//       });
-//     });
-//   } catch (error) {}
-// }
-// export async function fetchFacultySingleclassDetails(req, res, next) {
-//   const { singleClassId } = req.body;
-//   console.log(singleClassId);
-//   try {
-//     sql.connect(config, (err, db) => {
-//       if (err) {
-//         console.log(err.message);
-//         return res.json({ error: err.message });
-//       }
-//       const request = new sql.Request();
-//       request.input("single_classId", sql.Int, singleClassId);
-//       request.query(fetchFacultySingleClassQuery, (err, result) => {
-//         if (err) return res.json({ error: err.message });
-//         if (result) {
-//           return res.status(200).json({ success: result.recordset });
-//         }
-//       });
-//     });
-//   } catch (error) {}
-// }
-
-// // Bulk registration of mentees
-// export async function BulkMenteeRegistration(req, res, next) {
-//   try {
-//     // Get JSON data from request body
-//     const { students, instituteName, classId } = req.body;
-
-//     if (!students || !Array.isArray(students) || students.length === 0) {
-//       return res
-//         .status(400)
-//         .json({ error: "No student data provided or invalid format" });
-//     }
-//     if (!classId) {
-//       return res.status(400).json({ error: "Class ID is required" });
-//     }
-//     console.log("BulkMenteeRegistration API called", students, instituteName);
-
-//     // Connect to SQL server
-//     const pool = await sql.connect(config);
-
-//     // Track registration results
-//     const results = {
-//       successful: [],
-//       failed: [],
-//     };
-
-//     // Process each student record
-//     for (const student of students) {
-//       // Create a transaction for each student
-//       const transaction = new sql.Transaction(pool);
-
-//       try {
-//         // Start transaction
-//         await transaction.begin();
-
-//         // Extract student data from JSON
-//         const rollNumber = student["Roll Number"];
-//         const fullName = student["Name"];
-//         // Split full name into first and last name
-//         const nameParts = fullName.split(" ");
-//         const firstName = nameParts[0];
-//         const lastName =
-//           nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
-//         const email = student["Email Id"];
-//         const phoneNumber = student["Phone Number"].toString();
-
-//         // Create default password (firstname@1234)
-//         const defaultPassword = `${firstName.charAt(0).toUpperCase()}${firstName
-//           .slice(1)
-//           .toLowerCase()}@1234`;
-
-//         // Check if email already exists
-//         const checkEmailRequest = new sql.Request(transaction);
-//         checkEmailRequest.input("email", sql.VarChar, email.toLowerCase());
-//         const emailCheckResult = await checkEmailRequest.query(
-//           "select user_email from users_dtls where user_email = @email"
-//         );
-
-//         if (emailCheckResult.recordset.length > 0) {
-//           results.failed.push({
-//             rollNumber,
-//             name: fullName,
-//             email,
-//             reason: "Email already exists",
-//           });
-//           await transaction.rollback();
-//           continue;
-//         }
-
-//         // Hash password
-//         const saltRounds = await bcrypt.genSalt(12);
-//         const hashedPassword = await bcrypt.hash(defaultPassword, saltRounds);
-
-//         // Prepare mentee data
-//         const timestamp = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
-//         const menteeInstituteDetails = [
-//           {
-//             mentee_courseName: "",
-//             mentee_instituteName: instituteName || "",
-//             mentee_institute_End_Year: "",
-//             mentee_institute_Start_Year: "",
-//             mentee_institute_location: "",
-//           },
-//         ];
-
-//         // Insert user details - Using transaction
-//         const userRequest = new sql.Request(transaction);
-//         userRequest.input("user_email", sql.VarChar, email.toLowerCase());
-//         userRequest.input("user_pwd", sql.VarChar, hashedPassword);
-//         userRequest.input("user_firstname", sql.VarChar, firstName);
-//         userRequest.input("user_lastname", sql.VarChar, lastName);
-//         userRequest.input("user_phone_number", sql.VarChar, phoneNumber);
-//         userRequest.input("user_status", sql.VarChar, "1");
-//         userRequest.input("user_modified_by", sql.VarChar, "Admin");
-//         userRequest.input("user_type", sql.VarChar, "mentee");
-//         userRequest.input("user_is_superadmin", sql.VarChar, "0");
-//         userRequest.input("user_logindate", sql.Date, timestamp);
-//         userRequest.input("user_logintime", sql.Date, timestamp);
-//         userRequest.input("user_token", sql.VarChar, "");
-
-//         const userResult = await userRequest.query(userDtlsQuery);
-
-//         if (
-//           userResult &&
-//           userResult.recordset &&
-//           userResult.recordset.length > 0
-//         ) {
-//           const userDtlsId = userResult.recordset[0].user_dtls_id;
-//           console.log("User details inserted successfully:", userDtlsId);
-
-//           // Insert mentee details - Using transaction
-//           const menteeRequest = new sql.Request(transaction);
-//           menteeRequest.input("menteeUserDtlsId", sql.Int, userDtlsId);
-//           menteeRequest.input("menteeAbout", sql.VarChar, "");
-//           menteeRequest.input("menteeSkills", sql.Text, "[]");
-//           menteeRequest.input("menteeGender", sql.VarChar, "");
-//           menteeRequest.input("menteeType", sql.VarChar, "Student");
-//           menteeRequest.input(
-//             "menteeProfilePic",
-//             sql.VarChar,
-//             "https://practiwizstorage.blob.core.windows.net/practiwizcontainer/blue-circle-with-white-user_78370-4707.webp"
-//           );
-//           menteeRequest.input(
-//             "menteeInstitute",
-//             sql.Text,
-//             JSON.stringify(menteeInstituteDetails)
-//           );
-//           menteeRequest.input("menteeRollNumber", sql.VarChar, rollNumber);
-
-//           const menteeResult = await menteeRequest.query(
-//             MenteeRegisterByFacultyQuery
-//           );
-//           if (
-//             menteeResult &&
-//             menteeResult.recordset &&
-//             menteeResult.recordset.length > 0
-//           ) {
-//             const menteeDtlsId = menteeResult.recordset[0].mentee_dtls_id;
-//             console.log(
-//               "Mentee details inserted successfully:",
-//               menteeResult.recordset[0].mentee_dtls_id
-//             );
-
-//             // Insert mentee-class mapping - Using transaction
-//             const menteeClassRequest = new sql.Request(transaction);
-//             menteeClassRequest.input("menteeId", sql.Int, menteeDtlsId);
-//             menteeClassRequest.input("classId", sql.Int, classId);
-//             await menteeClassRequest.query(
-//               `INSERT INTO [dbo].[class_mentee_mapping] (mentee_dtls_id, class_dtls_id) VALUES (@menteeId, @classId)`
-//             );
-//           }
-//           // If we've reached here, both operations were successful
-//           // Commit the transaction
-//           await transaction.commit();
-
-//           // Send notifications - outside transaction as these are non-critical
-//           // await InsertNotificationHandler(
-//           //   userDtlsId,
-//           //   SuccessMsg,
-//           //   AccountCreatedHeading,
-//           //   AccountCreatedMessage
-//           // );
-
-//           // // Send email
-//           // const msg = accountCreatedEmailTemplate(
-//           //   email.toLowerCase(),
-//           //   `${firstName} ${lastName}`,
-//           //   defaultPassword
-//           // );
-
-//           // const emailResponse = await sendEmail(msg);
-
-//           // // Send WhatsApp message
-//           // sendWhatsAppMessage(
-//           //   phoneNumber,
-//           //   firstName,
-//           //   "mentee_acct_create_success"
-//           // );
-
-//           results.successful.push({
-//             rollNumber,
-//             name: fullName,
-//             email,
-//             password: defaultPassword,
-//           });
-//         } else {
-//           // User insert didn't return expected results
-//           await transaction.rollback();
-//           throw new Error("Failed to insert user details");
-//         }
-//       } catch (studentError) {
-//         // If any error occurs, roll back the transaction
-//         try {
-//           await transaction.rollback();
-//         } catch (rollbackError) {
-//           console.error("Error during transaction rollback:", rollbackError);
-//         }
-
-//         console.error(
-//           `Error registering student: ${student["Name"]}`,
-//           studentError
-//         );
-//         results.failed.push({
-//           rollNumber: student["Roll Number"],
-//           name: student["Name"],
-//           email: student["Email Id"],
-//           reason: studentError.message,
-//         });
-//       }
-//     }
-
-//     // Return results summary
-//     return res.json({
-//       success: `Successfully registered ${results.successful.length} mentees`,
-//       failed: results.failed.length > 0 ? results.failed : undefined,
-//       registered: results.successful,
-//     });
-//   } catch (error) {
-//     console.error("Bulk registration error:", error);
-//     return res.status(500).json({ error: "Failed to process student data" });
-//   }
-// }
-
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sql from "mssql";
@@ -358,10 +15,12 @@ import {
   AvailableCaseStudiesForfacultyQuery,
   insertNonPractywizCaseStudyQuery,
   getNonPractywizCaseStudiesByFacultyQuery,
-  fetchCaseStudyClassDataQuery,
   fetchClassListDataQuery,
   fetchStudentListDataQuery,
-  assignCaseStudyToClassQuery
+  assignCaseStudyToClassQuery,
+  fetchSingleNonPractywizCaseStudyQuery,
+  fetchSinglePractywizCaseStudyQuery,
+  fetchAssignCaseStudiesDetailsQuery
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -402,6 +61,37 @@ export async function fetchFacultyDetailsDashboard(req, res, next) {
     return res.status(500).json({ error: error.message });
   }
 }
+
+
+export async function fetchAssignCaseStudiesDetails(req, res, next) {
+  const { facultyid } = req.body;
+
+  if (!facultyid) {
+    return res.status(400).json({ error: "FacultyId is required" });
+  }
+
+  try {
+    await poolConnect; // Ensure pool is connected
+
+    const request = pool.request();
+    request.input("FacultyId", sql.Int, facultyid);
+
+    const result = await request.query(fetchAssignCaseStudiesDetailsQuery);
+
+    if (result && result.recordset) {
+      return res.status(200).json({ success: result.recordset });
+    } else {
+      return res.status(404).json({ error: "No data found" });
+    }
+  } catch (error) {
+    console.error("Error in fetchAssignCaseStudiesDetails:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+
+
+
 
 export async function CreateClass(req, res) {
   console.log("CreateClass API called");
@@ -515,249 +205,7 @@ export async function fetchStudentListofClass(req, res, next) {
   }
 }
 
-// Bulk registration of mentees old backup with mentee already exist case not hndled
-// export async function BulkMenteeRegistration(req, res, next) {
-//   try {
-//     // Get JSON data from request body
-//     const { students, instituteName, classId } = req.body;
 
-//     if (!students || !Array.isArray(students) || students.length === 0) {
-//       return res
-//         .status(400)
-//         .json({ error: "No student data provided or invalid format" });
-//     }
-//     if (!classId) {
-//       return res.status(400).json({ error: "Class ID is required" });
-//     }
-//     console.log(
-//       "BulkMenteeRegistration API called with",
-//       students.length,
-//       "students"
-//     );
-
-//     // Connect to SQL server
-//     await poolConnect; // Ensure pool is connected
-
-//     // Track registration results
-//     const results = {
-//       successful: [],
-//       failed: [],
-//     };
-
-//     // Process each student record
-//     for (const student of students) {
-//       // Create a transaction for each student
-//       const transaction = new sql.Transaction(pool);
-
-//       try {
-//         // Start transaction
-//         await transaction.begin();
-
-//         // Extract student data from JSON
-//         const rollNumber = student["Roll Number"];
-//         const fullName = student["Name"];
-
-//         if (!rollNumber || !fullName) {
-//           throw new Error("Missing required student data");
-//         }
-
-//         // Split full name into first and last name
-//         const nameParts = fullName.split(" ");
-//         const firstName = nameParts[0];
-//         const lastName =
-//           nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
-//         const email = student["Email Id"];
-
-//         if (!email) {
-//           throw new Error("Email is required");
-//         }
-
-//         const phoneNumber = student["Phone Number"]
-//           ? student["Phone Number"].toString()
-//           : "";
-
-//         // Create default password (firstname@1234)
-//         const defaultPassword = `${firstName.charAt(0).toUpperCase()}${firstName
-//           .slice(1)
-//           .toLowerCase()}@1234`;
-
-//         // Check if email already exists
-//         const checkEmailRequest = new sql.Request(transaction);
-//         checkEmailRequest.input("email", sql.VarChar, email.toLowerCase());
-//         const emailCheckResult = await checkEmailRequest.query(
-//           "SELECT user_email FROM users_dtls WHERE user_email = @email"
-//         );
-
-//         if (emailCheckResult.recordset.length > 0) {
-//           results.failed.push({
-//             rollNumber,
-//             name: fullName,
-//             email,
-//             reason: "Email already exists",
-//           });
-//           await transaction.rollback();
-//           continue;
-//         }
-
-//         // Hash password
-//         const saltRounds = 12;
-//         const hashedPassword = await bcrypt.hash(defaultPassword, saltRounds);
-
-//         // Prepare mentee data
-//         const timestamp = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
-//         const menteeInstituteDetails = [
-//           {
-//             mentee_courseName: "",
-//             mentee_instituteName: instituteName || "",
-//             mentee_institute_End_Year: "",
-//             mentee_institute_Start_Year: "",
-//             mentee_institute_location: "",
-//           },
-//         ];
-
-//         // Insert user details - Using transaction
-//         const userRequest = new sql.Request(transaction);
-//         userRequest.input("user_email", sql.VarChar, email.toLowerCase());
-//         userRequest.input("user_pwd", sql.VarChar, hashedPassword);
-//         userRequest.input("user_firstname", sql.VarChar, firstName);
-//         userRequest.input("user_lastname", sql.VarChar, lastName);
-//         userRequest.input("user_phone_number", sql.VarChar, phoneNumber);
-//         userRequest.input("user_status", sql.VarChar, "1");
-//         userRequest.input("user_modified_by", sql.VarChar, "Admin");
-//         userRequest.input("user_type", sql.VarChar, "mentee");
-//         userRequest.input("user_is_superadmin", sql.VarChar, "0");
-//         userRequest.input("user_logindate", sql.DateTime, timestamp);
-//         userRequest.input("user_logintime", sql.DateTime, timestamp);
-//         userRequest.input("user_token", sql.VarChar, "");
-
-//         const userResult = await userRequest.query(userDtlsQuery);
-
-//         if (
-//           userResult &&
-//           userResult.recordset &&
-//           userResult.recordset.length > 0
-//         ) {
-//           const userDtlsId = userResult.recordset[0].user_dtls_id;
-//           console.log("User details inserted successfully:", userDtlsId);
-
-//           // Insert mentee details - Using transaction
-//           const menteeRequest = new sql.Request(transaction);
-//           menteeRequest.input("menteeUserDtlsId", sql.Int, userDtlsId);
-//           menteeRequest.input("menteeAbout", sql.VarChar, "");
-//           menteeRequest.input("menteeSkills", sql.Text, "[]");
-//           menteeRequest.input("menteeGender", sql.VarChar, "");
-//           menteeRequest.input("menteeType", sql.VarChar, "Student");
-//           menteeRequest.input(
-//             "menteeProfilePic",
-//             sql.VarChar,
-//             "https://practiwizstorage.blob.core.windows.net/practiwizcontainer/blue-circle-with-white-user_78370-4707.webp"
-//           );
-//           menteeRequest.input(
-//             "menteeInstitute",
-//             sql.Text,
-//             JSON.stringify(menteeInstituteDetails)
-//           );
-//           menteeRequest.input("menteeRollNumber", sql.VarChar, rollNumber);
-
-//           const menteeResult = await menteeRequest.query(
-//             MenteeRegisterByFacultyQuery
-//           );
-//           if (
-//             menteeResult &&
-//             menteeResult.recordset &&
-//             menteeResult.recordset.length > 0
-//           ) {
-//             const menteeDtlsId = menteeResult.recordset[0].mentee_dtls_id;
-//             console.log("Mentee details inserted successfully:", menteeDtlsId);
-
-//             // Insert mentee-class mapping - Using transaction
-//             const menteeClassRequest = new sql.Request(transaction);
-//             menteeClassRequest.input("menteeId", sql.Int, menteeDtlsId);
-//             menteeClassRequest.input("classId", sql.Int, classId);
-//             await menteeClassRequest.query(
-//               `INSERT INTO [dbo].[class_mentee_mapping] (mentee_dtls_id, class_dtls_id) VALUES (@menteeId, @classId)`
-//             );
-
-//             // Commit the transaction
-//             await transaction.commit();
-
-//             // Store successful registration
-//             results.successful.push({
-//               rollNumber,
-//               name: fullName,
-//               email,
-//               password: defaultPassword, // Be careful with this in production
-//             });
-
-//             // If you want to implement it, make sure these functions and variables are defined:
-//             /*
-//             // Send notifications
-//             await InsertNotificationHandler(
-//               userDtlsId,
-//               "Success",  // Replace SuccessMsg
-//               "Account Created", // Replace AccountCreatedHeading
-//               "Your account has been created successfully" // Replace AccountCreatedMessage
-//             );
-
-//             // Send email
-//             const msg = accountCreatedEmailTemplate(
-//               email.toLowerCase(),
-//               `${firstName} ${lastName}`,
-//               defaultPassword
-//             );
-//             const emailResponse = await sendEmail(msg);
-
-//             // Send WhatsApp message
-//             sendWhatsAppMessage(
-//               phoneNumber,
-//               firstName,
-//               "mentee_acct_create_success"
-//             );
-//             */
-//           } else {
-//             // Mentee insert didn't return expected results
-//             await transaction.rollback();
-//             throw new Error("Failed to insert mentee details");
-//           }
-//         } else {
-//           // User insert didn't return expected results
-//           await transaction.rollback();
-//           throw new Error("Failed to insert user details");
-//         }
-//       } catch (studentError) {
-//         // If any error occurs, roll back the transaction
-//         try {
-//           if (transaction.isActive()) {
-//             await transaction.rollback();
-//           }
-//         } catch (rollbackError) {
-//           console.error("Error during transaction rollback:", rollbackError);
-//         }
-
-//         console.error(
-//           `Error registering student: ${student["Name"]}`,
-//           studentError.message
-//         );
-//         results.failed.push({
-//           rollNumber: student["Roll Number"] || "Unknown",
-//           name: student["Name"] || "Unknown",
-//           email: student["Email Id"] || "Unknown",
-//           reason: studentError.message,
-//         });
-//       }
-//     }
-
-//     // Return results summary
-//     return res.json({
-//       success: `Successfully registered ${results.successful.length} mentees`,
-//       failed: results.failed.length > 0 ? results.failed : undefined,
-//       registered: results.successful,
-//     });
-//   } catch (error) {
-//     console.error("Bulk registration error:", error);
-//     return res.status(500).json({ error: "Failed to process student data" });
-//   }
-// }
 
 // Bulk registration of mentees with existing user handling
 // This function handles the case where the user already exists in the database
@@ -1152,8 +600,17 @@ export async function fetchAvailableCaseStudiesForfaculty(req, res, next) {
     });
   }
 }
+
+
 export async function getCaseStudyData(req, res, next) {
-  const { caseStudyId } = req.body;
+  const { caseStudyId, caseType } = req.body;
+
+  //caseType 0 for non-practywiz and 1 for practywiz
+  const caseStudyGetQuery =
+    caseType === 0
+      ? fetchSingleNonPractywizCaseStudyQuery
+      : fetchSinglePractywizCaseStudyQuery;
+     
   try {
     sql.connect(config, (err, db) => {
       if (err) {
@@ -1162,7 +619,7 @@ export async function getCaseStudyData(req, res, next) {
       }
       const request = new sql.Request();
       request.input("caseStudy_Id", sql.Int, caseStudyId);
-      request.query(fetchCaseStudyClassDataQuery, (err, result) => {
+      request.query(caseStudyGetQuery, (err, result) => {
         if (err) return res.json({ error: err.message });
         if (result) {
           return res.json({ success: result.recordset });
@@ -1177,6 +634,7 @@ export async function getCaseStudyData(req, res, next) {
     });
   }
 }
+
 export async function getClassListData(req, res, next) {
   const { facultyID } = req.body;
   try {
@@ -1365,7 +823,6 @@ export async function getNonPractywizCaseStudiesByFaculty(req, res) {
     return res.status(500).json({ error: error.message });
   }
 }
-
 
 
 
