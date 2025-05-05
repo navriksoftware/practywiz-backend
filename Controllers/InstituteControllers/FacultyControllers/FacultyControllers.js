@@ -9,7 +9,8 @@ import {
   createClassQuery,
   fetchFacultyClassQuery,
   fetchFacultySingleClassQuery,
-  fetchFacultySingleDashboardQuery, fetchFacultySingleClassUpdateQuery,
+  fetchFacultySingleDashboardQuery,
+  fetchFacultySingleClassUpdateQuery,
   fetchStudentListofClassQuery,
   MenteeRegisterByFacultyQuery,
   AvailableCaseStudiesForfacultyQuery,
@@ -20,7 +21,7 @@ import {
   assignCaseStudyToClassQuery,
   fetchSingleNonPractywizCaseStudyQuery,
   fetchSinglePractywizCaseStudyQuery,
-  fetchAssignCaseStudiesDetailsQuery
+  fetchAssignCaseStudiesDetailsQuery,
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -62,7 +63,6 @@ export async function fetchFacultyDetailsDashboard(req, res, next) {
   }
 }
 
-
 export async function fetchAssignCaseStudiesDetails(req, res, next) {
   const { facultyid } = req.body;
 
@@ -88,10 +88,6 @@ export async function fetchAssignCaseStudiesDetails(req, res, next) {
     return res.status(500).json({ error: error.message });
   }
 }
-
-
-
-
 
 export async function CreateClass(req, res) {
   console.log("CreateClass API called");
@@ -204,8 +200,6 @@ export async function fetchStudentListofClass(req, res, next) {
     return res.status(500).json({ error: error.message });
   }
 }
-
-
 
 // Bulk registration of mentees with existing user handling
 // This function handles the case where the user already exists in the database
@@ -535,11 +529,7 @@ export async function BulkMenteeRegistration(req, res, next) {
 
 export async function UpdateclassDetails(req, res, next) {
   const { singleClassId, formData } = req.body;
-  const { Name,
-    SubjectCode,
-    SubjectName,
-    SemisterEnd,
-  } = formData;
+  const { Name, SubjectCode, SubjectName, SemisterEnd } = formData;
 
   try {
     sql.connect(config, (err, db) => {
@@ -553,7 +543,6 @@ export async function UpdateclassDetails(req, res, next) {
       request.input("class_subject", sql.VarChar, SubjectName);
       request.input("class_subject_code", sql.VarChar, SubjectCode);
       request.input("class_sem_end_date", sql.Date, SemisterEnd);
-
 
       request.query(fetchFacultySingleClassUpdateQuery, (err, result) => {
         if (err) return res.json({ error: err.message });
@@ -573,7 +562,6 @@ export async function UpdateclassDetails(req, res, next) {
     });
   }
 }
-
 
 export async function fetchAvailableCaseStudiesForfaculty(req, res, next) {
   const { facultyId } = req.body;
@@ -601,7 +589,6 @@ export async function fetchAvailableCaseStudiesForfaculty(req, res, next) {
   }
 }
 
-
 export async function getCaseStudyData(req, res, next) {
   const { caseStudyId, caseType } = req.body;
 
@@ -610,7 +597,7 @@ export async function getCaseStudyData(req, res, next) {
     caseType === 0
       ? fetchSingleNonPractywizCaseStudyQuery
       : fetchSinglePractywizCaseStudyQuery;
-     
+
   try {
     sql.connect(config, (err, db) => {
       if (err) {
@@ -664,7 +651,9 @@ export async function fetchStudentListofClasses(req, res, next) {
   const { selectedClasses } = req.body; // Expecting an array like ["101", "102", "103"]
 
   if (!Array.isArray(selectedClasses) || selectedClasses.length === 0) {
-    return res.status(400).json({ error: "selectedClasses must be a non-empty array" });
+    return res
+      .status(400)
+      .json({ error: "selectedClasses must be a non-empty array" });
   }
 
   try {
@@ -688,7 +677,10 @@ export async function fetchStudentListofClasses(req, res, next) {
             allStudents = allStudents.concat(result.recordset);
           }
         } catch (queryErr) {
-          console.log(`Error fetching for classId ${classId}:`, queryErr.message);
+          console.log(
+            `Error fetching for classId ${classId}:`,
+            queryErr.message
+          );
         }
       }
 
@@ -716,18 +708,19 @@ export async function assignCaseStudyToClass(req, res, next) {
     factQuestions,
     analysisQuestions,
     questionType,
-    owned_by
+    owned_by,
   } = req.body;
- console.log("Assigning case study to classes:", req.body);
+  console.log("Assigning case study to classes:", req.body);
   if (!Array.isArray(selectedClasses) || selectedClasses.length === 0) {
-    return res
-      .status(400)
-      .json({ success: false, message: "selectedClasses must be a non-empty array" });
+    return res.status(400).json({
+      success: false,
+      message: "selectedClasses must be a non-empty array",
+    });
   }
 
   try {
     // Ensure DB connection
-     sql.connect(config);
+    sql.connect(config);
 
     const allResults = [];
 
@@ -809,24 +802,25 @@ export async function getNonPractywizCaseStudiesByFaculty(req, res) {
     const request = pool.request();
     request.input("facultyId", sql.Int, facultyId);
 
-    const result = await request.query(getNonPractywizCaseStudiesByFacultyQuery);
+    const result = await request.query(
+      getNonPractywizCaseStudiesByFacultyQuery
+    );
 
     // Parse questions JSON for each record
-    const caseStudies = result.recordset.map(cs => ({
+    const caseStudies = result.recordset.map((cs) => ({
       ...cs,
-      non_practywiz_case_question: JSON.parse(cs.non_practywiz_case_question)
+      non_practywiz_case_question: JSON.parse(cs.non_practywiz_case_question),
     }));
 
     return res.status(200).json({ success: caseStudies });
   } catch (error) {
-    console.error("Error in getNonPractywizCaseStudiesByFaculty:", error.message);
+    console.error(
+      "Error in getNonPractywizCaseStudiesByFaculty:",
+      error.message
+    );
     return res.status(500).json({ error: error.message });
   }
 }
-
-
-
-
 
 // Handle cleanup when the process exits
 process.on("exit", () => {

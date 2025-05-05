@@ -93,7 +93,6 @@ FROM
 WHERE 
     [class_dtls_id] = @single_classId`;
 
-
 export const fetchFacultySingleClassUpdateQuery = `UPDATE [dbo].[class_dtls]
 SET 
     [class_name] = @class_name,
@@ -221,7 +220,6 @@ WHERE
 
 `;
 
-
 export const fetchClassListDataQuery = `SELECT
     c.[class_dtls_id],
     c.[class_name],
@@ -308,8 +306,6 @@ export const assignCaseStudyToClassQuery = `
        )
    `;
 
-
-
 export const insertNonPractywizCaseStudyQuery = `
   INSERT INTO non_practywiz_case_dtls
     (non_practywiz_case_title, non_practywiz_case_author, non_practywiz_case_category, non_practywiz_case_question, non_practywiz_case_faculty_dtls_id)
@@ -323,12 +319,11 @@ export const getNonPractywizCaseStudiesByFacultyQuery = `
   ORDER BY non_practywiz_case_cr_date DESC
 `;
 
-
 export const fetchAssignCaseStudiesDetailsQuery = `
-SELECT 
+SELECT
     fca.faculty_case_assign_dtls_id,
     fca.faculty_case_assign_case_study_id AS case_id,
-    CASE 
+    CASE
         WHEN fca.faculty_case_assign_owned_by_practywiz = 0 THEN cs.case_study_title
         WHEN fca.faculty_case_assign_owned_by_practywiz = 1 THEN npc.non_practywiz_case_title
     END AS case_title,
@@ -336,7 +331,7 @@ SELECT
     cd.class_subject_code AS class_code,
     (SELECT COUNT(*) FROM class_mentee_mapping cmm WHERE cmm.class_dtls_id = cd.class_dtls_id) AS number_of_students,
     fca.faculty_case_assign_end_date AS due_date,
-    CASE 
+    CASE
         WHEN fca.faculty_case_assign_owned_by_practywiz = 0 THEN 'Practywiz'
         WHEN fca.faculty_case_assign_owned_by_practywiz = 1 THEN 'Non-Practywiz'
     END AS case_type,
@@ -350,18 +345,18 @@ SELECT
     fca.faculty_case_assign_fact_question_qty,
     fca.faculty_case_assign_analysis_question_qty,
     fca.faculty_case_assign_question_distribution
-FROM 
+FROM
     dbo.faculty_case_assign_dtls fca
-LEFT JOIN 
-    dbo.case_study_details cs ON fca.faculty_case_assign_case_study_id = cs.case_study_id 
+LEFT JOIN
+    dbo.case_study_details cs ON fca.faculty_case_assign_case_study_id = cs.case_study_id
     AND fca.faculty_case_assign_owned_by_practywiz = 0
-LEFT JOIN 
-    dbo.non_practywiz_case_dtls npc ON fca.faculty_case_assign_case_study_id = npc.non_practywiz_case_dtls_id 
+LEFT JOIN
+    dbo.non_practywiz_case_dtls npc ON fca.faculty_case_assign_case_study_id = npc.non_practywiz_case_dtls_id
     AND fca.faculty_case_assign_owned_by_practywiz = 1
-JOIN 
+JOIN
     dbo.class_dtls cd ON fca.faculty_case_assign_class_dtls_id = cd.class_dtls_id
-WHERE 
+WHERE
     fca.faculty_case_assign_faculty_dtls_id = @FacultyId
-ORDER BY 
+ORDER BY
     fca.faculty_case_assign_end_date;
 `;
