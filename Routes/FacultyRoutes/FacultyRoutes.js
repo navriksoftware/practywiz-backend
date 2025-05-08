@@ -10,7 +10,7 @@ import {
   getClassListData
   , fetchStudentListofClasses,assignCaseStudyToClass,
   addNonPractywizCaseStudy,
-  getNonPractywizCaseStudiesByFaculty,fetchAssignCaseStudiesDetails
+  getNonPractywizCaseStudiesByFaculty,fetchAssignCaseStudiesDetails,fetchCaseStudiesListByclassId
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
 const router = express.Router();
@@ -32,6 +32,8 @@ router.post("/class/get", fetchFacultyclassDetails);
 
 // Route to fetch Signle class details
 router.post("/class/singledetail", fetchFacultySingleclassDetails);
+// Route to fetch case studies list by  class id
+router.post("/class/CaseStudiesList", fetchCaseStudiesListByclassId);
 
 // Route to update existing class details
 router.post("/class/singledetail-Update", UpdateclassDetails);

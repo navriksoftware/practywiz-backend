@@ -360,3 +360,46 @@ WHERE
 ORDER BY
     fca.faculty_case_assign_end_date;
 `;
+export const fetchCaseStudiesQuery = `
+SELECT 
+    
+    f.[faculty_case_assign_case_study_id],
+    f.[faculty_case_assign_class_dtls_id],
+    f.[faculty_case_assign_start_date],
+    f.[faculty_case_assign_end_date],
+    f.[faculty_case_assign_owned_by_practywiz],
+
+    -- Practywiz Case Study Details (if owned_by_practywiz = 1)
+    c.[case_study_id],
+    c.[case_study_title],
+    c.[case_study_categories],
+    c.[case_study_lesson],
+    c.[case_study_future_skills],
+    c.[case_study_num_characters],
+    c.[case_study_roles],
+    c.[case_study_main_character_role],
+    c.[case_study_challenge],
+    c.[case_study_content],
+   
+
+    -- Non-Practywiz Case Study Details (if owned_by_practywiz = 0)
+    n.[non_practywiz_case_dtls_id],
+    n.[non_practywiz_case_title],
+    n.[non_practywiz_case_author],
+    n.[non_practywiz_case_category]
+
+FROM 
+    [dbo].[faculty_case_assign_dtls] f
+LEFT JOIN 
+    [dbo].[case_study_details] c 
+    ON f.[faculty_case_assign_case_study_id] = c.[case_study_id]
+    AND f.[faculty_case_assign_owned_by_practywiz] = 1
+LEFT JOIN 
+    [dbo].[non_practywiz_case_dtls] n 
+    ON f.[faculty_case_assign_case_study_id] = n.[non_practywiz_case_dtls_id]
+    AND f.[faculty_case_assign_owned_by_practywiz] = 0
+WHERE 
+    f.[faculty_case_assign_class_dtls_id] = @single_classId;
+
+
+`;

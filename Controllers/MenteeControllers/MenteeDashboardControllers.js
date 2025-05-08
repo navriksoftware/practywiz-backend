@@ -7,6 +7,7 @@ import { sendEmail } from "../../Middleware/AllFunctions.js";
 import moment from "moment";
 import {
   fetchMenteeSingleDashboardQuery,
+  GetCaseDetailsByMenteeIdSqlQuery,
   GetMenteeAppliedInternshipsSqlQuery,
   IsFeedbackSubmittedQuery,
   MarkMenteeAllMessagesAsReadQuery,
@@ -263,3 +264,33 @@ export async function MenteefetchAppliedInternships(req, res) {
     return res.json({ error: "There is some error while fetching" });
   }
 }
+export async function MenteefetchCaseStudiesDetails(req, res) {
+  const { menteeId } = req.body;
+  if (!menteeId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Mentee ID is required" });
+  }
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) return res.json({ error: "There is some error while fetching" });
+      const request = new sql.Request();
+      request.input("menteeId", sql.Int, menteeId);
+      request.query(
+        GetCaseDetailsByMenteeIdSqlQuery,
+
+        (err, result) => {
+          if (err) return res.json({ error: err.message });
+          if (result && result.recordset && result.recordset.length > 0) {
+            return res.json({ success: result.recordset });
+          } else {
+            return res.json({ error: "No record found" });
+          }
+        }
+      );
+    });
+  } catch (error) {
+    return res.json({ error: "There is some error while fetching" });
+  }
+}
+

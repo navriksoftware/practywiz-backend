@@ -5,6 +5,7 @@ import {
   MenteeCompletedBookingAppointments,
   MenteeFeedbackSubmitHandler,
   MenteefetchAppliedInternships,
+  MenteefetchCaseStudiesDetails,
   MenteeMarkAllMessageAsRead,
   MenteeMarkSingleMessageAsRead,
 } from "../../Controllers/MenteeControllers/MenteeDashboardControllers.js";
@@ -21,6 +22,8 @@ router.post("/appointments/feedback/submit", MenteeFeedbackSubmitHandler);
 
 router.post("/applied-internships", MenteefetchAppliedInternships);
 // router.get("/applied-internships", MenteefetchAppliedInternships);
+router.post("/case-studies-details", MenteefetchCaseStudiesDetails);
+
 
 router.post("/notification/mark-all-read", MenteeMarkAllMessageAsRead);
 router.post("/notification/mark-single-read", MenteeMarkSingleMessageAsRead);

@@ -21,7 +21,7 @@ import {
   assignCaseStudyToClassQuery,
   fetchSingleNonPractywizCaseStudyQuery,
   fetchSinglePractywizCaseStudyQuery,
-  fetchAssignCaseStudiesDetailsQuery,
+  fetchAssignCaseStudiesDetailsQuery,fetchCaseStudiesQuery
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -167,6 +167,32 @@ export async function fetchFacultySingleclassDetails(req, res, next) {
     request.input("single_classId", sql.Int, singleClassId);
 
     const result = await request.query(fetchFacultySingleClassQuery);
+
+    if (result && result.recordset) {
+      return res.status(200).json({ success: result.recordset });
+    } else {
+      return res.status(404).json({ error: "Class not found" });
+    }
+  } catch (error) {
+    console.error("Error in fetchFacultySingleclassDetails:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+export async function fetchCaseStudiesListByclassId(req, res, next) {
+  const { classId } = req.body;
+  console.log("Fetching single class details for classId:", classId);
+
+  if (!classId) {
+    return res.status(400).json({ error: "classId is required" });
+  }
+
+  try {
+    await poolConnect; // Ensure pool is connected
+
+    const request = pool.request();
+    request.input("single_classId", sql.Int, classId);
+
+    const result = await request.query(fetchCaseStudiesQuery);
 
     if (result && result.recordset) {
       return res.status(200).json({ success: result.recordset });
