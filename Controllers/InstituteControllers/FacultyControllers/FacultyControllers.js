@@ -21,7 +21,9 @@ import {
   assignCaseStudyToClassQuery,
   fetchSingleNonPractywizCaseStudyQuery,
   fetchSinglePractywizCaseStudyQuery,
-  fetchAssignCaseStudiesDetailsQuery,fetchCaseStudiesQuery
+  fetchAssignCaseStudiesDetailsQuery,
+  fetchCaseStudiesQuery,
+  getSingleNonPractywizCaseStudyQuery
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -832,16 +834,47 @@ export async function getNonPractywizCaseStudiesByFaculty(req, res) {
       getNonPractywizCaseStudiesByFacultyQuery
     );
 
-    // Parse questions JSON for each record
-    const caseStudies = result.recordset.map((cs) => ({
-      ...cs,
-      non_practywiz_case_question: JSON.parse(cs.non_practywiz_case_question),
-    }));
-
-    return res.status(200).json({ success: caseStudies });
+    // No need to parse questions JSON as it's not included in the query results
+    return res.status(200).json({ success: result.recordset });
   } catch (error) {
     console.error(
       "Error in getNonPractywizCaseStudiesByFaculty:",
+      error.message
+    );
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+// This function retrieves a single non-Practywiz case study based on the provided caseStudyId.
+export async function getSingleNonPractywizCaseStudy(req, res) {
+  try {
+    const { caseStudyId } = req.body;
+    if (!caseStudyId) {
+      return res.status(400).json({ error: "caseStudyId is required" });
+    }
+
+    await poolConnect;
+    const request = pool.request();
+    request.input("caseStudyId", sql.Int, caseStudyId);
+
+    const result = await request.query(
+      getSingleNonPractywizCaseStudyQuery
+    );
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: "Case study not found" });
+    }
+
+    // Parse questions JSON for the record
+    const caseStudy = {
+      ...result.recordset[0],
+      non_practywiz_case_question: JSON.parse(result.recordset[0].non_practywiz_case_question),
+    };
+
+    return res.status(200).json({ success: caseStudy });
+  } catch (error) {
+    console.error(
+      "Error in getSingleNonPractywizCaseStudy:",
       error.message
     );
     return res.status(500).json({ error: error.message });

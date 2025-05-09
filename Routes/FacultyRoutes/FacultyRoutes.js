@@ -4,13 +4,19 @@ import {
   fetchFacultyclassDetails,
   fetchFacultyDetailsDashboard,
   fetchFacultySingleclassDetails,
-  BulkMenteeRegistration, UpdateclassDetails,
+  BulkMenteeRegistration,
+  UpdateclassDetails,
   fetchStudentListofClass,
-  fetchAvailableCaseStudiesForfaculty, getCaseStudyData,
-  getClassListData
-  , fetchStudentListofClasses,assignCaseStudyToClass,
+  fetchAvailableCaseStudiesForfaculty,
+  getCaseStudyData,
+  getClassListData,
+  fetchStudentListofClasses,
+  assignCaseStudyToClass,
   addNonPractywizCaseStudy,
-  getNonPractywizCaseStudiesByFaculty,fetchAssignCaseStudiesDetails,fetchCaseStudiesListByclassId
+  getNonPractywizCaseStudiesByFaculty,
+  fetchAssignCaseStudiesDetails,
+  fetchCaseStudiesListByclassId,
+  getSingleNonPractywizCaseStudy,
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
 const router = express.Router();
@@ -53,15 +59,16 @@ router.post("/case-study/list", fetchAvailableCaseStudiesForfaculty);
 // Route to add a non-Practiwiz case study
 router.post("/case-study/add-external", CreateClass);
 
-
 // Route to add a non-Practiwiz case study
 router.post("/case-study/add-non-practywiz-case", addNonPractywizCaseStudy);
 
 // Route to get non-Practiwiz case studies by faculty
 router.post("/case-study/list-non-practywiz-case", getNonPractywizCaseStudiesByFaculty);
 
+// Route to get single non-Practiwiz case study by case study ID
+router.post("/case-study/get-single-non-practywiz-case", getSingleNonPractywizCaseStudy);
 
-// Route to get the data of signle case by id  case study 
+// Route to get the data of signle case by id  case study
 router.post("/case-studies/fetch-caseData", getCaseStudyData);
 // Route to get the data of classlist by id  of faculty
 router.post("/case-studies/fetch-classlist", getClassListData);
@@ -69,7 +76,6 @@ router.post("/case-studies/fetch-classlist", getClassListData);
 router.post("/Student/fetch-student", fetchStudentListofClasses);
 // Route to assign a case study to a class by faculty
 router.post("/case-study/assign-case-study", assignCaseStudyToClass);
-
 
 // ==================== Notification Routes ====================
 

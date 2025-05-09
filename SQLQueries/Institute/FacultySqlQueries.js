@@ -314,7 +314,15 @@ export const insertNonPractywizCaseStudyQuery = `
 `;
 
 export const getNonPractywizCaseStudiesByFacultyQuery = `
-  SELECT * FROM non_practywiz_case_dtls
+  SELECT 
+    non_practywiz_case_dtls_id,
+    non_practywiz_case_title,
+    non_practywiz_case_author,
+    non_practywiz_case_category,
+    non_practywiz_case_faculty_dtls_id,
+    non_practywiz_case_cr_date,
+    non_practywiz_case_update_date
+  FROM non_practywiz_case_dtls
   WHERE non_practywiz_case_faculty_dtls_id = @facultyId
   ORDER BY non_practywiz_case_cr_date DESC
 `;
@@ -402,4 +410,10 @@ WHERE
     f.[faculty_case_assign_class_dtls_id] = @single_classId;
 
 
+`;
+
+
+export const getSingleNonPractywizCaseStudyQuery = `
+  SELECT * FROM non_practywiz_case_dtls
+  WHERE non_practywiz_case_dtls_id = @caseStudyId
 `;
