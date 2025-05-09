@@ -142,10 +142,40 @@ export async function RegisterInstitute(req, res, next) {
     const msg = accountCreatedEmailTemplate(lowEmail, fullName);
     const response = await sendEmail(msg);
     
-    // Return success message with appropriate user type
+    // Generate JWT tokens
+    const user_role = user_type; // Assuming user_type is equivalent to role, adjust if needed
+    
+    const accessToken = jwt.sign(
+      {
+        user_id: userDtlsId,
+        user_role: user_role,
+      },
+      process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
+      { expiresIn: "48h" }
+    );
+    
+    const token = jwt.sign(
+      {
+        user_id: userDtlsId,
+        user_email: lowEmail,
+        user_firstname: contact_person_first_name,
+        user_lastname: contact_person_last_name,
+        user_type: user_type,
+        user_role: user_role,
+      },
+      process.env.JWT_LOGIN_SECRET_KEY,
+      { expiresIn: "48h" }
+    );
+    
+    // Return success message with tokens
     const userTypeText = user_type === "institute" ? "an institute" : "a faculty";
     return res.json({
-      success: `Thank you for registering as ${userTypeText}`
+      success: `Thank you for registering as ${userTypeText}`,
+      success_status: true,
+      token: token,
+      accessToken: accessToken,
+      user_type: user_type,
+      user_id: userDtlsId
     });
     
   } catch (error) {
