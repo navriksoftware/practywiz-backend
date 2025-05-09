@@ -332,16 +332,16 @@ SELECT
     fca.faculty_case_assign_dtls_id,
     fca.faculty_case_assign_case_study_id AS case_id,
     CASE
-        WHEN fca.faculty_case_assign_owned_by_practywiz = 0 THEN cs.case_study_title
-        WHEN fca.faculty_case_assign_owned_by_practywiz = 1 THEN npc.non_practywiz_case_title
+        WHEN fca.faculty_case_assign_owned_by_practywiz = 1 THEN cs.case_study_title
+        WHEN fca.faculty_case_assign_owned_by_practywiz = 0 THEN npc.non_practywiz_case_title
     END AS case_title,
     cd.class_name,
     cd.class_subject_code AS class_code,
     (SELECT COUNT(*) FROM class_mentee_mapping cmm WHERE cmm.class_dtls_id = cd.class_dtls_id) AS number_of_students,
     fca.faculty_case_assign_end_date AS due_date,
     CASE
-        WHEN fca.faculty_case_assign_owned_by_practywiz = 0 THEN 'Practywiz'
-        WHEN fca.faculty_case_assign_owned_by_practywiz = 1 THEN 'Non-Practywiz'
+        WHEN fca.faculty_case_assign_owned_by_practywiz = 1 THEN 'Practywiz'
+        WHEN fca.faculty_case_assign_owned_by_practywiz = 0 THEN 'Non-Practywiz'
     END AS case_type,
     fca.faculty_case_assign_faculty_dtls_id,
     fca.faculty_case_assign_class_dtls_id,
@@ -357,10 +357,10 @@ FROM
     dbo.faculty_case_assign_dtls fca
 LEFT JOIN
     dbo.case_study_details cs ON fca.faculty_case_assign_case_study_id = cs.case_study_id
-    AND fca.faculty_case_assign_owned_by_practywiz = 0
+    AND fca.faculty_case_assign_owned_by_practywiz = 1
 LEFT JOIN
     dbo.non_practywiz_case_dtls npc ON fca.faculty_case_assign_case_study_id = npc.non_practywiz_case_dtls_id
-    AND fca.faculty_case_assign_owned_by_practywiz = 1
+    AND fca.faculty_case_assign_owned_by_practywiz = 0
 JOIN
     dbo.class_dtls cd ON fca.faculty_case_assign_class_dtls_id = cd.class_dtls_id
 WHERE
