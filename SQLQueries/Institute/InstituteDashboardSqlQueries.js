@@ -126,6 +126,7 @@ export const fetchCaseStudiesListForInstituteQuery = `SELECT
     a.institute_case_assign_dtls_id,
     a.institute_case_assign_institute_dtls_id,
     a.institute_case_assign_case_study_id,   
+    b.case_study_id,
     b.case_study_title,
     b.case_study_categories,
     b.case_study_lesson,
@@ -148,3 +149,20 @@ INNER JOIN
 WHERE 
     a.institute_case_assign_institute_dtls_id = @institute_Id;
 `;
+export const assignCaseStudyToFacultyQuery = `
+  INSERT INTO [dbo].[institute_case_assign_dtls] (
+    [institute_case_assign_institute_dtls_id],
+    [institute_case_assign_case_study_id],
+    [institute_case_assign_faculty_dtls_id],
+    [institute_case_assign_cr_date],
+    [institute_case_assign_update_date]
+  )
+  VALUES (
+    @institute_Id,
+    @caseStudy_Id,
+    @faculty_Id,
+    GETDATE(),
+    GETDATE()
+  );
+`;
+

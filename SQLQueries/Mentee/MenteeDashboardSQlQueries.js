@@ -315,11 +315,11 @@ SELECT
 
     LEFT JOIN [dbo].[case_study_details] c
         ON f.faculty_case_assign_case_study_id = c.case_study_id
-        AND f.faculty_case_assign_owned_by_practywiz = 0
+        AND f.faculty_case_assign_owned_by_practywiz = 1
 
     LEFT JOIN [dbo].[non_practywiz_case_dtls] np
         ON f.faculty_case_assign_case_study_id = np.non_practywiz_case_dtls_id
-        AND f.faculty_case_assign_owned_by_practywiz = 1
+        AND f.faculty_case_assign_owned_by_practywiz = 0
 
     WHERE m.mentee_dtls_id = @menteeId;
 `;

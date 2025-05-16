@@ -676,13 +676,9 @@ export async function getClassListData(req, res, next) {
   }
 }
 export async function fetchStudentListofClasses(req, res, next) {
-  const { selectedClasses } = req.body; // Expecting an array like ["101", "102", "103"]
+  const { selectedClasses } = req.body;
 
-  if (!Array.isArray(selectedClasses) || selectedClasses.length === 0) {
-    return res
-      .status(400)
-      .json({ error: "selectedClasses must be a non-empty array" });
-  }
+
 
   try {
     sql.connect(config, async (err, db) => {
@@ -693,10 +689,8 @@ export async function fetchStudentListofClasses(req, res, next) {
 
       let allStudents = [];
 
-      // Loop over selectedClasses and fetch data for each
-      for (const classId of selectedClasses) {
         const request = new sql.Request();
-        request.input("class_id", sql.Int, classId);
+        request.input("class_id", sql.Int, selectedClasses);
 
         try {
           const result = await request.query(fetchStudentListDataQuery);
@@ -706,11 +700,11 @@ export async function fetchStudentListofClasses(req, res, next) {
           }
         } catch (queryErr) {
           console.log(
-            `Error fetching for classId ${classId}:`,
+            `Error fetching for classId ${selectedClasses}:`,
             queryErr.message
           );
         }
-      }
+      
 
       return res.status(200).json({ success: allStudents });
     });
