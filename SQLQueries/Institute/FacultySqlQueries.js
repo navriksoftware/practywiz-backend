@@ -335,6 +335,7 @@ SELECT
         WHEN fca.faculty_case_assign_owned_by_practywiz = 1 THEN cs.case_study_title
         WHEN fca.faculty_case_assign_owned_by_practywiz = 0 THEN npc.non_practywiz_case_title
     END AS case_title,
+    cd.class_dtls_id AS class_id,
     cd.class_name,
     cd.class_subject_code AS class_code,
     (SELECT COUNT(*) FROM class_mentee_mapping cmm WHERE cmm.class_dtls_id = cd.class_dtls_id) AS number_of_students,
@@ -416,4 +417,38 @@ WHERE
 export const getSingleNonPractywizCaseStudyQuery = `
   SELECT * FROM non_practywiz_case_dtls
   WHERE non_practywiz_case_dtls_id = @caseStudyId
+`;
+
+export const getCaseStudyDataQuery = `
+IF @case_type = 'Practywiz'
+BEGIN
+    SELECT 
+        cls.class_dtls_id,
+        cls.class_name,
+        cls.class_subject,
+        cls.class_subject_code,
+        cls.class_sem_end_date,
+        cs.case_study_title,
+        cs.case_study_questions
+    FROM [dbo].[class_dtls] cls
+    LEFT JOIN [dbo].[case_study_details] cs 
+        ON cs.case_study_id = @case_study_id
+    WHERE cls.class_dtls_id = @class_id;
+END
+ELSE IF @case_type = 'Non-Practywiz'
+BEGIN
+    SELECT 
+        cls.class_dtls_id,
+        cls.class_name,
+        cls.class_subject,
+        cls.class_subject_code,
+        cls.class_sem_end_date,       
+        np.non_practywiz_case_title,
+        np.non_practywiz_case_author
+    FROM [dbo].[class_dtls] cls
+    LEFT JOIN [dbo].[non_practywiz_case_dtls] np 
+        ON np.non_practywiz_case_dtls_id = @case_study_id
+    WHERE cls.class_dtls_id = @class_id;
+END
+
 `;

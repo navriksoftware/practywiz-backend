@@ -17,6 +17,7 @@ import {
   fetchAssignCaseStudiesDetails,
   fetchCaseStudiesListByclassId,
   getSingleNonPractywizCaseStudy,
+  fetchAssignSingleCaseStudiesDetails
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
 const router = express.Router();
@@ -27,6 +28,8 @@ const router = express.Router();
 router.post("/dashboard/details", fetchFacultyDetailsDashboard);
 // Route to fetch assigned case Studies
 router.post("/dashboard/get-assigned-cases", fetchAssignCaseStudiesDetails);
+// Route to fetch assigned Single case Studies
+router.post("/dashboard/get-assigned-single-cases", fetchAssignSingleCaseStudiesDetails);
 
 // ==================== Class Routes ====================
 

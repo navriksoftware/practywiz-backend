@@ -23,7 +23,8 @@ import {
   fetchSinglePractywizCaseStudyQuery,
   fetchAssignCaseStudiesDetailsQuery,
   fetchCaseStudiesQuery,
-  getSingleNonPractywizCaseStudyQuery
+  getSingleNonPractywizCaseStudyQuery,
+  getCaseStudyDataQuery
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -65,6 +66,7 @@ export async function fetchFacultyDetailsDashboard(req, res, next) {
   }
 }
 
+
 export async function fetchAssignCaseStudiesDetails(req, res, next) {
   const { facultyid } = req.body;
 
@@ -79,6 +81,29 @@ export async function fetchAssignCaseStudiesDetails(req, res, next) {
     request.input("FacultyId", sql.Int, facultyid);
 
     const result = await request.query(fetchAssignCaseStudiesDetailsQuery);
+
+    if (result && result.recordset) {
+      return res.status(200).json({ success: result.recordset });
+    } else {
+      return res.status(404).json({ error: "No data found" });
+    }
+  } catch (error) {
+    console.error("Error in fetchAssignCaseStudiesDetails:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+export async function fetchAssignSingleCaseStudiesDetails(req, res, next) {
+  const { class_id,case_study_id,case_type } = req.body;
+  try {
+    await poolConnect; // Ensure pool is connected
+
+    const request = pool.request();
+    request.input("class_id", sql.Int, class_id);
+    request.input("case_study_id", sql.Int, case_study_id);
+    request.input("case_type", sql.VarChar, case_type);
+
+    const result = await request.query(getCaseStudyDataQuery);
 
     if (result && result.recordset) {
       return res.status(200).json({ success: result.recordset });
@@ -238,7 +263,7 @@ export async function BulkMenteeRegistration(req, res, next) {
   try {
     // Get JSON data from request body
     const { students, instituteName, classId } = req.body;
-
+  console.log(req.body)
     if (!students || !Array.isArray(students) || students.length === 0) {
       return res
         .status(400)
@@ -676,10 +701,7 @@ export async function getClassListData(req, res, next) {
   }
 }
 export async function fetchStudentListofClasses(req, res, next) {
-  const { selectedClasses } = req.body;
-
-
-
+  const { selectedClass } = req.body;
   try {
     sql.connect(config, async (err, db) => {
       if (err) {
@@ -690,7 +712,7 @@ export async function fetchStudentListofClasses(req, res, next) {
       let allStudents = [];
 
         const request = new sql.Request();
-        request.input("class_id", sql.Int, selectedClasses);
+        request.input("class_id", sql.Int, selectedClass);
 
         try {
           const result = await request.query(fetchStudentListDataQuery);
@@ -700,7 +722,7 @@ export async function fetchStudentListofClasses(req, res, next) {
           }
         } catch (queryErr) {
           console.log(
-            `Error fetching for classId ${selectedClasses}:`,
+            `Error fetching for classId ${selectedClass}:`,
             queryErr.message
           );
         }
@@ -716,11 +738,13 @@ export async function fetchStudentListofClasses(req, res, next) {
     });
   }
 }
+
+
 export async function assignCaseStudyToClass(req, res, next) {
   const {
     caseStudyId,
     facultyID,
-    selectedClasses,
+    selectedClass,
     startDateTime,
     deadline,
     factTiming,
@@ -732,50 +756,45 @@ export async function assignCaseStudyToClass(req, res, next) {
     questionType,
     owned_by,
   } = req.body;
+
   console.log("Assigning case study to classes:", req.body);
-  if (!Array.isArray(selectedClasses) || selectedClasses.length === 0) {
-    return res.status(400).json({
-      success: false,
-      message: "selectedClasses must be a non-empty array",
-    });
-  }
 
   try {
     // Ensure DB connection
-    sql.connect(config);
+    await sql.connect(config);
+    const request = new sql.Request();
 
-    const allResults = [];
+    // Add inputs to SQL request
+    request.input("class_id", sql.Int, parseInt(selectedClass));
+    request.input("caseStudy_Id", sql.Int, parseInt(caseStudyId));
+    request.input("faculty_Id", sql.Int, facultyID);
+    request.input("startDateTime", sql.DateTime, startDateTime);
+    request.input("deadline", sql.DateTime, deadline);
+    request.input("factTiming", sql.Int, parseInt(factTiming));
+    request.input("analysisTiming", sql.Int, parseInt(analysisTiming));
+    request.input("classStart", sql.DateTime, classStart);
+    request.input("classEnd", sql.DateTime, classEnd);
+    request.input("factQuestions", sql.Int, parseInt(factQuestions));
+    request.input("analysisQuestions", sql.Int, parseInt(analysisQuestions));
+    request.input("questionType", sql.Bit, parseInt(questionType));
+    request.input("owned_by_who", sql.Bit, parseInt(owned_by));
 
-    for (const classId of selectedClasses) {
-      const request = new sql.Request();
+    // Execute the query
+    const result = await request.query(assignCaseStudyToClassQuery);
 
-      request.input("class_id", sql.Int, parseInt(classId));
-      request.input("caseStudy_Id", sql.Int, parseInt(caseStudyId));
-      request.input("faculty_Id", sql.Int, facultyID);
-      request.input("startDateTime", sql.DateTime, startDateTime);
-      request.input("deadline", sql.DateTime, deadline);
-      request.input("factTiming", sql.Int, parseInt(factTiming));
-      request.input("analysisTiming", sql.Int, parseInt(analysisTiming));
-      request.input("classStart", sql.DateTime, classStart);
-      request.input("classEnd", sql.DateTime, classEnd);
-      request.input("factQuestions", sql.Int, parseInt(factQuestions));
-      request.input("analysisQuestions", sql.Int, parseInt(analysisQuestions));
-      request.input("questionType", sql.Bit, parseInt(questionType));
-      request.input("owned_by_who", sql.Bit, parseInt(owned_by)); // Assuming owned_by is a string
-      try {
-        const result = await request.query(assignCaseStudyToClassQuery);
-        allResults.push({ classId, data: result.recordset });
-      } catch (queryErr) {
-        console.error(`Query error for classId ${classId}:`, queryErr.message);
-        allResults.push({ classId, error: queryErr.message });
-      }
+    // Check and return result
+    if (result) {
+      return res.status(200).json({
+        success: true,
+        message: "Case study assigned to all selected class",
+      });
+    } else {
+      return res.status(200).json({
+        success: false,
+        message: "No data returned after assigning case study",
+      });
     }
 
-    return res.status(200).json({
-      success: true,
-      message: "Case study assigned to all selected classes",
-      results: allResults,
-    });
   } catch (error) {
     console.error("DB Error:", error.message);
     return res.status(500).json({
@@ -785,7 +804,7 @@ export async function assignCaseStudyToClass(req, res, next) {
     });
   }
 }
-// Add Non-Practywiz Case Study
+
 export async function addNonPractywizCaseStudy(req, res) {
   try {
     const { title, author, category, questions, facultyId } = req.body;
