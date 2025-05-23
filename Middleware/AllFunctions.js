@@ -44,6 +44,39 @@ export function uploadMentorPhotoToAzure(imageData, blobName) {
       });
     });
 }
+// export function uploadMenteeResumeToAzure(fileBuffer, blobName) {
+//   console.log("line 49");
+// }
+export function uploadMenteeResumeToAzure(fileBuffer, blobName) {
+  console.log("line 49");
+  const blobService = new BlockBlobClient(
+    process.env.AZURE_STORAGE_CONNECTION_STRING,
+    "practiwizcontainer/menteeresume",
+    blobName
+  );
+
+  const stream = intoStream(fileBuffer);
+  const streamLength = fileBuffer.length;
+
+  return blobService
+    .uploadStream(stream, streamLength)
+    .then((response) => {
+      console.log("Resume uploaded to Azure successfully:", response.requestId);
+      // console.log("line 62");
+      return {
+        success: true,
+        message: "Upload successful",
+        url: blobService.url,
+      };
+    })
+    .catch((err) => {
+      console.error("Error uploading resume to Azure:", err.message);
+      return {
+        success: false,
+        error: "There was an error uploading to Azure Blob Storage",
+      };
+    });
+}
 
 export async function convertTo24HourFormat(time12h) {
   // Extract the period (AM/PM) from the string

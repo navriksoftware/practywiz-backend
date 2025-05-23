@@ -16,7 +16,7 @@ import { fileURLToPath } from "url";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import authRouter from "./Routes/AuthRoutes/AuthRoutes.js";
-import VerifyOTP from "./Routes/VerifyOTPRoutes/VerifyOTPRoutes.js"
+import VerifyOTP from "./Routes/VerifyOTPRoutes/VerifyOTPRoutes.js";
 import mentorRouter from "./Routes/MentorRoutes/MentorRoutes.js";
 import mentorBookingRouter from "./Routes/MentorRoutes/MentorBookingRoute.js";
 import menteeRoute from "./Routes/MenteeRoutes/MenteeRoutes.js";
@@ -61,10 +61,8 @@ const corsOptions = {
   ],
 };
 
-
 // Apply CORS middleware
 app.use(cors(corsOptions));
-
 
 app.options("*", cors(corsOptions)); // This is usually redundant, as `cors()` already handles preflight requests.
 
@@ -188,10 +186,8 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
       .query(autoApproveFetchAllNotApprovedMentorQuery);
     console.log(result.recordset);
 
-
     if (result.recordset.length > 0) {
       for (const record of result.recordset) {
-
         if (parseInt(record.total_progress) >= 80) {
           const name = record.mentor_firstname + " " + record.mentor_lastname;
 
@@ -202,13 +198,15 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
               "UPDATE mentor_dtls SET mentor_approved_status = 'Yes' WHERE mentor_user_dtls_id = @mentorUserId"
             );
 
-
-
           //Whatsappnotification send to mentor for account is approved now
-          ApprovedAccountMessgsendtoMentor(record.mentor_phone_number, name, "mentor_approved_success");
+          ApprovedAccountMessgsendtoMentor(
+            record.mentor_phone_number,
+            name,
+            "mentor_approved_success"
+          );
 
           // email send to mentor for account is approved now
-          mentorApprovedEmailTemplate(record.mentor_email, name)
+          mentorApprovedEmailTemplate(record.mentor_email, name);
         }
       }
     } else {
@@ -220,7 +218,7 @@ async function getAllNotApprovedMentorsListAdminDashboard() {
 }
 
 setInterval(() => {
-  getAllNotApprovedMentorsListAdminDashboard();// need to change the time interval according to the requirement
+  getAllNotApprovedMentorsListAdminDashboard(); // need to change the time interval according to the requirement
 }, 43200 * 1000);
 
 // Start server

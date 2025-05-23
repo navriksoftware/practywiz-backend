@@ -300,6 +300,7 @@ export async function ApplyInternship(req, res) {
     resume,
   } = req.body;
   console.log(req.body);
+  // return res.json({ error: "this is an custom error" });
   try {
     sql.connect(config, (err, db) => {
       if (err) return res.json({ error: err.message });
@@ -406,13 +407,22 @@ export async function employerProfileSettingUpdate(req, res) {
 
 export async function internshipStatusChange(req, res) {
   const { status, id } = req.body;
-  console.log("This is internship status", status);
-  console.log("user id is ", id);
-
-  return res
-    .status(200)
-    .json({ success: "Status has been changed Successfully" });
-  // return res.status(400).json({ error: "something went wrong" });
+  try {
+    let pool = await sql.connect(config);
+    let request = pool.request();
+    request.input("new_status", sql.VarChar, status);
+    request.input("internship_post_id", sql.Int, id);
+    await request.query(
+      `update [dbo].[employer_internship_posts_dtls] 
+      SET [employer_internship_post_status]=@new_status
+      where employer_internship_post_dtls_id=@internship_post_id`
+    );
+    return res
+      .status(200)
+      .json({ success: "Status has been changed Successfully" });
+  } catch (e) {
+    return res.status(400).json({ error: "Something went wrong in DataBase" });
+  }
 }
 
 export async function EditInternshipPost(req, res) {
