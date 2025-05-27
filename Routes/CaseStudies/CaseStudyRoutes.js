@@ -6,6 +6,7 @@ import {
   PayCaseStudyAmount,
   fetchPurchasedCaseStudies,
   fetchPurchasedCaseStudyById,
+  requestCaseStudy,
 } from "../../Controllers/CaseStydiesControllers/CaseStudiesController.js";
 
 import {
@@ -38,5 +39,7 @@ router.post("/generate-follow-up-question", generateFollowUpQuestions);
 router.post("/check-full-analysis-questions-result", checkFullAnalysisResult);
 
 router.post("/connect-with-consultant", connectWithCaseStudyConsultant);
+
+router.post("/request-case-study", requestCaseStudy);
 
 export default router;

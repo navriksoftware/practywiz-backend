@@ -13,6 +13,8 @@ import { sendEmail } from "../../Middleware/AllFunctions.js";
 import {
   caseStudyConsultantEmailTemplate,
   caseStudyAuthorAutoReplyTemplate,
+  CaseRequestToPractywizTemplate,
+  CaseRequestAuthorAutoReplyTemplate,
 } from "../../EmailTemplates/CaseStudyEmailTemplate/CaseStudyConsultantEmailTemplate.js";
 
 dotenv.config();
@@ -290,3 +292,74 @@ export async function connectWithCaseStudyConsultant(req, res) {
     });
   }
 }
+
+export const requestCaseStudy = async (req, res) => {
+  const { userEmail, caseArea, subject, expectedLearning, course, year } =
+    req.body;
+
+  // Validate required fields
+  if (
+    !userEmail ||
+    !caseArea ||
+    !subject ||
+    !expectedLearning ||
+    !course ||
+    !year
+  ) {
+    return res.status(400).json({
+      error: "Please provide all required fields.",
+    });
+  }
+
+  try {
+    // Send notification email to case study consultant
+    const consultantEmailTemplate = CaseRequestToPractywizTemplate(
+      userEmail,
+      caseArea,
+      subject,
+      expectedLearning,
+      course,
+      year
+    );
+
+    // Send auto-reply email to the potential author
+    const authorEmailTemplate = CaseRequestAuthorAutoReplyTemplate(
+      userEmail,
+      caseArea,
+      subject,
+      expectedLearning,
+      course,
+      year
+    );
+
+    // Send both emails
+    const consultantEmailResult = await sendEmail(consultantEmailTemplate);
+    const authorEmailResult = await sendEmail(authorEmailTemplate);
+
+    console.log(
+      "Consultant Email Result:",
+      consultantEmailResult,
+      "Author Email Result:",
+      authorEmailResult
+    );
+    // Check if emails were sent successfully
+    if (consultantEmailResult === "True" && authorEmailResult === "True") {
+      return res.status(200).json({
+        success:
+          "Your request has been sent successfully. Our case study consultant will contact you soon!",
+      });
+    } else {
+      // If email sending failed
+      return res.status(500).json({
+        error:
+          "There was an issue sending your request. Please try again later.",
+      });
+    }
+  } catch (error) {
+    console.error("Case study request error:", error);
+    return res.status(500).json({
+      error:
+        "There was an error processing your request. Please try again later.",
+    });
+  }
+};

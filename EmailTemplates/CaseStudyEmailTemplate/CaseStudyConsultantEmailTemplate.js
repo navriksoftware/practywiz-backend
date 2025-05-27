@@ -159,3 +159,193 @@ export const caseStudyAuthorAutoReplyTemplate = (name, email) => {
     `,
   };
 };
+
+export const CaseRequestToPractywizTemplate = (
+  userEmail,
+  caseArea,
+  subject,
+  expectedLearning,
+  course,
+  year
+) => {
+  return {
+    to: "tushar@navriksoftware.com", // Case study consultant email need to change with wecare@practywiz
+    from: "no-reply@practywiz.com",
+    subject: `New Case Study Request from ${userEmail}`,
+    html: `
+    <section
+      style="
+        font-family: 'Poppins', sans-serif;
+        background-color: #f4f8fb !important;
+        padding: 50px;
+      "
+    >
+      <div
+        style="
+          max-width: 600px;
+          margin: auto;
+          padding: 40px;
+          background-color: #ffffff !Important;
+          border-radius: 15px;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        "
+      >
+        <div style="text-align: center; margin-bottom: 30px;">
+          <img
+            src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
+            alt="Practywiz Logo"
+            style="max-width: 160px; margin-bottom: 20px;"
+          />
+          <h2
+            style="
+              font-size: 22px;
+              text-transform: uppercase;
+              color: #2c3e50;
+              margin: 0;
+            "
+          >
+            New Case Study Request
+          </h2>
+          <hr style="width: 80px; border: 1px solid #1abc9c; margin: 20px auto;" />
+        </div>
+
+        <p style="font-size: 16px; line-height: 1.5; color: #333333;">
+          A new case study request has been submitted by a user.
+        </p>
+        
+        <div style="background-color: #f9f9f9 !important; padding: 20px; border-radius: 10px; margin: 20px 0;">
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>User Email:</strong> ${userEmail}
+          </p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Case Area:</strong> ${caseArea}
+          </p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Subject:</strong> ${subject}
+          </p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Expected Learning:</strong> ${expectedLearning}
+          </p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Course:</strong> ${course}
+          </p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Year:</strong> ${year}
+          </p>
+        </div>
+        <p style="font-size: 16px; line-height: 1.5; color: #333333;">
+          Please reach out to this user at your earliest convenience.
+        </p>
+        <div style="text-align: center; margin-top: 30px;">
+          <a href="mailto:${userEmail}" 
+             style="text-decoration: none; padding: 12px 30px; background-color: #0255ca !important; color: #ffffff; border-radius: 50px; font-size: 16px; display: inline-block; box-shadow: 0 5px 15px rgba(2, 85, 202, 0.3);">
+            Contact User
+          </a>
+        </div>
+        <div style="text-align: center; margin-top: 40px;">
+          <img
+            src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
+            alt="Practywiz Footer Logo"
+            style="max-width: 120px;"
+          />
+        </div>
+      </div>
+    </section>
+    `,
+  };
+};
+
+export const CaseRequestAuthorAutoReplyTemplate = (
+  userEmail,
+  caseArea,
+  subject,
+  expectedLearning,
+  course,
+  year
+) => {
+  return {
+    to: userEmail, // Case study consultant email
+    from: "no-reply@practywiz.com",
+    subject: `Thank you for your case study request`,
+    html: `
+    <section
+      style="
+        font-family: 'Poppins', sans-serif;
+        background-color: #f4f8fb !important;
+        padding: 50px;
+      "
+    >
+      <div
+        style="
+          max-width: 600px;
+          margin: auto;
+          padding: 40px;
+          background-color: #ffffff !Important;
+          border-radius: 15px;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        "
+      >
+        <div style="text-align: center; margin-bottom: 30px;">
+          <img
+            src="https://practiwizstorage.blob.core.windows.net/practiwizcontainer/logo.jpg"
+            alt="Practywiz Logo"
+            style="max-width: 160px; margin-bottom: 20px;"
+          />
+          <h2
+            style="
+              font-size: 22px;
+              text-transform: uppercase;
+              color: #2c3e50;
+              margin: 0;
+            "
+          >
+            New Case Study Request
+          </h2>
+          <hr style="width: 80px; border: 1px solid #1abc9c; margin: 20px auto;" />
+        </div>
+
+        <p style="font-size: 16px; line-height: 1.5; color: #333333;">
+          Hi <b style="text-transform: uppercase;">${userEmail}</b>,
+        </p>
+        <p style="font-size: 16px; line-height: 1.5; color: #333333;">
+          Thank you for your case study request. We will review your request and get back to you shortly.
+        </p>
+        <p style="font-size: 16px; line-height: 1.5; color: #333333;">
+          Here are the details of your request:
+        </p>
+        <div style="background-color: #f9f9f9 !important; padding: 20px; border-radius: 10px; margin: 20px 0;">
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Case Area:</strong> ${caseArea}
+          </p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Subject:</strong> ${subject}
+          </p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Expected Learning:</strong> ${expectedLearning}
+          </p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Course:</strong> ${course}
+          </p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333333; margin: 10px 0;">
+            <strong>Year:</strong> ${year}
+          </p>
+        </div>
+        <p style="font-size: 16px; line-height: 1.5; color: #333333;">
+          If you have any questions in the meantime, please feel free to reach out to us.
+        </p>
+        <p style="font-size: 16px; line-height: 1.5; color: #333333; margin-top: 30px;">
+          Best Regards,<br />
+          The Practywiz Team
+        </p>
+        <div style="text-align: center; margin-top: 40px;">
+          <img
+            src="https://practiwizstorage.blob.core.windows.net/practywizcontainer/logo.jpg"
+            alt="Practywiz Footer Logo"
+            style="max-width: 120px;"
+          />
+        </div>
+      </div>
+    </section>
+    `,
+  };
+};
