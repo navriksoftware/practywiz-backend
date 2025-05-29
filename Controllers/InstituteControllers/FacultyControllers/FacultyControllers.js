@@ -24,7 +24,9 @@ import {
   fetchAssignCaseStudiesDetailsQuery,
   fetchCaseStudiesQuery,
   getSingleNonPractywizCaseStudyQuery,
-  getCaseStudyDataQuery
+  getCaseStudyDataQuery, deleteClassfacultySqlQuary,
+  fetchStudentListScoreQuary, SingleStudentAssessmentDetailsSQLQuary,
+  SingleStudentAssessmentUpdateSqlQuary
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -94,7 +96,7 @@ export async function fetchAssignCaseStudiesDetails(req, res, next) {
 }
 
 export async function fetchAssignSingleCaseStudiesDetails(req, res, next) {
-  const { class_id,case_study_id,case_type } = req.body;
+  const { class_id, case_study_id, case_type } = req.body;
   try {
     await poolConnect; // Ensure pool is connected
 
@@ -263,7 +265,7 @@ export async function BulkMenteeRegistration(req, res, next) {
   try {
     // Get JSON data from request body
     const { students, instituteName, classId } = req.body;
-  console.log(req.body)
+    console.log(req.body)
     if (!students || !Array.isArray(students) || students.length === 0) {
       return res
         .status(400)
@@ -616,6 +618,7 @@ export async function UpdateclassDetails(req, res, next) {
   }
 }
 
+
 export async function fetchAvailableCaseStudiesForfaculty(req, res, next) {
   const { facultyId } = req.body;
   try {
@@ -711,22 +714,22 @@ export async function fetchStudentListofClasses(req, res, next) {
 
       let allStudents = [];
 
-        const request = new sql.Request();
-        request.input("class_id", sql.Int, selectedClass);
+      const request = new sql.Request();
+      request.input("class_id", sql.Int, selectedClass);
 
-        try {
-          const result = await request.query(fetchStudentListDataQuery);
+      try {
+        const result = await request.query(fetchStudentListDataQuery);
 
-          if (result?.recordset?.length) {
-            allStudents = allStudents.concat(result.recordset);
-          }
-        } catch (queryErr) {
-          console.log(
-            `Error fetching for classId ${selectedClass}:`,
-            queryErr.message
-          );
+        if (result?.recordset?.length) {
+          allStudents = allStudents.concat(result.recordset);
         }
-      
+      } catch (queryErr) {
+        console.log(
+          `Error fetching for classId ${selectedClass}:`,
+          queryErr.message
+        );
+      }
+
 
       return res.status(200).json({ success: allStudents });
     });
@@ -893,6 +896,153 @@ export async function getSingleNonPractywizCaseStudy(req, res) {
     return res.status(500).json({ error: error.message });
   }
 }
+
+export async function handleDeleteClass(req, res) {
+  const { classId } = req.body;
+  console.log("Deleting class with ID:", req.body);
+  try {
+
+    if (!classId) {
+      return res.status(400).json({ error: "class Id is required" });
+    }
+
+    await poolConnect;
+    const request = pool.request();
+    request.input("class_Id", sql.Int, classId);
+
+    // const result = await request.query(
+    //   deleteClassfacultySqlQuary
+    // );
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: "Case study not found" });
+    }
+  } catch (error) {
+    console.error(
+      "Error in getSingleNonPractywizCaseStudy:",
+      error.message
+    );
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+export async function fetchStudentListofScorePage(req, res, next) {
+  const { class_id, faculty_caseassign_id } = req.body;
+  console.log("Fetching student list for class_id:", class_id, "and faculty_caseassign_id:", faculty_caseassign_id);
+  try {
+    sql.connect(config, async (err, db) => {
+      if (err) {
+        console.log(err.message);
+        return res.status(500).json({ error: err.message });
+      }
+      const request = new sql.Request();
+      request.input("class_id", sql.Int, class_id);
+      request.input("faculty_caseassign_id", sql.Int, faculty_caseassign_id);
+
+      try {
+        const result = await request.query(fetchStudentListScoreQuary);
+
+        if (result && result.recordset && result.recordset.length > 0) {
+          return res.status(200).json({ success: result.recordset });
+        }
+      } catch (queryErr) {
+        console.log(
+          `Error fetching for classId ${class_id} and faculty_caseassign_id ${faculty_caseassign_id}:`,
+          queryErr.message
+        );
+      }
+
+      return res.status(200).json({ success: [] });
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching student list",
+      error: error.message,
+    });
+  }
+}
+
+export async function SingleStudentAssessmentDetails(req, res, next) {
+  const { MenteeId, FacultyAssignId } = req.body;
+  console.log("Fetching assessment details for MenteeId:", MenteeId, "and FacultyAssignId:", FacultyAssignId);
+  if (!MenteeId || !FacultyAssignId) {
+    return res.status(400).json({ error: "MenteeId and FacultyAssignId are required" });
+  }
+
+  try {
+    sql.connect(config, async (err, db) => {
+      if (err) {
+        console.log(err.message);
+        return res.status(500).json({ error: err.message });
+      }
+      const request = new sql.Request();
+      request.input("Mentee_Id", sql.Int, MenteeId);
+      request.input("FacultyAssign_Id", sql.Int, FacultyAssignId);
+
+      try {
+        const result = await request.query(SingleStudentAssessmentDetailsSQLQuary);
+
+
+        return res.status(200).json({ success: result.recordset });
+
+      } catch (queryErr) {
+        console.log(
+          `Error fetching for classId ${MenteeId} and faculty_caseassign_id ${FacultyAssignId}:`,
+          queryErr.message
+        );
+      }
+
+      return res.status(200).json({ success: [] });
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching student list",
+      error: error.message,
+    });
+  }
+}
+
+
+export async function SingleStudentAssessmentUpdate(req, res, next) {
+  const { menteeId, AssignId, totalObtained, totalMax, factDetails, analysisDetails, researchDetails } = req.body;
+  console.log(factDetails);
+  try {
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.input("mentee_Id", sql.Int, parseInt(menteeId, 10));
+    request.input("Assign_Id", sql.Int, parseInt(AssignId, 10));
+    request.input("total_Obtained", sql.Int, parseInt(totalObtained, 10));
+    request.input("total_Max", sql.Int, parseInt(totalMax, 10));
+    request.input("fact_Details", sql.Text, JSON.stringify(factDetails));
+    request.input("analysis_Details", sql.Text, JSON.stringify(analysisDetails));
+    request.input("research_Details", sql.Text, JSON.stringify(researchDetails));
+
+    const result = await request.query(SingleStudentAssessmentUpdateSqlQuary);
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No matching record found to update.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Changes updated successfully",
+    });
+
+  } catch (error) {
+    console.error("Update Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error updating student assessment",
+      error: error.message,
+    });
+  }
+}
+
 
 // Handle cleanup when the process exits
 process.on("exit", () => {

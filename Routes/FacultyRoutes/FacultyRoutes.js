@@ -17,7 +17,9 @@ import {
   fetchAssignCaseStudiesDetails,
   fetchCaseStudiesListByclassId,
   getSingleNonPractywizCaseStudy,
-  fetchAssignSingleCaseStudiesDetails
+  fetchAssignSingleCaseStudiesDetails,
+  handleDeleteClass,
+  fetchStudentListofScorePage,SingleStudentAssessmentDetails,SingleStudentAssessmentUpdate
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
 const router = express.Router();
@@ -30,11 +32,17 @@ router.post("/dashboard/details", fetchFacultyDetailsDashboard);
 router.post("/dashboard/get-assigned-cases", fetchAssignCaseStudiesDetails);
 // Route to fetch assigned Single case Studies
 router.post("/dashboard/get-assigned-single-cases", fetchAssignSingleCaseStudiesDetails);
+// Route to fetch Single student assessment details
+router.post("/dashboard/single-assessment-details",SingleStudentAssessmentDetails);
+// Route to use Single student assessment details for update
+router.post("/dashboard/single-Student-assessment/update",SingleStudentAssessmentUpdate);
 
 // ==================== Class Routes ====================
 
 // Route to create a new class
 router.post("/createClass", CreateClass);
+
+router.post("/class/delete-class", handleDeleteClass);
 
 // Route to fetch class data for dashboard
 router.post("/class/get", fetchFacultyclassDetails);
@@ -79,6 +87,8 @@ router.post("/case-studies/fetch-classlist", getClassListData);
 router.post("/Student/fetch-student", fetchStudentListofClasses);
 // Route to assign a case study to a class by faculty
 router.post("/case-study/assign-case-study", assignCaseStudyToClass);
+// Route to fetch the student list of score page
+router.post("/student-score/list", fetchStudentListofScorePage);
 
 // ==================== Notification Routes ====================
 

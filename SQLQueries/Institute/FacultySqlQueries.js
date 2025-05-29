@@ -442,7 +442,8 @@ BEGIN
         cls.class_name,
         cls.class_subject,
         cls.class_subject_code,
-        cls.class_sem_end_date,       
+        cls.class_sem_end_date, 
+        np.non_practywiz_case_question,
         np.non_practywiz_case_title,
         np.non_practywiz_case_author
     FROM [dbo].[class_dtls] cls
@@ -452,3 +453,181 @@ BEGIN
 END
 
 `;
+export const deleteClassfacultySqlQuary = `
+-- Delete from class_mentee_mapping where class_dtls_id is present in both tables
+DELETE FROM [dbo].[class_mentee_mapping]
+WHERE class_dtls_id IN (
+    SELECT class_dtls_id
+    FROM [dbo].[class_mentee_mapping]
+    INTERSECT
+    SELECT class_dtls_id
+    FROM [dbo].[class_dtls]
+);
+
+-- Then delete from class_dtls where class_dtls_id was already in class_mentee_mapping
+DELETE FROM [dbo].[class_dtls]
+WHERE class_dtls_id IN (
+    SELECT class_dtls_id
+    FROM [dbo].[class_mentee_mapping] WITH (NOLOCK)
+    INTERSECT
+    SELECT class_dtls_id
+    FROM [dbo].[class_dtls]
+);
+
+`;
+
+
+export const fetchStudentListScoreQuary = `SELECT 
+    md.mentee_dtls_id,
+    md.mentee_user_dtls_id,
+    u.user_firstname,
+    u.user_lastname,
+    u.user_email,
+    u.user_phone_number,
+    md.mentee_roll_no,
+    rd.mentee_result_dtls_id,
+    rd.mentee_result_fact_details,
+    rd.mentee_result_analysis_details,
+    rd.mentee_result_research_details,
+    rd.mentee_result_total_score,
+    rd.mentee_result_max_score
+FROM 
+    dbo.class_mentee_mapping cm
+INNER JOIN 
+    dbo.mentee_dtls md ON cm.mentee_dtls_id = md.mentee_dtls_id
+INNER JOIN 
+    dbo.users_dtls u ON md.mentee_user_dtls_id = u.user_dtls_id
+LEFT JOIN 
+    dbo.mentee_result_dtls rd 
+    ON rd.mentee_result_mentee_dtls_id = md.mentee_dtls_id 
+    AND rd.mentee_result_faculty_case_assign_dtls_id = @faculty_caseassign_id
+WHERE 
+    cm.class_dtls_id = @class_id
+`;
+export const SingleStudentAssessmentDetailsSQLQuary = `
+SELECT 
+    -- Mentee Result Details
+    mr.*,
+
+    -- Faculty Case Assignment Details
+    fc.*,
+
+    -- Class Details
+    c.*,
+
+    -- Mentee Details
+    m.mentee_dtls_id,
+    m.mentee_user_dtls_id,
+    m.mentee_about,
+    m.mentee_skills,
+    m.mentee_gender,
+    m.mentee_type,
+    m.mentee_profile_pic_url,
+    m.mentee_institute_details,
+    m.mentee_certificate_details,
+    m.mentee_experience_details,
+    m.mentee_language,
+    m.mentee_linkedin_url,
+    m.mentee_twitter_url,
+    m.mentee_instagram_url,
+    m.mentee_dtls_cr_date,
+    m.mentee_dtls_update_date,
+    m.mentee_additional_details,
+    m.mentee_roll_no,
+    m.mentee_institute_code,
+    m.mentee_resume_url,
+
+    -- User Details
+    u.user_dtls_id,
+    u.user_email,
+    u.user_pwd,
+    u.user_firstname,
+    u.user_lastname,
+    u.user_phone_number,
+    u.user_status,
+    u.user_modified_by,
+    u.user_type,
+    u.user_is_superadmin,
+    u.user_logindate,
+    u.user_logintime,
+    u.user_token,
+    u.user_profile_active_status,
+
+    -- Practywiz Case Study Details
+    cs.case_study_id,
+    cs.case_study_categories,
+    cs.case_study_title,
+    cs.case_study_lesson,
+    cs.case_study_future_skills,
+    cs.case_study_num_characters,
+    cs.case_study_roles,
+    cs.case_study_main_character_role,
+    cs.case_study_challenge,
+    cs.case_study_content,
+    cs.case_study_questions,
+    cs.case_study_video_link,
+    cs.case_study_image_link,
+    cs.case_study_price,
+    cs.case_study_rating,
+
+    -- Non-Practywiz Case Study Details
+    ncs.non_practywiz_case_dtls_id,
+    ncs.non_practywiz_case_title,
+    ncs.non_practywiz_case_author,
+    ncs.non_practywiz_case_category,
+    ncs.non_practywiz_case_question,
+    ncs.non_practywiz_case_cr_date,
+    ncs.non_practywiz_case_update_date
+
+FROM [dbo].[mentee_result_dtls] mr
+
+-- Join faculty case assignment
+LEFT JOIN [dbo].[faculty_case_assign_dtls] fc
+    ON mr.mentee_result_faculty_case_assign_dtls_id = fc.faculty_case_assign_dtls_id
+
+-- Join class details
+LEFT JOIN [dbo].[class_dtls] c
+    ON fc.faculty_case_assign_class_dtls_id = c.class_dtls_id
+
+-- Join mentee details
+LEFT JOIN [dbo].[mentee_dtls] m
+    ON mr.mentee_result_mentee_dtls_id = m.mentee_dtls_id
+
+-- Join user details
+LEFT JOIN [dbo].[users_dtls] u
+    ON m.mentee_user_dtls_id = u.user_dtls_id
+
+-- Join Practywiz case study only if owned_by_practywiz = 1
+LEFT JOIN [dbo].[case_study_details] cs
+    ON fc.faculty_case_assign_owned_by_practywiz = 1
+    AND cs.case_study_id = fc.faculty_case_assign_case_study_id
+    AND fc.faculty_case_assign_dtls_id = mr.mentee_result_faculty_case_assign_dtls_id
+
+-- Join Non-Practywiz case study only if owned_by_practywiz = 0
+LEFT JOIN [dbo].[non_practywiz_case_dtls] ncs
+    ON fc.faculty_case_assign_owned_by_practywiz = 0
+    AND ncs.non_practywiz_case_dtls_id = fc.faculty_case_assign_case_study_id
+    AND fc.faculty_case_assign_dtls_id = mr.mentee_result_faculty_case_assign_dtls_id
+
+-- Filter by mentee ID and assignment ID
+WHERE 
+    mr.mentee_result_mentee_dtls_id = @Mentee_Id
+    AND mr.mentee_result_faculty_case_assign_dtls_id = @FacultyAssign_Id;
+
+`;
+
+export const SingleStudentAssessmentUpdateSqlQuary = `
+
+UPDATE [dbo].[mentee_result_dtls]
+SET 
+    [mentee_result_fact_details] = @fact_Details,
+    [mentee_result_analysis_details] = @analysis_Details,
+    [mentee_result_research_details] = @research_Details,
+    [mentee_result_max_score] = @total_Max,
+    [mentee_result_total_score] = @total_Obtained,
+    [mentee_result_update_date] = GETDATE()
+WHERE 
+    [mentee_result_mentee_dtls_id] = @mentee_Id
+    AND [mentee_result_faculty_case_assign_dtls_id] = @Assign_Id;
+
+`
