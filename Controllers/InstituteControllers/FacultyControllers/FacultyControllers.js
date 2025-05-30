@@ -96,13 +96,14 @@ export async function fetchAssignCaseStudiesDetails(req, res, next) {
 }
 
 export async function fetchAssignSingleCaseStudiesDetails(req, res, next) {
-  const { class_id, case_study_id, case_type } = req.body;
+  const { class_id, case_study_id, case_type, faculty_case_assign_dtls_id } = req.body;
   try {
     await poolConnect; // Ensure pool is connected
 
     const request = pool.request();
     request.input("class_id", sql.Int, class_id);
     request.input("case_study_id", sql.Int, case_study_id);
+    request.input("faculty_case_assign_dtls_id", sql.Int, faculty_case_assign_dtls_id);
     request.input("case_type", sql.VarChar, case_type);
 
     const result = await request.query(getCaseStudyDataQuery);

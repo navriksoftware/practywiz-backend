@@ -419,6 +419,40 @@ export const getSingleNonPractywizCaseStudyQuery = `
   WHERE non_practywiz_case_dtls_id = @caseStudyId
 `;
 
+// export const getCaseStudyDataQuery = `
+// IF @case_type = 'Practywiz'
+// BEGIN
+//     SELECT 
+//         cls.class_dtls_id,
+//         cls.class_name,
+//         cls.class_subject,
+//         cls.class_subject_code,
+//         cls.class_sem_end_date,
+//         cs.case_study_title,
+//         cs.case_study_questions
+//     FROM [dbo].[class_dtls] cls
+//     LEFT JOIN [dbo].[case_study_details] cs 
+//         ON cs.case_study_id = @case_study_id
+//     WHERE cls.class_dtls_id = @class_id;
+// END
+// ELSE IF @case_type = 'Non-Practywiz'
+// BEGIN
+//     SELECT 
+//         cls.class_dtls_id,
+//         cls.class_name,
+//         cls.class_subject,
+//         cls.class_subject_code,
+//         cls.class_sem_end_date, 
+//         np.non_practywiz_case_question,
+//         np.non_practywiz_case_title,
+//         np.non_practywiz_case_author
+//     FROM [dbo].[class_dtls] cls
+//     LEFT JOIN [dbo].[non_practywiz_case_dtls] np 
+//         ON np.non_practywiz_case_dtls_id = @case_study_id
+//     WHERE cls.class_dtls_id = @class_id;
+// END
+
+// `;
 export const getCaseStudyDataQuery = `
 IF @case_type = 'Practywiz'
 BEGIN
@@ -429,10 +463,15 @@ BEGIN
         cls.class_subject_code,
         cls.class_sem_end_date,
         cs.case_study_title,
-        cs.case_study_questions
+        cs.case_study_questions,
+        fcad.faculty_case_assign_dtls_id,
+        faculty_case_assign_end_date
+       
     FROM [dbo].[class_dtls] cls
     LEFT JOIN [dbo].[case_study_details] cs 
         ON cs.case_study_id = @case_study_id
+    LEFT JOIN [dbo].[faculty_case_assign_dtls] fcad 
+        ON fcad.faculty_case_assign_dtls_id = @faculty_case_assign_dtls_id
     WHERE cls.class_dtls_id = @class_id;
 END
 ELSE IF @case_type = 'Non-Practywiz'
@@ -445,12 +484,18 @@ BEGIN
         cls.class_sem_end_date, 
         np.non_practywiz_case_question,
         np.non_practywiz_case_title,
-        np.non_practywiz_case_author
+        np.non_practywiz_case_author,
+        fcad.faculty_case_assign_dtls_id,
+        faculty_case_assign_end_date
+        
     FROM [dbo].[class_dtls] cls
     LEFT JOIN [dbo].[non_practywiz_case_dtls] np 
         ON np.non_practywiz_case_dtls_id = @case_study_id
+    LEFT JOIN [dbo].[faculty_case_assign_dtls] fcad 
+        ON fcad.faculty_case_assign_dtls_id = @faculty_case_assign_dtls_id
     WHERE cls.class_dtls_id = @class_id;
 END
+
 
 `;
 export const deleteClassfacultySqlQuary = `
@@ -490,7 +535,8 @@ export const fetchStudentListScoreQuary = `SELECT
     rd.mentee_result_analysis_details,
     rd.mentee_result_research_details,
     rd.mentee_result_total_score,
-    rd.mentee_result_max_score
+    rd.mentee_result_max_score,
+    rd.mentee_result_update_date
 FROM 
     dbo.class_mentee_mapping cm
 INNER JOIN 

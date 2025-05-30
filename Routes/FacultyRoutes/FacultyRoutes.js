@@ -67,8 +67,8 @@ router.post("/bulk-register-mentees", BulkMenteeRegistration);
 // Route to fetch available case studies (Practiwiz and others)
 router.post("/case-study/list", fetchAvailableCaseStudiesForfaculty);
 
-// Route to add a non-Practiwiz case study
-router.post("/case-study/add-external", CreateClass);
+// // Route to add a non-Practiwiz case study
+// router.post("/case-study/add-external", CreateClass);
 
 // Route to add a non-Practiwiz case study
 router.post("/case-study/add-non-practywiz-case", addNonPractywizCaseStudy);
@@ -93,6 +93,6 @@ router.post("/student-score/list", fetchStudentListofScorePage);
 // ==================== Notification Routes ====================
 
 // Route to get dashboard notifications
-router.post("/notifications", CreateClass);
+// router.post("/notifications", CreateClass);
 
 export default router;
