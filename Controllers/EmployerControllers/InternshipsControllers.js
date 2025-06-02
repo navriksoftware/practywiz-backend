@@ -259,7 +259,7 @@ export async function fetchSingleInternshipPost(req, res, next) {
         }
       });
     });
-  } catch (error) { }
+  } catch (error) {}
 }
 
 export async function fetch10InternshipsInHome(req, res, next) {
@@ -300,6 +300,7 @@ export async function ApplyInternship(req, res) {
     resume,
   } = req.body;
   console.log(req.body);
+  // return res.json({ error: "this is an custom error" });
   try {
     sql.connect(config, (err, db) => {
       if (err) return res.json({ error: err.message });
@@ -350,8 +351,6 @@ export async function employerProfileSettingUpdate(req, res) {
       organization_website,
       organization_linkedin,
     } = fromdata;
-
-
 
     // Connect to the database
     let pool = await sql.connect(config);
@@ -404,4 +403,66 @@ export async function employerProfileSettingUpdate(req, res) {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
+}
+
+export async function internshipStatusChange(req, res) {
+  const { status, id } = req.body;
+  try {
+    let pool = await sql.connect(config);
+    let request = pool.request();
+    request.input("new_status", sql.VarChar, status);
+    request.input("internship_post_id", sql.Int, id);
+    await request.query(
+      `update [dbo].[employer_internship_posts_dtls] 
+      SET [employer_internship_post_status]=@new_status
+      where employer_internship_post_dtls_id=@internship_post_id`
+    );
+    return res
+      .status(200)
+      .json({ success: "Status has been changed Successfully" });
+  } catch (e) {
+    return res.status(400).json({ error: "Something went wrong in DataBase" });
+  }
+}
+
+export async function EditInternshipPost(req, res) {
+  const {
+    internshipProfile,
+    internshipType,
+    internshipOpening,
+    partFullTime,
+    StartTimeFrom,
+    endTimeTo,
+    internshipPostTimezone,
+    InternshipLocation,
+    internshipStart,
+    internshipDuration,
+    internshipStipendType,
+    stipendCurrencyType,
+    stipendAmount,
+    stipendTime,
+    internshipPPOcheckbox,
+    internshipRequirementsDeatils,
+    internshipResponsibilities,
+    supervisionType,
+    internshipSatrtBy,
+    employer_internship_post_support,
+    employer_internship_post_project,
+    employer_internship_post_contribution,
+    taskCategory,
+    businessObjective,
+    projectPlan,
+  } = req.body.payload;
+  const {
+    internshipPostId,
+    employerUserDtlsId,
+    internshipSkills,
+    internshipPerks,
+    internshipDomain,
+    employerOrgDtlsId,
+  } = req.body;
+
+  console.log("body data", req.body.payload);
+
+  return res.status(200).json({ success: "Post Edited Successfully" });
 }

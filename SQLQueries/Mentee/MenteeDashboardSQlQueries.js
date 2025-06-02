@@ -17,8 +17,8 @@ export const fetchMenteeSingleDashboardQuery = `SELECT
     m.[mentee_profile_pic_url],
     m.[mentee_institute_details],
     m.[mentee_certificate_details],
-    m.[mentee_experience_details]
-    ,m.[mentee_language],
+    m.[mentee_experience_details],
+    m.[mentee_language],
     m.[mentee_linkedin_url],
     m.[mentee_twitter_url],
     m.[mentee_instagram_url],
@@ -263,3 +263,63 @@ WHERE
     ia.[mentee_user_dtls_id] = @mentee_user_dtls_id
 ORDER BY 
     ia.[internship_applicant_dtls_cr_date] DESC`;
+export const GetCaseDetailsByMenteeIdSqlQuery = `
+SELECT 
+        -- Case Assignment Details
+        f.faculty_case_assign_dtls_id,
+        f.faculty_case_assign_faculty_dtls_id,
+        f.faculty_case_assign_case_study_id,
+        f.faculty_case_assign_class_dtls_id,
+        f.faculty_case_assign_start_date,
+        f.faculty_case_assign_end_date,
+        f.faculty_case_assign_owned_by_practywiz,
+        f.faculty_case_assign_fact_question_time,
+        f.faculty_case_assign_analysis_question_time,
+        f.faculty_case_assign_class_start_date,
+        f.faculty_case_assign_class_end_date,
+        f.faculty_case_assign_cr_date,
+        f.faculty_case_assign_update_date,
+        f.faculty_case_assign_fact_question_qty,
+        f.faculty_case_assign_analysis_question_qty,
+        f.faculty_case_assign_question_distribution,
+
+        -- Practywiz Case Details
+        c.case_study_title,
+        c.case_study_categories,
+        c.case_study_content,
+        c.case_study_questions,
+
+        -- Non-Practywiz Case Details
+        np.non_practywiz_case_title,
+        np.non_practywiz_case_author,
+        np.non_practywiz_case_question,
+        np.non_practywiz_case_category,
+
+        -- Class Details
+        cd.class_name,
+        cd.class_subject,
+        cd.class_subject_code,
+        cd.class_sem_end_date,
+        cd.class_faculty_dtls_id,
+        cd.class_dtls_cr_date,
+        cd.class_dtls_update_date,
+        cd.class_status
+
+    FROM [dbo].[faculty_case_assign_dtls] f
+
+    INNER JOIN [dbo].[class_mentee_mapping] m
+        ON f.faculty_case_assign_class_dtls_id = m.class_dtls_id
+
+    INNER JOIN [dbo].[class_dtls] cd
+        ON f.faculty_case_assign_class_dtls_id = cd.class_dtls_id
+
+    LEFT JOIN [dbo].[case_study_details] c
+        ON f.faculty_case_assign_case_study_id = c.case_study_id
+        AND f.faculty_case_assign_owned_by_practywiz = 1
+
+    LEFT JOIN [dbo].[non_practywiz_case_dtls] np
+        ON f.faculty_case_assign_case_study_id = np.non_practywiz_case_dtls_id
+        AND f.faculty_case_assign_owned_by_practywiz = 0
+
+    WHERE m.mentee_dtls_id = @menteeId;
+`;

@@ -3,10 +3,15 @@ import jwt from "jsonwebtoken";
 import sql from "mssql";
 import config from "../../Config/dbConfig.js";
 import dotenv from "dotenv";
-import { sendEmail } from "../../Middleware/AllFunctions.js";
+import {
+  sendEmail,
+  uploadMenteeResumeToAzure,
+} from "../../Middleware/AllFunctions.js";
 import moment from "moment";
+
 import {
   fetchMenteeSingleDashboardQuery,
+  GetCaseDetailsByMenteeIdSqlQuery,
   GetMenteeAppliedInternshipsSqlQuery,
   IsFeedbackSubmittedQuery,
   MarkMenteeAllMessagesAsReadQuery,
@@ -248,6 +253,156 @@ export async function MenteefetchAppliedInternships(req, res) {
       request.input("mentee_user_dtls_id", sql.Int, menteeId);
       request.query(
         GetMenteeAppliedInternshipsSqlQuery,
+
+        (err, result) => {
+          if (err) return res.json({ error: err.message });
+          if (result && result.recordset && result.recordset.length > 0) {
+            return res.json({ success: result.recordset });
+          } else {
+            return res.json({ error: "No record found" });
+          }
+        }
+      );
+    });
+  } catch (error) {
+    return res.json({ error: "There is some error while fetching" });
+  }
+}
+
+export async function ResumeUpload(req, res) {
+  let dbConn = null;
+
+  try {
+    // Validate required request parameters
+    const { name, id } = req.body;
+
+    if (!name || !id) {
+      return res
+        .status(400)
+        .json({ error: "Missing required parameters: name and id" });
+    }
+
+    // Validate file upload
+    if (!req.files || !req.files.file) {
+      return res.status(400).json({ error: "No resume file was uploaded" });
+    }
+
+    const file = req.files.file;
+
+    // Optional: Validate file type if needed
+    // if (file.mimetype !== "application/pdf") {
+    //   return res.status(400).json({ error: "Only PDF files are accepted" });
+    // }
+
+    // Generate blob name and URL
+    const blobName = `${id}-${name}`;
+    const mentee_resume_url = `https://practiwizstorage.blob.core.windows.net/practiwizcontainer/menteeresume/${blobName}`;
+
+    try {
+      // Upload file to Azure
+      await uploadMenteeResumeToAzure(file.data, blobName);
+    } catch (uploadError) {
+      console.error("Azure upload failed:", uploadError);
+      return res
+        .status(500)
+        .json({ error: "Failed to upload resume to storage" });
+    }
+
+    // Connect to database
+    try {
+      dbConn = await sql.connect(config);
+    } catch (dbError) {
+      console.error("Database connection failed:", dbError);
+      return res.status(500).json({ error: "Failed to connect to database" });
+    }
+
+    // Update database record
+    try {
+      const request = new sql.Request(dbConn);
+      request.input("mentee_resume_url", sql.VarChar, mentee_resume_url);
+      request.input("mentee_user_dtls_id", sql.Int, parseInt(id, 10));
+
+      const result = await request.query(
+        `UPDATE [dbo].[mentee_dtls] 
+         SET [mentee_resume_url] = @mentee_resume_url
+         WHERE mentee_user_dtls_id = @mentee_user_dtls_id`
+      );
+
+      // Check if any rows were affected
+      if (result.rowsAffected[0] === 0) {
+        return res
+          .status(404)
+          .json({ error: "No mentee record found with the provided ID" });
+      }
+
+      return res.status(200).json({
+        message: "Resume uploaded successfully",
+        url: mentee_resume_url,
+      });
+    } catch (queryError) {
+      console.error("Database query failed:", queryError);
+      return res
+        .status(500)
+        .json({ error: "Failed to update database record" });
+    }
+  } catch (error) {
+    console.error("ResumeUpload error:", error);
+    return res.status(500).json({
+      error: "An unexpected error occurred while processing your request",
+    });
+  } finally {
+    // Close database connection if it was opened
+    if (dbConn) {
+      try {
+        await dbConn.close();
+      } catch (closeError) {
+        console.error("Error closing database connection:", closeError);
+      }
+    }
+  }
+}
+
+export async function ResumeDownload(req, res) {
+  let dbConn = null;
+  const { user_id } = req.query;
+  // GET RESUME FROM DB
+  try {
+    dbConn = await sql.connect(config);
+  } catch (dbError) {
+    console.error("Database connection failed:", dbError);
+    return res.status(500).json({ error: "Failed to connect to database" });
+  }
+
+  try {
+    const request = new sql.Request(dbConn);
+    request.input("mentee_user_dtls_id", sql.Int, user_id);
+    const result = await request.query(
+      `select mentee_resume_url from [dbo].[mentee_dtls] 
+         WHERE mentee_user_dtls_id = @mentee_user_dtls_id`
+    );
+    return res.status(200).json({
+      message: "Got Resume URL Successfully",
+      url: `${result.recordset[0].mentee_resume_url}`,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+export async function MenteefetchCaseStudiesDetails(req, res) {
+  const { menteeId } = req.body;
+  if (!menteeId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Mentee ID is required" });
+  }
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) return res.json({ error: "There is some error while fetching" });
+      const request = new sql.Request();
+      request.input("menteeId", sql.Int, menteeId);
+      request.query(
+        GetCaseDetailsByMenteeIdSqlQuery,
 
         (err, result) => {
           if (err) return res.json({ error: err.message });

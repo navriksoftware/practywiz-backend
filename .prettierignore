@@ -1,0 +1,25 @@
+# Build outputs
+build/
+dist/
+
+# Dependencies
+node_modules/
+
+# Generated files
+coverage/
+*.min.js
+
+# Configuration files
+package-lock.json
+yarn.lock
+
+# Data dumps
+*.sql
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.*
