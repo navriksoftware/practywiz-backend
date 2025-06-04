@@ -26,7 +26,8 @@ import {
   getSingleNonPractywizCaseStudyQuery,
   getCaseStudyDataQuery, deleteClassfacultySqlQuary,
   fetchStudentListScoreQuary, SingleStudentAssessmentDetailsSQLQuary,
-  SingleStudentAssessmentUpdateSqlQuary
+  SingleStudentAssessmentUpdateSqlQuary,
+  deleteStudentfromClassSqlQuary
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
 
@@ -256,6 +257,28 @@ export async function fetchStudentListofClass(req, res, next) {
     return res.status(500).json({ error: error.message });
   }
 }
+export async function removeStudentFromClass(req, res, next) {
+  const { classMappingId } = req.body;
+  console.log("Removing student from class with classMappingId:", classMappingId);
+  if (!classMappingId) {
+    return res.status(400).json({ error: " classMappingId require" });
+  }
+  try {
+    await poolConnect; // Ensure pool is connected
+    const request = pool.request();
+    request.input("class_Mapping_Id", sql.Int, classMappingId);
+    const result = await request.query(deleteStudentfromClassSqlQuary);
+    if (result && result.rowsAffected && result.rowsAffected[0] > 0) {
+      return res.status(200).json({ success: "Student removed from class successfully" });
+    } else {
+      return res.status(404).json({ error: "No student found with the provided classMappingId" });
+    }
+  } catch (error) {
+    console.error("Error in fetchStudentListofClass:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 
 // Bulk registration of mentees with existing user handling
 // This function handles the case where the user already exists in the database

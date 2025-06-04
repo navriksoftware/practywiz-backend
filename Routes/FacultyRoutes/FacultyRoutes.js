@@ -19,7 +19,8 @@ import {
   getSingleNonPractywizCaseStudy,
   fetchAssignSingleCaseStudiesDetails,
   handleDeleteClass,
-  fetchStudentListofScorePage,SingleStudentAssessmentDetails,SingleStudentAssessmentUpdate
+  fetchStudentListofScorePage,SingleStudentAssessmentDetails,SingleStudentAssessmentUpdate,
+  removeStudentFromClass
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
 const router = express.Router();
@@ -56,6 +57,7 @@ router.post("/class/CaseStudiesList", fetchCaseStudiesListByclassId);
 router.post("/class/singledetail-Update", UpdateclassDetails);
 
 router.post("/class/studentlist", fetchStudentListofClass);
+router.post("/class/remove-student", removeStudentFromClass);
 
 // ==================== Notification Routes ====================
 
