@@ -3,8 +3,32 @@ import jwt from "jsonwebtoken";
 import sql from "mssql";
 import config from "../../../Config/dbConfig.js";
 import dotenv from "dotenv";
-// import { sendEmail } from "../../Middleware/AllFunctions.js";
 import moment from "moment";
+import {
+  accountCreatedEmailTemplate,
+  existingMenteeAddedToClassEmailTemplate,
+  newMenteeAccountCreatedEmailTemplate,
+} from "../../../EmailTemplates/AccountEmailTemplate/AccountEmailTemplate.js";
+import { InsertNotificationHandler } from "../../../Middleware/NotificationFunction.js";
+import {
+  SuccessMsg,
+  InfoMsg,
+  WarningMsg,
+  InstituteCodeVerifiedHeading,
+  InstituteCodeVerifiedMessage,
+  PasswordChangedHeading,
+  PasswordChangedMessage,
+  ClassCreatedHeading,
+  ClassCreatedMessage,
+  CaseAssignedToClassHeading,
+  CaseAssignedToClassMessage,
+  CaseAssignedByInstituteHeading,
+  CaseAssignedByInstituteMessage,
+  NonPractywizCaseCreatedHeading,
+  NonPractywizCaseCreatedMessage,
+  CaseDeadlineReminderHeading,
+  CaseDeadlineReminderMessage,
+} from "../../../Messages/Messages.js";
 import {
   createClassQuery,
   fetchFacultyClassQuery,
@@ -24,12 +48,15 @@ import {
   fetchAssignCaseStudiesDetailsQuery,
   fetchCaseStudiesQuery,
   getSingleNonPractywizCaseStudyQuery,
-  getCaseStudyDataQuery, deleteClassfacultySqlQuary,
-  fetchStudentListScoreQuary, SingleStudentAssessmentDetailsSQLQuary,
+  getCaseStudyDataQuery,
+  deleteClassfacultySqlQuary,
+  fetchStudentListScoreQuary,
+  SingleStudentAssessmentDetailsSQLQuary,
   SingleStudentAssessmentUpdateSqlQuary,
-  deleteStudentfromClassSqlQuary
+  deleteStudentfromClassSqlQuary,
 } from "../../../SQLQueries/Institute/FacultySqlQueries.js";
 import { userDtlsQuery } from "../../../SQLQueries/MentorSQLQueries.js";
+import { sendEmail } from "../../../Middleware/AllFunctions.js";
 
 dotenv.config();
 
@@ -69,7 +96,6 @@ export async function fetchFacultyDetailsDashboard(req, res, next) {
   }
 }
 
-
 export async function fetchAssignCaseStudiesDetails(req, res, next) {
   const { facultyid } = req.body;
 
@@ -97,14 +123,19 @@ export async function fetchAssignCaseStudiesDetails(req, res, next) {
 }
 
 export async function fetchAssignSingleCaseStudiesDetails(req, res, next) {
-  const { class_id, case_study_id, case_type, faculty_case_assign_dtls_id } = req.body;
+  const { class_id, case_study_id, case_type, faculty_case_assign_dtls_id } =
+    req.body;
   try {
     await poolConnect; // Ensure pool is connected
 
     const request = pool.request();
     request.input("class_id", sql.Int, class_id);
     request.input("case_study_id", sql.Int, case_study_id);
-    request.input("faculty_case_assign_dtls_id", sql.Int, faculty_case_assign_dtls_id);
+    request.input(
+      "faculty_case_assign_dtls_id",
+      sql.Int,
+      faculty_case_assign_dtls_id
+    );
     request.input("case_type", sql.VarChar, case_type);
 
     const result = await request.query(getCaseStudyDataQuery);
@@ -141,8 +172,27 @@ export async function CreateClass(req, res) {
     request.input("subject_name", sql.VarChar, SubjectName);
     request.input("semister_end", sql.Date, SemisterEnd);
     request.input("faculty_id", sql.Int, facultyId);
-
     const result = await request.query(createClassQuery);
+
+    // Get the faculty user ID from the faculty_dtls table
+    const userIdQuery = await request.query(`
+      SELECT faculty_user_dtls_id 
+      FROM faculty_dtls 
+      WHERE faculty_dtls_id = ${facultyId}
+    `);
+
+    if (userIdQuery.recordset && userIdQuery.recordset.length > 0) {
+      const userId = userIdQuery.recordset[0].faculty_user_dtls_id;
+
+      const customMessage = `Class ${Name} created successfully with Subject Code ${SubjectCode} and Subject Name ${SubjectName}.`;
+      // Add notification for class creation using the user ID, not faculty ID
+      await InsertNotificationHandler(
+        userId,
+        SuccessMsg,
+        ClassCreatedHeading,
+        customMessage
+      );
+    }
 
     console.log("Class created successfully");
     return res.status(200).json({
@@ -259,7 +309,10 @@ export async function fetchStudentListofClass(req, res, next) {
 }
 export async function removeStudentFromClass(req, res, next) {
   const { classMappingId } = req.body;
-  console.log("Removing student from class with classMappingId:", classMappingId);
+  console.log(
+    "Removing student from class with classMappingId:",
+    classMappingId
+  );
   if (!classMappingId) {
     return res.status(400).json({ error: " classMappingId require" });
   }
@@ -269,16 +322,19 @@ export async function removeStudentFromClass(req, res, next) {
     request.input("class_Mapping_Id", sql.Int, classMappingId);
     const result = await request.query(deleteStudentfromClassSqlQuary);
     if (result && result.rowsAffected && result.rowsAffected[0] > 0) {
-      return res.status(200).json({ success: "Student removed from class successfully" });
+      return res
+        .status(200)
+        .json({ success: "Student removed from class successfully" });
     } else {
-      return res.status(404).json({ error: "No student found with the provided classMappingId" });
+      return res
+        .status(404)
+        .json({ error: "No student found with the provided classMappingId" });
     }
   } catch (error) {
     console.error("Error in fetchStudentListofClass:", error.message);
     return res.status(500).json({ error: error.message });
   }
 }
-
 
 // Bulk registration of mentees with existing user handling
 // This function handles the case where the user already exists in the database
@@ -289,7 +345,6 @@ export async function BulkMenteeRegistration(req, res, next) {
   try {
     // Get JSON data from request body
     const { students, instituteName, classId } = req.body;
-    console.log(req.body)
     if (!students || !Array.isArray(students) || students.length === 0) {
       return res
         .status(400)
@@ -404,10 +459,46 @@ export async function BulkMenteeRegistration(req, res, next) {
                   UPDATE [dbo].[mentee_dtls] 
                   SET mentee_roll_no = @menteeRollNumber
                   WHERE mentee_dtls_id = @menteeId
+                `); // Get class details for the email
+                const classDetailsRequest = new sql.Request(transaction);
+                classDetailsRequest.input("classId", sql.Int, classId);
+                const classDetailsResult = await classDetailsRequest.query(`
+                   SELECT c.class_name, c.class_subject, c.class_subject_code,
+                         CONCAT(u.user_firstname, ' ', u.user_lastname) as instructor_name
+                  FROM class_dtls c
+                  JOIN faculty_dtls f ON c.class_faculty_dtls_id = f.faculty_dtls_id
+                  JOIN users_dtls u ON f.faculty_user_dtls_id = u.user_dtls_id
+                  WHERE c.class_dtls_id = @classId
                 `);
 
                 // Commit the transaction
                 await transaction.commit();
+
+                // If we have class details, send an email notification
+                if (classDetailsResult.recordset.length > 0) {
+                  const classDetails = classDetailsResult.recordset[0];
+
+                  // Send email notification to mentee about being added to a new class
+                  const emailData = existingMenteeAddedToClassEmailTemplate(
+                    email.toLowerCase(),
+                    fullName,
+                    classDetails.class_name,
+                    classDetails.class_subject,
+                    classDetails.class_subject_code,
+                    classDetails.instructor_name
+                  );
+                  try {
+                    await sendEmail(emailData);
+                    console.log(
+                      `Email notification sent to ${email} about new class enrollment`
+                    );
+                  } catch (emailError) {
+                    console.error(
+                      `Failed to send email notification to ${email}:`,
+                      emailError
+                    );
+                  }
+                }
 
                 // Add to existingMapped results
                 results.existingMapped.push({
@@ -483,7 +574,6 @@ export async function BulkMenteeRegistration(req, res, next) {
           userResult.recordset.length > 0
         ) {
           const userDtlsId = userResult.recordset[0].user_dtls_id;
-          console.log("User details inserted successfully:", userDtlsId);
 
           // Insert mentee details - Using transaction
           const menteeRequest = new sql.Request(transaction);
@@ -513,7 +603,6 @@ export async function BulkMenteeRegistration(req, res, next) {
             menteeResult.recordset.length > 0
           ) {
             const menteeDtlsId = menteeResult.recordset[0].mentee_dtls_id;
-            console.log("Mentee details inserted successfully:", menteeDtlsId);
 
             // Insert mentee-class mapping - Using transaction
             const menteeClassRequest = new sql.Request(transaction);
@@ -521,7 +610,17 @@ export async function BulkMenteeRegistration(req, res, next) {
             menteeClassRequest.input("classId", sql.Int, classId);
             await menteeClassRequest.query(
               `INSERT INTO [dbo].[class_mentee_mapping] (mentee_dtls_id, class_dtls_id) VALUES (@menteeId, @classId)`
-            );
+            ); // Get class details for the email
+            const classDetailsRequest = new sql.Request(transaction);
+            classDetailsRequest.input("classId", sql.Int, classId);
+            const classDetailsResult = await classDetailsRequest.query(`
+              SELECT c.class_name, c.class_subject, c.class_subject_code,
+                    CONCAT(u.user_firstname, ' ', u.user_lastname) as instructor_name
+              FROM class_dtls c
+              JOIN faculty_dtls f ON c.class_faculty_dtls_id = f.faculty_dtls_id
+              JOIN users_dtls u ON f.faculty_user_dtls_id = u.user_dtls_id
+              WHERE c.class_dtls_id = @classId
+            `);
 
             // Commit the transaction
             await transaction.commit();
@@ -534,6 +633,33 @@ export async function BulkMenteeRegistration(req, res, next) {
               password: defaultPassword, // Be careful with this in production
             });
 
+            // Send email notification with account details and class enrollment
+            if (classDetailsResult.recordset.length > 0) {
+              const classDetails = classDetailsResult.recordset[0];
+
+              const emailData = newMenteeAccountCreatedEmailTemplate(
+                email.toLowerCase(),
+                fullName,
+                defaultPassword,
+                classDetails.class_name,
+                classDetails.class_subject,
+                classDetails.class_subject_code,
+                classDetails.instructor_name
+              );
+
+              try {
+                await sendEmail(emailData);
+                console.log(
+                  `Account creation and class enrollment email sent to ${email}`
+                );
+              } catch (emailError) {
+                console.error(
+                  `Failed to send account creation email to ${email}:`,
+                  emailError
+                );
+              }
+            }
+
             // If you want to implement it, make sure these functions and variables are defined:
             /*
             // Send notifications
@@ -544,13 +670,6 @@ export async function BulkMenteeRegistration(req, res, next) {
               "Your account has been created successfully" // Replace AccountCreatedMessage
             );
 
-            // Send email
-            const msg = accountCreatedEmailTemplate(
-              email.toLowerCase(),
-              `${firstName} ${lastName}`,
-              defaultPassword
-            );
-            const emailResponse = await sendEmail(msg);
 
             // Send WhatsApp message
             sendWhatsAppMessage(
@@ -641,7 +760,6 @@ export async function UpdateclassDetails(req, res, next) {
     });
   }
 }
-
 
 export async function fetchAvailableCaseStudiesForfaculty(req, res, next) {
   const { facultyId } = req.body;
@@ -754,7 +872,6 @@ export async function fetchStudentListofClasses(req, res, next) {
         );
       }
 
-
       return res.status(200).json({ success: allStudents });
     });
   } catch (error) {
@@ -765,7 +882,6 @@ export async function fetchStudentListofClasses(req, res, next) {
     });
   }
 }
-
 
 export async function assignCaseStudyToClass(req, res, next) {
   const {
@@ -804,10 +920,25 @@ export async function assignCaseStudyToClass(req, res, next) {
     request.input("factQuestions", sql.Int, parseInt(factQuestions));
     request.input("analysisQuestions", sql.Int, parseInt(analysisQuestions));
     request.input("questionType", sql.Bit, parseInt(questionType));
-    request.input("owned_by_who", sql.Bit, parseInt(owned_by));
+    request.input("owned_by_who", sql.Bit, parseInt(owned_by)); // Execute the query
+    const result = await request.query(assignCaseStudyToClassQuery); // Get the faculty user ID from the faculty_dtls table
+    const userIdQuery = await request.query(`
+      SELECT faculty_user_dtls_id 
+      FROM faculty_dtls 
+      WHERE faculty_dtls_id = ${facultyID}
+    `);
 
-    // Execute the query
-    const result = await request.query(assignCaseStudyToClassQuery);
+    if (userIdQuery.recordset && userIdQuery.recordset.length > 0) {
+      const userId = userIdQuery.recordset[0].faculty_user_dtls_id;
+
+      // Add notification for case study assigned to class using the user ID, not faculty ID
+      await InsertNotificationHandler(
+        userId,
+        InfoMsg,
+        CaseAssignedToClassHeading,
+        CaseAssignedToClassMessage
+      );
+    }
 
     // Check and return result
     if (result) {
@@ -821,7 +952,6 @@ export async function assignCaseStudyToClass(req, res, next) {
         message: "No data returned after assigning case study",
       });
     }
-
   } catch (error) {
     console.error("DB Error:", error.message);
     return res.status(500).json({
@@ -848,8 +978,26 @@ export async function addNonPractywizCaseStudy(req, res) {
     request.input("category", sql.VarChar(255), category);
     request.input("questions", sql.Text, JSON.stringify(questions));
     request.input("facultyId", sql.Int, facultyId);
-
     await request.query(insertNonPractywizCaseStudyQuery);
+
+    // Get the faculty user ID from the faculty_dtls table
+    const userIdQuery = await request.query(`
+      SELECT faculty_user_dtls_id 
+      FROM faculty_dtls 
+      WHERE faculty_dtls_id = ${facultyId}
+    `);
+
+    if (userIdQuery.recordset && userIdQuery.recordset.length > 0) {
+      const userId = userIdQuery.recordset[0].faculty_user_dtls_id;
+      const customMessage = `Your non-Practywiz case study titled "${title}" has been created successfully.`;
+      // Add notification for non-Practywiz case creation using the user ID
+      await InsertNotificationHandler(
+        userId,
+        SuccessMsg,
+        NonPractywizCaseCreatedHeading,
+        customMessage
+      );
+    }
 
     return res.status(200).json({ message: "Case study added successfully" });
   } catch (error) {
@@ -897,9 +1045,7 @@ export async function getSingleNonPractywizCaseStudy(req, res) {
     const request = pool.request();
     request.input("caseStudyId", sql.Int, caseStudyId);
 
-    const result = await request.query(
-      getSingleNonPractywizCaseStudyQuery
-    );
+    const result = await request.query(getSingleNonPractywizCaseStudyQuery);
 
     if (result.recordset.length === 0) {
       return res.status(404).json({ error: "Case study not found" });
@@ -908,15 +1054,14 @@ export async function getSingleNonPractywizCaseStudy(req, res) {
     // Parse questions JSON for the record
     const caseStudy = {
       ...result.recordset[0],
-      non_practywiz_case_question: JSON.parse(result.recordset[0].non_practywiz_case_question),
+      non_practywiz_case_question: JSON.parse(
+        result.recordset[0].non_practywiz_case_question
+      ),
     };
 
     return res.status(200).json({ success: caseStudy });
   } catch (error) {
-    console.error(
-      "Error in getSingleNonPractywizCaseStudy:",
-      error.message
-    );
+    console.error("Error in getSingleNonPractywizCaseStudy:", error.message);
     return res.status(500).json({ error: error.message });
   }
 }
@@ -925,7 +1070,6 @@ export async function handleDeleteClass(req, res) {
   const { classId } = req.body;
   console.log("Deleting class with ID:", req.body);
   try {
-
     if (!classId) {
       return res.status(400).json({ error: "class Id is required" });
     }
@@ -942,17 +1086,19 @@ export async function handleDeleteClass(req, res) {
       return res.status(404).json({ error: "Case study not found" });
     }
   } catch (error) {
-    console.error(
-      "Error in getSingleNonPractywizCaseStudy:",
-      error.message
-    );
+    console.error("Error in getSingleNonPractywizCaseStudy:", error.message);
     return res.status(500).json({ error: error.message });
   }
 }
 
 export async function fetchStudentListofScorePage(req, res, next) {
   const { class_id, faculty_caseassign_id } = req.body;
-  console.log("Fetching student list for class_id:", class_id, "and faculty_caseassign_id:", faculty_caseassign_id);
+  console.log(
+    "Fetching student list for class_id:",
+    class_id,
+    "and faculty_caseassign_id:",
+    faculty_caseassign_id
+  );
   try {
     sql.connect(config, async (err, db) => {
       if (err) {
@@ -989,9 +1135,16 @@ export async function fetchStudentListofScorePage(req, res, next) {
 
 export async function SingleStudentAssessmentDetails(req, res, next) {
   const { MenteeId, FacultyAssignId } = req.body;
-  console.log("Fetching assessment details for MenteeId:", MenteeId, "and FacultyAssignId:", FacultyAssignId);
+  console.log(
+    "Fetching assessment details for MenteeId:",
+    MenteeId,
+    "and FacultyAssignId:",
+    FacultyAssignId
+  );
   if (!MenteeId || !FacultyAssignId) {
-    return res.status(400).json({ error: "MenteeId and FacultyAssignId are required" });
+    return res
+      .status(400)
+      .json({ error: "MenteeId and FacultyAssignId are required" });
   }
 
   try {
@@ -1005,11 +1158,11 @@ export async function SingleStudentAssessmentDetails(req, res, next) {
       request.input("FacultyAssign_Id", sql.Int, FacultyAssignId);
 
       try {
-        const result = await request.query(SingleStudentAssessmentDetailsSQLQuary);
-
+        const result = await request.query(
+          SingleStudentAssessmentDetailsSQLQuary
+        );
 
         return res.status(200).json({ success: result.recordset });
-
       } catch (queryErr) {
         console.log(
           `Error fetching for classId ${MenteeId} and faculty_caseassign_id ${FacultyAssignId}:`,
@@ -1028,9 +1181,16 @@ export async function SingleStudentAssessmentDetails(req, res, next) {
   }
 }
 
-
 export async function SingleStudentAssessmentUpdate(req, res, next) {
-  const { menteeId, AssignId, totalObtained, totalMax, factDetails, analysisDetails, researchDetails } = req.body;
+  const {
+    menteeId,
+    AssignId,
+    totalObtained,
+    totalMax,
+    factDetails,
+    analysisDetails,
+    researchDetails,
+  } = req.body;
   console.log(factDetails);
   try {
     await sql.connect(config);
@@ -1040,8 +1200,16 @@ export async function SingleStudentAssessmentUpdate(req, res, next) {
     request.input("total_Obtained", sql.Int, parseInt(totalObtained, 10));
     request.input("total_Max", sql.Int, parseInt(totalMax, 10));
     request.input("fact_Details", sql.Text, JSON.stringify(factDetails));
-    request.input("analysis_Details", sql.Text, JSON.stringify(analysisDetails));
-    request.input("research_Details", sql.Text, JSON.stringify(researchDetails));
+    request.input(
+      "analysis_Details",
+      sql.Text,
+      JSON.stringify(analysisDetails)
+    );
+    request.input(
+      "research_Details",
+      sql.Text,
+      JSON.stringify(researchDetails)
+    );
 
     const result = await request.query(SingleStudentAssessmentUpdateSqlQuary);
 
@@ -1056,7 +1224,6 @@ export async function SingleStudentAssessmentUpdate(req, res, next) {
       success: true,
       message: "Changes updated successfully",
     });
-
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({
@@ -1066,7 +1233,6 @@ export async function SingleStudentAssessmentUpdate(req, res, next) {
     });
   }
 }
-
 
 // Handle cleanup when the process exits
 process.on("exit", () => {

@@ -418,7 +418,6 @@ WHERE
 
 `;
 
-
 export const getSingleNonPractywizCaseStudyQuery = `
   SELECT * FROM non_practywiz_case_dtls
   WHERE non_practywiz_case_dtls_id = @caseStudyId
@@ -427,7 +426,7 @@ export const getSingleNonPractywizCaseStudyQuery = `
 // export const getCaseStudyDataQuery = `
 // IF @case_type = 'Practywiz'
 // BEGIN
-//     SELECT 
+//     SELECT
 //         cls.class_dtls_id,
 //         cls.class_name,
 //         cls.class_subject,
@@ -436,23 +435,23 @@ export const getSingleNonPractywizCaseStudyQuery = `
 //         cs.case_study_title,
 //         cs.case_study_questions
 //     FROM [dbo].[class_dtls] cls
-//     LEFT JOIN [dbo].[case_study_details] cs 
+//     LEFT JOIN [dbo].[case_study_details] cs
 //         ON cs.case_study_id = @case_study_id
 //     WHERE cls.class_dtls_id = @class_id;
 // END
 // ELSE IF @case_type = 'Non-Practywiz'
 // BEGIN
-//     SELECT 
+//     SELECT
 //         cls.class_dtls_id,
 //         cls.class_name,
 //         cls.class_subject,
 //         cls.class_subject_code,
-//         cls.class_sem_end_date, 
+//         cls.class_sem_end_date,
 //         np.non_practywiz_case_question,
 //         np.non_practywiz_case_title,
 //         np.non_practywiz_case_author
 //     FROM [dbo].[class_dtls] cls
-//     LEFT JOIN [dbo].[non_practywiz_case_dtls] np 
+//     LEFT JOIN [dbo].[non_practywiz_case_dtls] np
 //         ON np.non_practywiz_case_dtls_id = @case_study_id
 //     WHERE cls.class_dtls_id = @class_id;
 // END
@@ -526,7 +525,6 @@ WHERE class_dtls_id IN (
 
 `;
 
-
 export const fetchStudentListScoreQuary = `SELECT 
     md.mentee_dtls_id,
     md.mentee_user_dtls_id,
@@ -555,118 +553,186 @@ LEFT JOIN
 WHERE 
     cm.class_dtls_id = @class_id
 `;
+// export const SingleStudentAssessmentDetailsSQLQuary = `
+// SELECT
+//     -- Mentee Result Details
+//     mr.*,
+
+//     -- Faculty Case Assignment Details
+//     fc.*,
+
+//     -- Class Details
+//     c.*,
+
+//     -- Mentee Details
+//     m.mentee_dtls_id,
+//     m.mentee_user_dtls_id,
+//     m.mentee_about,
+//     m.mentee_skills,
+//     m.mentee_gender,
+//     m.mentee_type,
+//     m.mentee_profile_pic_url,
+//     m.mentee_institute_details,
+//     m.mentee_certificate_details,
+//     m.mentee_experience_details,
+//     m.mentee_language,
+//     m.mentee_linkedin_url,
+//     m.mentee_twitter_url,
+//     m.mentee_instagram_url,
+//     m.mentee_dtls_cr_date,
+//     m.mentee_dtls_update_date,
+//     m.mentee_additional_details,
+//     m.mentee_roll_no,
+//     m.mentee_institute_code,
+//     m.mentee_resume_url,
+
+//     -- User Details
+//     u.user_dtls_id,
+//     u.user_email,
+//     u.user_pwd,
+//     u.user_firstname,
+//     u.user_lastname,
+//     u.user_phone_number,
+//     u.user_status,
+//     u.user_modified_by,
+//     u.user_type,
+//     u.user_is_superadmin,
+//     u.user_logindate,
+//     u.user_logintime,
+//     u.user_token,
+//     u.user_profile_active_status,
+
+//     -- Practywiz Case Study Details
+//     cs.case_study_id,
+//     cs.case_study_categories,
+//     cs.case_study_title,
+//     cs.case_study_lesson,
+//     cs.case_study_future_skills,
+//     cs.case_study_num_characters,
+//     cs.case_study_roles,
+//     cs.case_study_main_character_role,
+//     cs.case_study_challenge,
+//     cs.case_study_content,
+//     cs.case_study_questions,
+//     cs.case_study_video_link,
+//     cs.case_study_image_link,
+//     cs.case_study_price,
+//     cs.case_study_rating,
+
+//     -- Non-Practywiz Case Study Details
+//     ncs.non_practywiz_case_dtls_id,
+//     ncs.non_practywiz_case_title,
+//     ncs.non_practywiz_case_author,
+//     ncs.non_practywiz_case_category,
+//     ncs.non_practywiz_case_question,
+//     ncs.non_practywiz_case_cr_date,
+//     ncs.non_practywiz_case_update_date
+
+// FROM [dbo].[mentee_result_dtls] mr
+
+// -- Join faculty case assignment
+// LEFT JOIN [dbo].[faculty_case_assign_dtls] fc
+//     ON mr.mentee_result_faculty_case_assign_dtls_id = fc.faculty_case_assign_dtls_id
+
+// -- Join class details
+// LEFT JOIN [dbo].[class_dtls] c
+//     ON fc.faculty_case_assign_class_dtls_id = c.class_dtls_id
+
+// -- Join mentee details
+// LEFT JOIN [dbo].[mentee_dtls] m
+//     ON mr.mentee_result_mentee_dtls_id = m.mentee_dtls_id
+
+// -- Join user details
+// LEFT JOIN [dbo].[users_dtls] u
+//     ON m.mentee_user_dtls_id = u.user_dtls_id
+
+// -- Join Practywiz case study only if owned_by_practywiz = 1
+// LEFT JOIN [dbo].[case_study_details] cs
+//     ON fc.faculty_case_assign_owned_by_practywiz = 1
+//     AND cs.case_study_id = fc.faculty_case_assign_case_study_id
+//     AND fc.faculty_case_assign_dtls_id = mr.mentee_result_faculty_case_assign_dtls_id
+
+// -- Join Non-Practywiz case study only if owned_by_practywiz = 0
+// LEFT JOIN [dbo].[non_practywiz_case_dtls] ncs
+//     ON fc.faculty_case_assign_owned_by_practywiz = 0
+//     AND ncs.non_practywiz_case_dtls_id = fc.faculty_case_assign_case_study_id
+//     AND fc.faculty_case_assign_dtls_id = mr.mentee_result_faculty_case_assign_dtls_id
+
+// -- Filter by mentee ID and assignment ID
+// WHERE
+//     mr.mentee_result_mentee_dtls_id = @Mentee_Id
+//     AND mr.mentee_result_faculty_case_assign_dtls_id = @FacultyAssign_Id;
+
+// `;
+
 export const SingleStudentAssessmentDetailsSQLQuary = `
-SELECT 
-    -- Mentee Result Details
-    mr.*,
-
-    -- Faculty Case Assignment Details
-    fc.*,
-
-    -- Class Details
-    c.*,
-
-    -- Mentee Details
-    m.mentee_dtls_id,
-    m.mentee_user_dtls_id,
-    m.mentee_about,
-    m.mentee_skills,
-    m.mentee_gender,
-    m.mentee_type,
-    m.mentee_profile_pic_url,
-    m.mentee_institute_details,
-    m.mentee_certificate_details,
-    m.mentee_experience_details,
-    m.mentee_language,
-    m.mentee_linkedin_url,
-    m.mentee_twitter_url,
-    m.mentee_instagram_url,
-    m.mentee_dtls_cr_date,
-    m.mentee_dtls_update_date,
-    m.mentee_additional_details,
-    m.mentee_roll_no,
-    m.mentee_institute_code,
-    m.mentee_resume_url,
-
-    -- User Details
-    u.user_dtls_id,
-    u.user_email,
-    u.user_pwd,
+    SELECT 
+    -- Mentee Basic Info
     u.user_firstname,
     u.user_lastname,
-    u.user_phone_number,
-    u.user_status,
-    u.user_modified_by,
-    u.user_type,
-    u.user_is_superadmin,
-    u.user_logindate,
-    u.user_logintime,
-    u.user_token,
-    u.user_profile_active_status,
-
-    -- Practywiz Case Study Details
-    cs.case_study_id,
-    cs.case_study_categories,
-    cs.case_study_title,
-    cs.case_study_lesson,
-    cs.case_study_future_skills,
-    cs.case_study_num_characters,
-    cs.case_study_roles,
-    cs.case_study_main_character_role,
-    cs.case_study_challenge,
-    cs.case_study_content,
-    cs.case_study_questions,
-    cs.case_study_video_link,
-    cs.case_study_image_link,
-    cs.case_study_price,
-    cs.case_study_rating,
-
-    -- Non-Practywiz Case Study Details
-    ncs.non_practywiz_case_dtls_id,
-    ncs.non_practywiz_case_title,
-    ncs.non_practywiz_case_author,
-    ncs.non_practywiz_case_category,
-    ncs.non_practywiz_case_question,
-    ncs.non_practywiz_case_cr_date,
-    ncs.non_practywiz_case_update_date
+    m.mentee_roll_no,
+    
+    -- Class Info
+    c.class_name,
+    c.class_subject,
+    c.class_subject_code,
+    
+    -- Assignment Dates
+    fc.faculty_case_assign_start_date,
+    fc.faculty_case_assign_end_date,
+    
+    -- Case Study Basic Info
+    CASE 
+        WHEN fc.faculty_case_assign_owned_by_practywiz = 1 
+        THEN cs.case_study_title
+        ELSE ncs.non_practywiz_case_title
+    END AS case_study_title,
+    
+    CASE 
+        WHEN fc.faculty_case_assign_owned_by_practywiz = 1 
+        THEN cs.case_study_categories
+        ELSE ncs.non_practywiz_case_category
+    END AS case_study_category,
+    
+    -- Result/Score Data (MAIN FOCUS)
+    mr.mentee_result_total_score,
+    mr.mentee_result_max_score,
+    mr.mentee_result_fact_details,
+    mr.mentee_result_analysis_details,
+    mr.mentee_result_research_details,
+    mr.mentee_result_update_date,
+    mr.mentee_result_cr_date,
+    
+    -- Additional useful fields
+    fc.faculty_case_assign_fact_question_qty,
+    fc.faculty_case_assign_analysis_question_qty
 
 FROM [dbo].[mentee_result_dtls] mr
 
--- Join faculty case assignment
 LEFT JOIN [dbo].[faculty_case_assign_dtls] fc
     ON mr.mentee_result_faculty_case_assign_dtls_id = fc.faculty_case_assign_dtls_id
 
--- Join class details
 LEFT JOIN [dbo].[class_dtls] c
     ON fc.faculty_case_assign_class_dtls_id = c.class_dtls_id
 
--- Join mentee details
 LEFT JOIN [dbo].[mentee_dtls] m
     ON mr.mentee_result_mentee_dtls_id = m.mentee_dtls_id
 
--- Join user details
 LEFT JOIN [dbo].[users_dtls] u
     ON m.mentee_user_dtls_id = u.user_dtls_id
 
--- Join Practywiz case study only if owned_by_practywiz = 1
 LEFT JOIN [dbo].[case_study_details] cs
     ON fc.faculty_case_assign_owned_by_practywiz = 1
     AND cs.case_study_id = fc.faculty_case_assign_case_study_id
-    AND fc.faculty_case_assign_dtls_id = mr.mentee_result_faculty_case_assign_dtls_id
 
--- Join Non-Practywiz case study only if owned_by_practywiz = 0
 LEFT JOIN [dbo].[non_practywiz_case_dtls] ncs
     ON fc.faculty_case_assign_owned_by_practywiz = 0
     AND ncs.non_practywiz_case_dtls_id = fc.faculty_case_assign_case_study_id
-    AND fc.faculty_case_assign_dtls_id = mr.mentee_result_faculty_case_assign_dtls_id
 
--- Filter by mentee ID and assignment ID
 WHERE 
     mr.mentee_result_mentee_dtls_id = @Mentee_Id
     AND mr.mentee_result_faculty_case_assign_dtls_id = @FacultyAssign_Id;
-
 `;
-
 export const SingleStudentAssessmentUpdateSqlQuary = `
 
 UPDATE [dbo].[mentee_result_dtls]
@@ -681,4 +747,4 @@ WHERE
     [mentee_result_mentee_dtls_id] = @mentee_Id
     AND [mentee_result_faculty_case_assign_dtls_id] = @Assign_Id;
 
-`
+`;
