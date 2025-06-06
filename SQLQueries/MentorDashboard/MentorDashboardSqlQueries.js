@@ -324,6 +324,8 @@ export const fetchMentorNotUpdatedDetailsQuery = `
     WHERE 
         u.[user_dtls_id] = @desired_mentor_dtls_id1;  -- Replace with the dynamic user id as needed`;
 
+export const fetchNotifictionsQuery = `SELECT * from notifications_dtls where notification_user_dtls_id = @userID order by notification_created_at desc`;
+
 export const MarkMentorAllMessagesAsReadQuery = `update notifications_dtls set notification_is_read = 1, notification_read_at =@timestamp where notification_user_dtls_id = @mentorUserDtlsId`;
 
 export const MarkMentorSingleMessageAsReadQuery = `update notifications_dtls set notification_is_read = 1, notification_read_at =@timestamp where notification_user_dtls_id = @mentorUserDtlsId and notification_dtls_id = @mentorNotificationId

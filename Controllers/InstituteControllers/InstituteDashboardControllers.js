@@ -11,6 +11,7 @@ import {
   SuccessMsg,
   CaseAssignedByInstituteHeading,
   CaseAssignedByInstituteMessage,
+  InstituteCaseAssignedToFacultyHeading,
 } from "../../Messages/Messages.js";
 import {
   fetchCaseStudiesListForInstituteQuery,
@@ -180,13 +181,13 @@ export async function AssignCaseStudyToFaculty(req, res, next) {
           "Unnamed case study";
 
         // Custom message for institute notification
-        const instituteCustomMessage = `A new case study "${caseStudyTitle}" assigned to "${facultyFullName}"`;
+        const instituteCustomMessage = `A new case study "${caseStudyTitle}" has been assigned to faculty member ${facultyFullName}`;
 
         // Add notification for institute admin
         await InsertNotificationHandler(
           instituteUserId,
           InfoMsg,
-          CaseAssignedByInstituteHeading,
+          InstituteCaseAssignedToFacultyHeading,
           instituteCustomMessage
         );
       }

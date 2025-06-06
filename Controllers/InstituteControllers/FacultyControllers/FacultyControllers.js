@@ -898,6 +898,7 @@ export async function assignCaseStudyToClass(req, res, next) {
     analysisQuestions,
     questionType,
     owned_by,
+    caseStudyTitle,
   } = req.body;
 
   console.log("Assigning case study to classes:", req.body);
@@ -922,26 +923,34 @@ export async function assignCaseStudyToClass(req, res, next) {
     request.input("questionType", sql.Bit, parseInt(questionType));
     request.input("owned_by_who", sql.Bit, parseInt(owned_by)); // Execute the query
     const result = await request.query(assignCaseStudyToClassQuery); // Get the faculty user ID from the faculty_dtls table
-    const userIdQuery = await request.query(`
+
+    // Check and return result
+    if (result) {
+      const userIdQuery = await request.query(`
       SELECT faculty_user_dtls_id 
       FROM faculty_dtls 
       WHERE faculty_dtls_id = ${facultyID}
     `);
+      const classAssignedTo = await request.query(`
+      SELECT class_name, class_subject, class_subject_code
+      FROM class_dtls
+      WHERE class_dtls_id = ${selectedClass}
+    `);
 
-    if (userIdQuery.recordset && userIdQuery.recordset.length > 0) {
-      const userId = userIdQuery.recordset[0].faculty_user_dtls_id;
+      if (userIdQuery.recordset && userIdQuery.recordset.length > 0) {
+        const userId = userIdQuery.recordset[0]?.faculty_user_dtls_id;
+        const className = classAssignedTo.recordset[0]?.class_name;
+        const classSubject = classAssignedTo.recordset[0]?.class_subject;
+        const customMessage = `Case study titled "${caseStudyTitle}" has been assigned to class "${className}" with Subject "${classSubject}" successfully.`;
+        // Add notification for case study assigned to class using the user ID, not faculty ID
+        await InsertNotificationHandler(
+          userId,
+          InfoMsg,
+          CaseAssignedToClassHeading,
+          customMessage
+        );
+      }
 
-      // Add notification for case study assigned to class using the user ID, not faculty ID
-      await InsertNotificationHandler(
-        userId,
-        InfoMsg,
-        CaseAssignedToClassHeading,
-        CaseAssignedToClassMessage
-      );
-    }
-
-    // Check and return result
-    if (result) {
       return res.status(200).json({
         success: true,
         message: "Case study assigned to all selected class",

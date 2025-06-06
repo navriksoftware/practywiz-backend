@@ -17,6 +17,9 @@ export const CaseStudySubmittedHeading = "Case study submitted";
 export const MentorApplicationProgressHeading = `Fill the mentor application`;
 export const InternshipHeading = `Internship post created`;
 
+//institute notification headings
+export const InstituteCaseAssignedToFacultyHeading = `New case assigned to faculty`;
+
 // Faculty notification headings
 export const InstituteCodeVerifiedHeading = `Institute code verified`;
 export const ClassCreatedHeading = `Class created successfully`;
