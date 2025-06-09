@@ -70,6 +70,8 @@ export async function RegisterInstitute(req, res, next) {
       user_type,
     } = req.body.data;
 
+    console.log(req.body.data);
+
     const lowEmail = email.toLowerCase();
     const saltRounds = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -151,7 +153,6 @@ export async function RegisterInstitute(req, res, next) {
     // Send email
     const fullName = `${contact_person_first_name} ${contact_person_last_name}`;
     const msg = accountCreatedEmailTemplate(lowEmail, fullName);
-<<<<<<< Updated upstream
 
     try {
       const emailResponse = await sendEmail(msg);
@@ -161,9 +162,6 @@ export async function RegisterInstitute(req, res, next) {
     } catch (emailError) {
       console.error("Error sending email:", emailError);
     }
-=======
-    const response = await sendEmail(msg);
->>>>>>> Stashed changes
 
     // Generate JWT tokens
     const user_role = user_type; // Assuming user_type is equivalent to role, adjust if needed
@@ -204,11 +202,7 @@ export async function RegisterInstitute(req, res, next) {
   } catch (error) {
     console.error("Registration error:", error);
     return res.json({
-<<<<<<< Updated upstream
       error: "There is something wrong with the registration process.",
-=======
-      error: "There is something wrong with the registration.",
->>>>>>> Stashed changes
     });
   }
 }
