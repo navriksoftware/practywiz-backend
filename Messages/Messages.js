@@ -16,6 +16,18 @@ export const MentorDisApprovedHeading = `Not Approved as a Mentor`;
 export const CaseStudySubmittedHeading = "Case study submitted";
 export const MentorApplicationProgressHeading = `Fill the mentor application`;
 export const InternshipHeading = `Internship post created`;
+
+//institute notification headings
+export const InstituteCaseAssignedToFacultyHeading = `New case assigned to faculty`;
+
+// Faculty notification headings
+export const InstituteCodeVerifiedHeading = `Institute code verified`;
+export const ClassCreatedHeading = `Class created successfully`;
+export const CaseAssignedToClassHeading = `New case assigned to class`;
+export const CaseAssignedByInstituteHeading = `New case assigned by institute`;
+export const NonPractywizCaseCreatedHeading = `Non-Practywiz case created`;
+export const CaseDeadlineReminderHeading = `Case deadline reminder`;
+
 // notification messages
 export const MentorDisApprovedMsg = `There are some reasons while approving for the mentor`;
 export const PasswordChangedMessage = `Successfully you have updated the password for the account`;
@@ -33,6 +45,20 @@ export const CaseStudyPurchasedMessage =
   "You have successfully purchased the case study";
 export const MentorEmailAlertMessage =
   "Please fill the mentor application, To approve as a mentor.";
-export const InternshipPostMessage = "Successfully you have created the internship post "
+export const InternshipPostMessage =
+  "Successfully you have created the internship post ";
 export const EmployerProfileChangedMessage =
   "Successfully you have updated the Employer profile details.";
+
+// Faculty notification messages
+export const InstituteCodeVerifiedMessage =
+  "Your institute code has been successfully verified";
+export const ClassCreatedMessage = "You have successfully created a new class";
+export const CaseAssignedToClassMessage =
+  "A new case study has been assigned to your class";
+export const CaseAssignedByInstituteMessage =
+  "A new case study has been assigned to you by your institute admin";
+export const NonPractywizCaseCreatedMessage =
+  "You have successfully created a non-Practywiz case study";
+export const CaseDeadlineReminderMessage =
+  "Reminder: The deadline for a case study assigned to your class is approaching";

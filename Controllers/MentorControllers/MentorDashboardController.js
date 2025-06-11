@@ -7,6 +7,7 @@ import {
   CheckBankDetailsExistsQuery,
   fetchMentorNotUpdatedDetailsQuery,
   fetchMentorSingleDashboardQuery,
+  fetchNotifictionsQuery,
   InsertBankDetailsQuery,
   MarkMentorAllMessagesAsReadQuery,
   MarkMentorSingleMessageAsReadQuery,
@@ -165,6 +166,43 @@ export async function InsertBankDetails(req, res) {
                   success: "successfully inserted the bank details",
                 });
               }
+            });
+          }
+        });
+      }
+    });
+  } catch (error) {
+    return res.json({
+      error: error.message,
+    });
+  }
+}
+
+export async function fetchNotifictions(req, res) {
+  const { userId } = req.params;
+  try {
+    sql.connect(config, (err, db) => {
+      if (err) {
+        return res.json({
+          error: err.message,
+        });
+      }
+      if (db) {
+        const request = new sql.Request();
+        request.input("userID", sql.Int, userId);
+        request.query(fetchNotifictionsQuery, (err, result) => {
+          if (err) {
+            return res.json({
+              error: err.message,
+            });
+          }
+          if (result.recordset.length > 0) {
+            return res.json({
+              success: result.recordset,
+            });
+          } else {
+            return res.json({
+              error: "No notifications found",
             });
           }
         });

@@ -40,6 +40,7 @@ import { sendEmail } from "./Middleware/AllFunctions.js";
 import { autoApproveFetchAllNotApprovedMentorQuery } from "./SQLQueries/AdminDashboard/AdminSqlQueries.js";
 import { ApprovedAccountMessgsendtoMentor } from "./WhtasappMessages/SuccessMessageFunction.js";
 import { mentorApprovedEmailTemplate } from "./EmailTemplates/MentorEmailTemplate/MentorEmailTemplate.js";
+import { initDeadlineReminders } from "./Middleware/DeadlineReminder.js";
 
 dotenv.config();
 
@@ -225,4 +226,7 @@ setInterval(() => {
 app.listen(port, () => {
   console.log(`Running on port http://localhost:${port}`);
   console.log("Working fine on " + process.env.PORT);
+
+  // Initialize the deadline reminder service
+  initDeadlineReminders();
 });

@@ -8,7 +8,7 @@ import moment from "moment";
 import {
   InstituteRegisterSqlQuery,
   InstituteTableInsertQuery,
-  FacultyTableInsertQuery
+  FacultyTableInsertQuery,
 } from "../../SQLQueries/Institute/InstituteSQLQueries.js";
 import { accountCreatedEmailTemplate } from "../../EmailTemplates/AccountEmailTemplate/AccountEmailTemplate.js";
 import { InsertNotificationHandler } from "../../Middleware/NotificationFunction.js";
@@ -57,7 +57,6 @@ export async function fetchGuestLectures(req, res, next) {
   }
 }
 
-
 export async function RegisterInstitute(req, res, next) {
   try {
     const {
@@ -68,7 +67,7 @@ export async function RegisterInstitute(req, res, next) {
       password,
       organization_name,
       organization_code,
-      user_type
+      user_type,
     } = req.body.data;
 
     console.log(req.body.data);
@@ -76,44 +75,57 @@ export async function RegisterInstitute(req, res, next) {
     const lowEmail = email.toLowerCase();
     const saltRounds = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    
+
     // Connect to SQL database
     const pool = await sql.connect(config);
-    
+
     // Check if email already exists
     const checkEmailRequest = new sql.Request(pool);
     checkEmailRequest.input("email", sql.VarChar, lowEmail);
     const emailCheckResult = await checkEmailRequest.query(
       "select user_email from users_dtls where user_email = @email"
     );
-    
+
     if (emailCheckResult.recordset.length > 0) {
       return res.json({
-        error: "This email address is already in use. Please use another email address"
+        error:
+          "This email address is already in use. Please use another email address",
       });
     }
-    
+
     // Register user
     const registerRequest = new sql.Request(pool);
-    
+
     // Add common input parameters
     registerRequest.input("user_email", sql.VarChar, lowEmail);
     registerRequest.input("user_pwd", sql.VarChar, hashedPassword);
-    registerRequest.input("user_firstname", sql.VarChar, contact_person_first_name);
-    registerRequest.input("user_lastname", sql.VarChar, contact_person_last_name);
+    registerRequest.input(
+      "user_firstname",
+      sql.VarChar,
+      contact_person_first_name
+    );
+    registerRequest.input(
+      "user_lastname",
+      sql.VarChar,
+      contact_person_last_name
+    );
     registerRequest.input("user_phone_number", sql.VarChar, phone);
     registerRequest.input("user_status", sql.VarChar, "1");
     registerRequest.input("user_type", sql.VarChar, user_type);
-    
+
     // Insert user details
     const userResult = await registerRequest.query(InstituteRegisterSqlQuery);
-    
-    if (!userResult || !userResult.recordset || userResult.recordset.length === 0) {
+
+    if (
+      !userResult ||
+      !userResult.recordset ||
+      userResult.recordset.length === 0
+    ) {
       return res.json({ error: "No record inserted or returned." });
     }
-    
+
     const userDtlsId = userResult.recordset[0].user_dtls_id;
-    
+
     // Insert organization details (either institute or faculty)
     const orgRequest = new sql.Request(pool);
     orgRequest.input("userId", sql.Int, userDtlsId);
@@ -121,14 +133,15 @@ export async function RegisterInstitute(req, res, next) {
     orgRequest.input("organizationCode", sql.VarChar, organization_code);
     orgRequest.input("organizationAbout", sql.Text, "");
     orgRequest.input("organizationProfilePic", sql.VarChar, "");
-    
+
     // Use the appropriate query based on user type
-    const queryToUse = user_type === "institute" ? 
-      InstituteTableInsertQuery : 
-      FacultyTableInsertQuery;
-      
+    const queryToUse =
+      user_type === "institute"
+        ? InstituteTableInsertQuery
+        : FacultyTableInsertQuery;
+
     await orgRequest.query(queryToUse);
-    
+
     // Handle notifications
     await InsertNotificationHandler(
       userDtlsId,
@@ -136,15 +149,23 @@ export async function RegisterInstitute(req, res, next) {
       AccountCreatedHeading,
       AccountCreatedMessage
     );
-    
+
     // Send email
     const fullName = `${contact_person_first_name} ${contact_person_last_name}`;
     const msg = accountCreatedEmailTemplate(lowEmail, fullName);
-    const response = await sendEmail(msg);
-    
+
+    try {
+      const emailResponse = await sendEmail(msg);
+      if (emailResponse !== "True" && emailResponse !== true) {
+        console.error("Email sending failed:", emailResponse);
+      }
+    } catch (emailError) {
+      console.error("Error sending email:", emailError);
+    }
+
     // Generate JWT tokens
     const user_role = user_type; // Assuming user_type is equivalent to role, adjust if needed
-    
+
     const accessToken = jwt.sign(
       {
         user_id: userDtlsId,
@@ -153,7 +174,7 @@ export async function RegisterInstitute(req, res, next) {
       process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
       { expiresIn: "48h" }
     );
-    
+
     const token = jwt.sign(
       {
         user_id: userDtlsId,
@@ -166,24 +187,25 @@ export async function RegisterInstitute(req, res, next) {
       process.env.JWT_LOGIN_SECRET_KEY,
       { expiresIn: "48h" }
     );
-    
+
     // Return success message with tokens
-    const userTypeText = user_type === "institute" ? "an institute" : "a faculty";
+    const userTypeText =
+      user_type === "institute" ? "an institute" : "a faculty";
     return res.json({
       success: `Thank you for registering as ${userTypeText}`,
       success_status: true,
       token: token,
       accessToken: accessToken,
       user_type: user_type,
-      user_id: userDtlsId
+      user_id: userDtlsId,
     });
-    
   } catch (error) {
     console.error("Registration error:", error);
-    return res.json({ error: "There is something wrong with the registration process." });
+    return res.json({
+      error: "There is something wrong with the registration process.",
+    });
   }
 }
-
 
 // export async function RegisterInstitute(req, res, next) {
 //   const {
@@ -329,7 +351,6 @@ export async function RegisterInstitute(req, res, next) {
 //                   }
 //                 });
 //               }
-
 
 //             } else {
 //               return res.json({ error: "No record inserted or returned." });

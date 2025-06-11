@@ -8,13 +8,14 @@ import moment from "moment";
 import { userDtlsQuery } from "../../SQLQueries/MentorSQLQueries.js";
 import { MenteeRegisterQuery } from "../../SQLQueries/Mentee/MenteeSqlQueries.js";
 import { accountCreatedEmailTemplate } from "../../EmailTemplates/AccountEmailTemplate/AccountEmailTemplate.js";
+import { newUserNotificationTemplate } from "../../EmailTemplates/AdminEmailTemplate/AdminNotificationTemplate.js";
 import { InsertNotificationHandler } from "../../Middleware/NotificationFunction.js";
 import {
   AccountCreatedHeading,
   AccountCreatedMessage,
   SuccessMsg,
 } from "../../Messages/Messages.js";
-import {sendWhatsAppMessage} from "../../WhtasappMessages/SuccessMessageFunction.js";
+import { sendWhatsAppMessage } from "../../WhtasappMessages/SuccessMessageFunction.js";
 
 dotenv.config();
 
@@ -118,6 +119,16 @@ export async function MenteeRegistration(req, res, next) {
                     mentee_firstname + " " + mentee_lastname
                   );
                   const response = await sendEmail(msg);
+
+                  // Send notification to admin
+                  const fullName = mentee_firstname + " " + mentee_lastname;
+                  const adminMsg = newUserNotificationTemplate(
+                    "Mentee",
+                    fullName,
+                    lowEmail
+                  );
+                  await sendEmail(adminMsg);
+
                   if (
                     response === "True" ||
                     response === "true" ||

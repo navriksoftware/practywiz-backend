@@ -36,7 +36,11 @@ import {
   traineeBookingRemainderEmailTemplate,
 } from "../../EmailTemplates/MentorEmailTemplate/MentorSessionEmailTemplates.js";
 import { MentorSessionBookingRemainderSqlQuery } from "../../SQLQueries/MentorDashboard/MentorNotificationSqlQuery.js";
-import {sendWhatsAppMessage,RemainderMessgSendToMentor,RemainderMessgSendToMentee} from "../../WhtasappMessages/SuccessMessageFunction.js";
+import {
+  sendWhatsAppMessage,
+  RemainderMessgSendToMentor,
+  RemainderMessgSendToMentee,
+} from "../../WhtasappMessages/SuccessMessageFunction.js";
 dotenv.config();
 
 // registering of the mentor application
@@ -240,7 +244,6 @@ export async function MentorRegistration(req, res, next) {
                 success: "Thank you for applying the mentor application",
               });
             }
-
           } else {
             console.error("No record inserted or returned.");
             return res.json({ err: "No record inserted or returned." });
@@ -537,10 +540,8 @@ function sentEmailRemainderToMentorAndTrainee(beforeMinutes) {
               "https://www.practiwiz.com/mentor/dashboard"
             );
 
-
             // RemainderMessgSendToMentor(mentorPhoneNo, menteeName, mentorName, mentorBookingStartsTime, starttime, endtime, joinURL, template)
             // RemainderMessgSendToMentee(mentorPhoneNo, menteeName, mentorName, mentorBookingStartsTime, starttime, endtime, joinURL, template)
-
 
             scheduleReminderHandler(
               bookingDbDate,
