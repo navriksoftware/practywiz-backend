@@ -38,7 +38,14 @@ const sendWhatsAppMessage = async (phoneNumber, firstName, template) => {
     );
   }
 };
-const menteePaymentReceivedMessage = async (menteePhoneNo, menteeName, sessionDate, sessionFrom, sessionTo, template) => {
+const menteePaymentReceivedMessage = async (
+  menteePhoneNo,
+  menteeName,
+  sessionDate,
+  sessionFrom,
+  sessionTo,
+  template
+) => {
   try {
     const response = await axios({
       url: "https://graph.facebook.com/v21.0/581414571714157/messages",
@@ -61,9 +68,9 @@ const menteePaymentReceivedMessage = async (menteePhoneNo, menteeName, sessionDa
               type: "body",
               parameters: [
                 { type: "text", text: menteeName },
-                { type: 'text', text: sessionDate },
-                { type: 'text', text: sessionFrom },
-                { type: 'text', text: sessionTo }
+                { type: "text", text: sessionDate },
+                { type: "text", text: sessionFrom },
+                { type: "text", text: sessionTo },
               ],
             },
           ],
@@ -79,7 +86,15 @@ const menteePaymentReceivedMessage = async (menteePhoneNo, menteeName, sessionDa
     );
   }
 };
-const ApprovalReqToMentorMessage = async (mentorPhoneNo, mentorName, menteeName, sessionDate, sessionFrom, sessionTo, template) => {
+const ApprovalReqToMentorMessage = async (
+  mentorPhoneNo,
+  mentorName,
+  menteeName,
+  sessionDate,
+  sessionFrom,
+  sessionTo,
+  template
+) => {
   try {
     const response = await axios({
       url: "https://graph.facebook.com/v21.0/581414571714157/messages",
@@ -102,10 +117,10 @@ const ApprovalReqToMentorMessage = async (mentorPhoneNo, mentorName, menteeName,
               type: "body",
               parameters: [
                 { type: "text", text: mentorName },
-                { type: 'text', text: menteeName },
-                { type: 'text', text: sessionDate },
-                { type: 'text', text: sessionFrom },
-                { type: 'text', text: sessionTo }
+                { type: "text", text: menteeName },
+                { type: "text", text: sessionDate },
+                { type: "text", text: sessionFrom },
+                { type: "text", text: sessionTo },
               ],
             },
           ],
@@ -121,7 +136,16 @@ const ApprovalReqToMentorMessage = async (mentorPhoneNo, mentorName, menteeName,
     );
   }
 };
-const SessionApprovedToMenteeMessage = async (menteePhoneNo, menteeName, mentorName, mentorBookingStartsTime, starttime, endtime, joinURL, template) => {
+const SessionApprovedToMenteeMessage = async (
+  menteePhoneNo,
+  menteeName,
+  mentorName,
+  mentorBookingStartsTime,
+  starttime,
+  endtime,
+  joinURL,
+  template
+) => {
   try {
     const response = await axios({
       url: "https://graph.facebook.com/v21.0/581414571714157/messages",
@@ -144,11 +168,11 @@ const SessionApprovedToMenteeMessage = async (menteePhoneNo, menteeName, mentorN
               type: "body",
               parameters: [
                 { type: "text", text: menteeName },
-                { type: 'text', text: mentorName },
-                { type: 'text', text: mentorBookingStartsTime },
-                { type: 'text', text: starttime },
-                { type: 'text', text: endtime },
-                { type: 'text', text: joinURL }
+                { type: "text", text: mentorName },
+                { type: "text", text: mentorBookingStartsTime },
+                { type: "text", text: starttime },
+                { type: "text", text: endtime },
+                { type: "text", text: joinURL },
               ],
             },
           ],
@@ -164,7 +188,16 @@ const SessionApprovedToMenteeMessage = async (menteePhoneNo, menteeName, mentorN
     );
   }
 };
-const SessionApprovedToMentorMessage = async (mentorPhoneNo, menteeName, mentorName, mentorBookingStartsTime, starttime, endtime, joinURL, template) => {
+const SessionApprovedToMentorMessage = async (
+  mentorPhoneNo,
+  menteeName,
+  mentorName,
+  mentorBookingStartsTime,
+  starttime,
+  endtime,
+  joinURL,
+  template
+) => {
   try {
     const response = await axios({
       url: "https://graph.facebook.com/v21.0/581414571714157/messages",
@@ -187,11 +220,11 @@ const SessionApprovedToMentorMessage = async (mentorPhoneNo, menteeName, mentorN
               type: "body",
               parameters: [
                 { type: "text", text: mentorName },
-                { type: 'text', text: menteeName },
-                { type: 'text', text: mentorBookingStartsTime },
-                { type: 'text', text: starttime },
-                { type: 'text', text: endtime },
-                { type: 'text', text: joinURL }
+                { type: "text", text: menteeName },
+                { type: "text", text: mentorBookingStartsTime },
+                { type: "text", text: starttime },
+                { type: "text", text: endtime },
+                { type: "text", text: joinURL },
               ],
             },
           ],
@@ -207,7 +240,11 @@ const SessionApprovedToMentorMessage = async (mentorPhoneNo, menteeName, mentorN
     );
   }
 };
-const ApprovedAccountMessgsendtoMentor = async (mentorPhoneNo, mentorName, template) => {
+const ApprovedAccountMessgsendtoMentor = async (
+  mentorPhoneNo,
+  mentorName,
+  template
+) => {
   try {
     const response = await axios({
       url: "https://graph.facebook.com/v21.0/581414571714157/messages",
@@ -228,9 +265,7 @@ const ApprovedAccountMessgsendtoMentor = async (mentorPhoneNo, mentorName, templ
           components: [
             {
               type: "body",
-              parameters: [
-                { type: "text", text: mentorName }
-              ],
+              parameters: [{ type: "text", text: mentorName }],
             },
           ],
         },
@@ -246,7 +281,16 @@ const ApprovedAccountMessgsendtoMentor = async (mentorPhoneNo, mentorName, templ
   }
 };
 
-const RemainderMessgSendToMentor = async (mentorPhoneNo, menteeName, mentorName, mentorBookingStartsTime, starttime, endtime, joinURL, template) => {
+const RemainderMessgSendToMentor = async (
+  mentorPhoneNo,
+  menteeName,
+  mentorName,
+  mentorBookingStartsTime,
+  starttime,
+  endtime,
+  joinURL,
+  template
+) => {
   try {
     const response = await axios({
       url: "https://graph.facebook.com/v21.0/581414571714157/messages",
@@ -269,11 +313,11 @@ const RemainderMessgSendToMentor = async (mentorPhoneNo, menteeName, mentorName,
               type: "body",
               parameters: [
                 { type: "text", text: mentorName },
-                { type: 'text', text: menteeName },
-                { type: 'text', text: mentorBookingStartsTime },
-                { type: 'text', text: starttime },
-                { type: 'text', text: endtime },
-                { type: 'text', text: joinURL }
+                { type: "text", text: menteeName },
+                { type: "text", text: mentorBookingStartsTime },
+                { type: "text", text: starttime },
+                { type: "text", text: endtime },
+                { type: "text", text: joinURL },
               ],
             },
           ],
@@ -289,7 +333,16 @@ const RemainderMessgSendToMentor = async (mentorPhoneNo, menteeName, mentorName,
     );
   }
 };
-const RemainderMessgSendToMentee = async (mentorPhoneNo, menteeName, mentorName, mentorBookingStartsTime, starttime, endtime, joinURL, template) => {
+const RemainderMessgSendToMentee = async (
+  mentorPhoneNo,
+  menteeName,
+  mentorName,
+  mentorBookingStartsTime,
+  starttime,
+  endtime,
+  joinURL,
+  template
+) => {
   try {
     const response = await axios({
       url: "https://graph.facebook.com/v21.0/581414571714157/messages",
@@ -312,11 +365,11 @@ const RemainderMessgSendToMentee = async (mentorPhoneNo, menteeName, mentorName,
               type: "body",
               parameters: [
                 { type: "text", text: menteeName },
-                { type: 'text', text: mentorName },
-                { type: 'text', text: mentorBookingStartsTime },
-                { type: 'text', text: starttime },
-                { type: 'text', text: endtime },
-                { type: 'text', text: joinURL }
+                { type: "text", text: mentorName },
+                { type: "text", text: mentorBookingStartsTime },
+                { type: "text", text: starttime },
+                { type: "text", text: endtime },
+                { type: "text", text: joinURL },
               ],
             },
           ],
@@ -333,7 +386,6 @@ const RemainderMessgSendToMentee = async (mentorPhoneNo, menteeName, mentorName,
   }
 };
 
-
 export {
   sendWhatsAppMessage,
   ApprovalReqToMentorMessage,
@@ -342,5 +394,5 @@ export {
   menteePaymentReceivedMessage,
   ApprovedAccountMessgsendtoMentor,
   RemainderMessgSendToMentor,
-  RemainderMessgSendToMentee
+  RemainderMessgSendToMentee,
 };

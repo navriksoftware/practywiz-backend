@@ -317,10 +317,12 @@ export async function ApplyInternship(req, res) {
       request.query(ApplyInternshipSqlQuery, (err, result) => {
         if (err) return res.json({ error: err.message });
         if (result) {
+          costumMssgHeading = "Internship Applied";
+          costumMssg = "You have successfully applied for the internship";
           const menteeNotificationHandler = InsertNotificationHandler(
             mentee_user_dtls_id,
             SuccessMsg,
-            InternshipHeading,
+            costumMssgHeading,
             InternshipPostMessage
           );
           return res.json({

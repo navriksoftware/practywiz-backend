@@ -29,6 +29,7 @@ import {
 // import moment, { max } from "moment";
 import { mentorApplicationEmail } from "../../EmailTemplates/MentorEmailTemplate/MentorEmailTemplate.js";
 import { sendWhatsAppMessage } from "../../WhtasappMessages/SuccessMessageFunction.js";
+import { newUserNotificationTemplate } from "../../EmailTemplates/AdminEmailTemplate/AdminNotificationTemplate.js";
 // import { json } from "body-parser";
 dotenv.config();
 
@@ -142,7 +143,7 @@ export async function MentorUpdatedRegistration(req, res, next) {
                 "mentor_profile_photo",
                 sql.VarChar,
                 filename ||
-                "https://practiwizstorage.blob.core.windows.net/practiwizcontainer/blue-circle-with-white-user_78370-4707.webp"
+                  "https://practiwizstorage.blob.core.windows.net/practiwizcontainer/blue-circle-with-white-user_78370-4707.webp"
               );
               request.input(
                 "mentor_social_media_profile",
@@ -233,13 +234,22 @@ export async function MentorUpdatedRegistration(req, res, next) {
                       AccountCreatedHeading,
                       AccountCreatedMessage
                     );
+
+                    // Send notification to admin
+                    const adminMsg = newUserNotificationTemplate(
+                      "Mentor",
+                      mentor_firstname + " " + mentor_lastname,
+                      lowEmail
+                    );
+                    await sendEmail(adminMsg);
+
                     const msg = mentorUpdatedRegAccountCreatedEmailTemplate(
                       lowEmail,
                       mentor_firstname + " " + mentor_lastname
                     );
                     const response = await sendEmail(msg);
                     const name = mentor_firstname + " " + mentor_lastname;
-                    //message send to mentor for Account created successfully & 80% prfile need to complete for approval  
+                    //message send to mentor for Account created successfully & 80% prfile need to complete for approval
                     // sendWhatsAppMessage(mentor_phone_number, name, "mentor_acct_create_success_meg");
 
                     const accessToken = jwt.sign(
@@ -350,7 +360,6 @@ export async function MentorUpdateAdditionalDetails(req, res, next) {
           // );
           const response = await sendEmail(msg);
           if (response === "True" || response === "true" || response === true) {
-
             return res.json({
               success: "Thank you for applying the mentor application",
             });
@@ -398,24 +407,24 @@ function arrayFunctions(array, mentorDtlsId, day, timestamp) {
           }
           request.query(
             "INSERT INTO mentor_timeslots_dtls (mentor_dtls_id,mentor_timeslot_day,mentor_timeslot_from,mentor_timeslot_to,mentor_timeslot_rec_indicator,mentor_timeslot_rec_end_timeframe,mentor_timeslot_rec_cr_date,mentor_timeslot_rec_update_date,mentor_timeslot_duration) VALUES('" +
-            mentorDtlsId +
-            "','" +
-            day +
-            "','" +
-            FromTime +
-            "','" +
-            ToTime +
-            "','" +
-            mentorRecType +
-            "','" +
-            mentorRecEndDate +
-            "','" +
-            timestamp +
-            "','" +
-            timestamp +
-            "','" +
-            mentorTimeSlotDuration +
-            "')",
+              mentorDtlsId +
+              "','" +
+              day +
+              "','" +
+              FromTime +
+              "','" +
+              ToTime +
+              "','" +
+              mentorRecType +
+              "','" +
+              mentorRecEndDate +
+              "','" +
+              timestamp +
+              "','" +
+              timestamp +
+              "','" +
+              mentorTimeSlotDuration +
+              "')",
             (err, success) => {
               if (err) {
                 console.log(err.message);
@@ -445,30 +454,31 @@ function updateMentorTimestamp(availabilityData, mentorDtlsId) {
             0,
             2
           )}${item.startPeriod}`;
-          let ToTime = `${item.endHour}:${item.endMinute.substring(0, 2)}${item.endPeriod
-            }`;
+          let ToTime = `${item.endHour}:${item.endMinute.substring(0, 2)}${
+            item.endPeriod
+          }`;
           let mentorRecStartDate = `${item.fromDate}`;
           let mentorRecEndDate = `${item.toDate}`;
           let mentorTimeSlotDuration = `${item.duration}`;
           let mentorRecType = "Daily";
           request.query(
             "INSERT INTO mentor_timeslots_dtls (mentor_dtls_id,mentor_timeslot_day,mentor_timeslot_from,mentor_timeslot_to,mentor_timeslot_rec_indicator,mentor_timeslot_rec_end_timeframe,mentor_timeslot_duration,mentor_timeslot_rec_start_timeframe) VALUES('" +
-            mentorDtlsId +
-            "','" +
-            day +
-            "','" +
-            FromTime +
-            "','" +
-            ToTime +
-            "','" +
-            mentorRecType +
-            "','" +
-            mentorRecEndDate +
-            "','" +
-            mentorTimeSlotDuration +
-            "','" +
-            mentorRecStartDate +
-            "')",
+              mentorDtlsId +
+              "','" +
+              day +
+              "','" +
+              FromTime +
+              "','" +
+              ToTime +
+              "','" +
+              mentorRecType +
+              "','" +
+              mentorRecEndDate +
+              "','" +
+              mentorTimeSlotDuration +
+              "','" +
+              mentorRecStartDate +
+              "')",
             (err, success) => {
               if (err) {
                 console.log(err.message);
@@ -518,5 +528,3 @@ export async function MentorOnboardingFeedbackController(req, res, next) {
     return res.json({ error: err.message });
   }
 }
-
-

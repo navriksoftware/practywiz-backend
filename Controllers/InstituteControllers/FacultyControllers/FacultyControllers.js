@@ -9,7 +9,13 @@ import {
   existingMenteeAddedToClassEmailTemplate,
   newMenteeAccountCreatedEmailTemplate,
 } from "../../../EmailTemplates/AccountEmailTemplate/AccountEmailTemplate.js";
+import {
+  caseStudyAssignmentEmailTemplate,
+  caseStudyCombinedEmailTemplate,
+  caseStudySplitEmailTemplate,
+} from "../../../EmailTemplates/CaseStudyEmailTemplate/CaseStudyAssignmentEmailTemplate.js";
 import { InsertNotificationHandler } from "../../../Middleware/NotificationFunction.js";
+import { scheduleCaseStudyReminder } from "../../../Middleware/CaseStudyReminderScheduler.js";
 import {
   SuccessMsg,
   InfoMsg,
@@ -469,12 +475,10 @@ export async function BulkMenteeRegistration(req, res, next) {
                   JOIN faculty_dtls f ON c.class_faculty_dtls_id = f.faculty_dtls_id
                   JOIN users_dtls u ON f.faculty_user_dtls_id = u.user_dtls_id
                   WHERE c.class_dtls_id = @classId
-                `);
-
-                // Commit the transaction
+                `); // Commit the transaction
                 await transaction.commit();
 
-                // If we have class details, send an email notification
+                // If we have class details, send an email notification and create notification
                 if (classDetailsResult.recordset.length > 0) {
                   const classDetails = classDetailsResult.recordset[0];
 
@@ -498,8 +502,18 @@ export async function BulkMenteeRegistration(req, res, next) {
                       emailError
                     );
                   }
-                }
 
+                  // Create in-app notification for the mentee
+                  const customMenteeAddedToClassHeading = `You have been added to a new class`;
+                  const customMenteeMessage = `You have been successfully added to the class ${classDetails.class_name} with Subject Code ${classDetails.class_subject_code}.`;
+
+                  const menteeNotification = await InsertNotificationHandler(
+                    existingUser.user_dtls_id,
+                    SuccessMsg,
+                    customMenteeAddedToClassHeading,
+                    customMenteeMessage
+                  );
+                }
                 // Add to existingMapped results
                 results.existingMapped.push({
                   rollNumber,
@@ -632,6 +646,18 @@ export async function BulkMenteeRegistration(req, res, next) {
               email,
               password: defaultPassword, // Be careful with this in production
             });
+
+            //system notification for mentee account creation
+            const customMessage = `Your account has been created successfully with email ${email.toLowerCase()} and password ${defaultPassword}. You have been enrolled in the class ${
+              classDetailsResult.recordset[0].class_name
+            }.`;
+            const customHeading = `Account Created Successfully`;
+            await InsertNotificationHandler(
+              userDtlsId,
+              SuccessMsg,
+              customHeading,
+              customMessage
+            );
 
             // Send email notification with account details and class enrollment
             if (classDetailsResult.recordset.length > 0) {
@@ -883,6 +909,7 @@ export async function fetchStudentListofClasses(req, res, next) {
   }
 }
 
+// factTiming, analysisTiming, 0=before class, 1=In after class, 2=after class
 export async function assignCaseStudyToClass(req, res, next) {
   const {
     caseStudyId,
@@ -948,6 +975,157 @@ export async function assignCaseStudyToClass(req, res, next) {
           InfoMsg,
           CaseAssignedToClassHeading,
           customMessage
+        );
+      }
+
+      // Get all mentees in the class to send them notifications
+      const menteesQuery = await request.query(`
+        SELECT 
+          m.mentee_dtls_id,
+          m.mentee_user_dtls_id,
+          u.user_email,
+          u.user_firstname,
+          u.user_lastname
+        FROM class_mentee_mapping cm
+        JOIN mentee_dtls m ON cm.mentee_dtls_id = m.mentee_dtls_id
+        JOIN users_dtls u ON m.mentee_user_dtls_id = u.user_dtls_id
+        WHERE cm.class_dtls_id = ${selectedClass}
+      `);
+
+      if (menteesQuery.recordset && menteesQuery.recordset.length > 0) {
+        const className = classAssignedTo.recordset[0]?.class_name;
+        const classSubject = classAssignedTo.recordset[0]?.class_subject;
+
+        // Calculate start/end times for fact finding and analysis based on timing settings
+        let factStartTime, factEndTime, analysisStartTime, analysisEndTime;
+
+        // Fact Finding timing
+        if (parseInt(factTiming) === 0) {
+          // Before class
+          factStartTime = new Date(startDateTime);
+          factEndTime = new Date(classStart);
+        } else if (parseInt(factTiming) === 1) {
+          // In class
+          factStartTime = new Date(classStart);
+          factEndTime = new Date(classEnd);
+        } else {
+          // After class
+          factStartTime = new Date(classEnd);
+          factEndTime = new Date(deadline);
+        }
+
+        // Analysis timing
+        if (parseInt(analysisTiming) === 0) {
+          // Before class
+          analysisStartTime = new Date(startDateTime);
+          analysisEndTime = new Date(classStart);
+        } else if (parseInt(analysisTiming) === 1) {
+          // In class
+          analysisStartTime = new Date(classStart);
+          analysisEndTime = new Date(classEnd);
+        } else {
+          // After class
+          analysisStartTime = new Date(classEnd);
+          analysisEndTime = new Date(deadline);
+        }
+
+        // Format times for display
+        const formattedFactStartTime = factStartTime.toLocaleString();
+        const formattedFactEndTime = factEndTime.toLocaleString();
+        const formattedAnalysisStartTime = analysisStartTime.toLocaleString();
+        const formattedAnalysisEndTime = analysisEndTime.toLocaleString();
+
+        // Prepare arrays for recipient data for reminders
+        const userIds = [];
+        const emails = [];
+        const names = []; // Send notifications and emails to all mentees
+        for (const mentee of menteesQuery.recordset) {
+          // Add recipient to reminder lists
+          userIds.push(mentee.mentee_user_dtls_id);
+          emails.push(mentee.user_email);
+          names.push(`${mentee.user_firstname} ${mentee.user_lastname}`);
+
+          console.log(
+            `Sending notification and email to ${mentee.user_email} for case study "${caseStudyTitle}"`
+          );
+
+          // Send a single notification with combined information
+          let notificationMessage = "";
+
+          if (parseInt(factTiming) === parseInt(analysisTiming)) {
+            notificationMessage = `New case study "${caseStudyTitle}" has been assigned to your class "${className}" (${classSubject}). Both Fact Finding and Analysis tasks will be from ${formattedFactStartTime} to ${formattedFactEndTime}.`;
+          } else {
+            notificationMessage = `New case study "${caseStudyTitle}" has been assigned to your class "${className}" (${classSubject}). Fact Finding: ${formattedFactStartTime} to ${formattedFactEndTime}. Analysis: ${formattedAnalysisStartTime} to ${formattedAnalysisEndTime}.`;
+          }
+
+          // Send single notification
+          await InsertNotificationHandler(
+            mentee.mentee_user_dtls_id,
+            InfoMsg,
+            "New Case Study Assigned",
+            notificationMessage
+          );
+
+          // Send single email with both timings
+          let emailData;
+          if (parseInt(factTiming) === parseInt(analysisTiming)) {
+            emailData = caseStudyCombinedEmailTemplate(
+              mentee.user_email,
+              `${mentee.user_firstname} ${mentee.user_lastname}`,
+              caseStudyTitle,
+              className,
+              classSubject,
+              formattedFactStartTime,
+              formattedFactEndTime
+            );
+          } else {
+            // Create a combined email template that includes both fact finding and analysis timings
+            emailData = caseStudySplitEmailTemplate(
+              mentee.user_email,
+              `${mentee.user_firstname} ${mentee.user_lastname}`,
+              caseStudyTitle,
+              className,
+              classSubject,
+              formattedFactStartTime,
+              formattedFactEndTime,
+              formattedAnalysisStartTime,
+              formattedAnalysisEndTime
+            );
+          }
+
+          await sendEmail(emailData);
+        }
+
+        // Schedule reminders 1 hour before start time
+        const reminderData = {
+          userIds,
+          emails,
+          names,
+          caseStudyTitle,
+          className,
+          classSubject,
+        };
+
+        if (parseInt(factTiming) === parseInt(analysisTiming)) {
+          // Schedule combined reminder
+          scheduleCaseStudyReminder(reminderData, factStartTime, "Combined");
+        } else {
+          // Schedule separate reminders for Fact Finding and Analysis
+          scheduleCaseStudyReminder(
+            reminderData,
+            factStartTime,
+            "Fact Finding"
+          );
+
+          scheduleCaseStudyReminder(
+            reminderData,
+            analysisStartTime,
+            "Analysis"
+          );
+        }
+
+        console.log(
+          `Sent notifications and emails to ${menteesQuery.recordset.length} mentees about the new case study assignment.`
         );
       }
 
