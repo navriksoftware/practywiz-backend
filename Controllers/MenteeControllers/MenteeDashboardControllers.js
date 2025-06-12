@@ -19,7 +19,9 @@ import {
   MenteeApprovedBookingQuery,
   MenteeCompletedBookingQuery,
   MenteeFeedbackSubmitHandlerQuery,
+  GetMenteeResultSubmissionStatusSqlQuery,
 } from "../../SQLQueries/Mentee/MenteeDashboardSQlQueries.js";
+import { format } from "path";
 dotenv.config();
 // get all mentee user details in the dashboard after login
 // to fetch single mentor and need to pass the user id
@@ -416,5 +418,76 @@ export async function MenteefetchCaseStudiesDetails(req, res) {
     });
   } catch (error) {
     return res.json({ error: "There is some error while fetching" });
+  }
+}
+
+// Add this function to the existing MenteeDashboardControllers.js file
+
+export async function GetMenteeResultSubmissionStatus(req, res) {
+  const { menteeId, facultyCaseAssignId } = req.body;
+
+  if (!menteeId || !facultyCaseAssignId) {
+    return res.status(400).json({
+      success: false,
+      message: "Mentee ID and Faculty Case Assign ID are required",
+    });
+  }
+  // Get the current time in India Standard Time (IST)
+  // let currentTime = new Date(
+  //   new Date().toLocaleString("en-US", {
+  //     timeZone: "Asia/Kolkata",
+  //   })
+  // );
+  // currentTime = currentTime.toString();
+  // console.log("Current server time:", currentTime);
+  let currentTime = new Date(new Date().getTime() + 19800000); // 5.5 hours in milliseconds
+
+  try {
+    sql.connect(config, (err, db) => {
+      if (err)
+        return res.json({
+          error: "There is some error while fetching submission status",
+        });
+
+      const request = new sql.Request();
+      request.input("menteeId", sql.Int, menteeId);
+      request.input("facultyCaseAssignId", sql.Int, facultyCaseAssignId);
+
+      request.query(GetMenteeResultSubmissionStatusSqlQuery, (err, result) => {
+        if (err) return res.json({ error: err.message });
+
+        if (result && result.recordset && result.recordset.length > 0) {
+          const submissionData = result.recordset[0];
+
+          // Check if each question type has been submitted
+          const submissionStatus = {
+            factBasedQuestions:
+              submissionData.mentee_result_fact_details !== null,
+            analysisBasedQuestions:
+              submissionData.mentee_result_analysis_details !== null,
+            researchBasedQuestions:
+              submissionData.mentee_result_research_details !== null,
+          };
+
+          return res.json({ success: true, submissionStatus, currentTime });
+        } else {
+          // No submission found, all are false
+
+          return res.json({
+            success: true,
+            submissionStatus: {
+              factBasedQuestions: false,
+              analysisBasedQuestions: false,
+              researchBasedQuestions: false,
+            },
+            currentTime: currentTime,
+          });
+        }
+      });
+    });
+  } catch (error) {
+    return res.json({
+      error: "There is some error while fetching submission status",
+    });
   }
 }

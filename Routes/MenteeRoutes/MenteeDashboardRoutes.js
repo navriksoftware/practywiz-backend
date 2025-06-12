@@ -10,6 +10,7 @@ import {
   MenteeMarkSingleMessageAsRead,
   ResumeUpload,
   ResumeDownload,
+  GetMenteeResultSubmissionStatus,
 } from "../../Controllers/MenteeControllers/MenteeDashboardControllers.js";
 
 const router = express.Router();
@@ -32,4 +33,7 @@ router.post("/notification/mark-single-read", MenteeMarkSingleMessageAsRead);
 
 router.post("/resume/upload", ResumeUpload);
 router.get("/resume/download", ResumeDownload);
+
+router.post("/get-result-submission-status", GetMenteeResultSubmissionStatus);
+
 export default router;

@@ -7,7 +7,7 @@ dotenv.config();
 
 const llm = new ChatOpenAI({
   modelName: "gpt-3.5-turbo",
-  temperature: 0.7,
+  temperature: 0.4,
   openAIApiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -117,57 +117,58 @@ Return ONLY a JSON array in this exact format:
   }
 };
 
-export const generateFollowUpQuestions = async (req, res) => {
-  const { case_study_id, question, answer } = req.body;
+// Practywiz old code snippet for generate FollowUp Questions
+// export const generateFollowUpQuestions = async (req, res) => {
+//   const { case_study_id, question, answer } = req.body;
 
-  try {
-    console.log("Generating follow-up question for case study:", case_study_id);
-    console.log("Original question:", question);
-    console.log("User's answer:", answer);
+//   try {
+//     console.log("Generating follow-up question for case study:", case_study_id);
+//     console.log("Original question:", question);
+//     console.log("User's answer:", answer);
 
-    if (!case_study_id || !question || !answer) {
-      return res
-        .status(400)
-        .json({ error: "Missing one or more required fields" });
-    }
+//     if (!case_study_id || !question || !answer) {
+//       return res
+//         .status(400)
+//         .json({ error: "Missing one or more required fields" });
+//     }
 
-    const caseStudy = await getCaseStudyById(case_study_id);
-    if (!caseStudy) {
-      console.log("Case study not found for ID:", case_study_id);
-      return res.status(404).json({ error: "Case study not found" });
-    }
+//     const caseStudy = await getCaseStudyById(case_study_id);
+//     if (!caseStudy) {
+//       console.log("Case study not found for ID:", case_study_id);
+//       return res.status(404).json({ error: "Case study not found" });
+//     }
 
-    console.log("Found case study:", caseStudy.case_study_title);
+//     console.log("Found case study:", caseStudy.case_study_title);
 
-    if (!process.env.OPENAI_API_KEY) {
-      console.error("OpenAI API key is missing");
-      return res
-        .status(500)
-        .json({ error: "OpenAI API key is not configured" });
-    }
+//     if (!process.env.OPENAI_API_KEY) {
+//       console.error("OpenAI API key is missing");
+//       return res
+//         .status(500)
+//         .json({ error: "OpenAI API key is not configured" });
+//     }
 
-    const messages = [
-      new SystemMessage(
-        "Generate a follow-up question based on the user's answer. The question should be analytical and probe deeper into their understanding. Return ONLY the question text, no additional formatting."
-      ),
-      new HumanMessage(
-        `Context: ${caseStudy.case_study_content}\n\nQuestion: ${question}\n\nUser's Answer: ${answer}\n\nGenerate one follow-up question:`
-      ),
-    ];
+//     const messages = [
+//       new SystemMessage(
+//         "Generate a follow-up question based on the user's answer. The question should be analytical and probe deeper into their understanding. Return ONLY the question text, no additional formatting."
+//       ),
+//       new HumanMessage(
+//         `Context: ${caseStudy.case_study_content}\n\nQuestion: ${question}\n\nUser's Answer: ${answer}\n\nGenerate one follow-up question:`
+//       ),
+//     ];
 
-    console.log("Sending request to OpenAI...");
-    const response = await llm.invoke(messages);
-    console.log("Received response from OpenAI:", response.content);
+//     console.log("Sending request to OpenAI...");
+//     const response = await llm.invoke(messages);
+//     console.log("Received response from OpenAI:", response.content);
 
-    res.json({ followUpQuestion: response.content.trim() });
-  } catch (err) {
-    console.error("Error in generateFollowUpQuestions:", err);
-    res.status(500).json({
-      error: "Internal server error",
-      details: process.env.NODE_ENV === "development" ? err.message : undefined,
-    });
-  }
-};
+//     res.json({ followUpQuestion: response.content.trim() });
+//   } catch (err) {
+//     console.error("Error in generateFollowUpQuestions:", err);
+//     res.status(500).json({
+//       error: "Internal server error",
+//       details: process.env.NODE_ENV === "development" ? err.message : undefined,
+//     });
+//   }
+// };
 
 export const checkFullAnalysisResult = async (req, res) => {
   const { case_study_id, analysisData } = req.body;
@@ -355,6 +356,99 @@ Format your response EXACTLY as this JSON:
       error: "Internal server error",
       details:
         process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+export const generateFollowUpQuestions = async (req, res) => {
+  const { id, question, correctAnswer, userAnswer } = req.body;
+  console.log(`Generating follow-up question for ID: ${id} \n Question: ${question} \n Correct Answer: ${correctAnswer} \n User Answer: ${userAnswer}`);
+
+  try {
+    // Validate input
+    if (!question || !correctAnswer || !userAnswer) {
+      return res.status(400).json({
+        success: false,
+        error:
+          "Missing one or more required fields (id, question, correctAnswer, userAnswer)",
+      });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("OpenAI API key is missing");
+      return res
+        .status(500)
+        .json({ success: false, error: "AI is not configured" });
+    }
+
+    // Compose the system and user prompts
+    const systemPrompt = `
+You are an expert educator and question generator.
+Given:
+- The original question
+- The correct answer
+- The user's answer
+
+Your task:
+1. Analyze the user's answer in comparison to the correct answer.
+2. Generate ONE analytical, thought-provoking follow-up question that probes deeper into the user's understanding, addresses any misconceptions, or encourages further critical thinking.
+3. Also provide the correct answer for the follow-up question.
+
+Return ONLY a JSON object in this format:
+{
+  "question": "The follow-up question text",
+  "correctAnswer": "The correct answer for the follow-up question"
+}
+`;
+
+    const userPrompt = `
+Original Question: ${question}
+Correct Answer: ${correctAnswer}
+User's Answer: ${userAnswer}
+Generate a follow-up question and its correct answer.
+`;
+
+    const messages = [
+      new SystemMessage(systemPrompt),
+      new HumanMessage(userPrompt),
+    ];
+
+    // Call the LLM
+    const response = await llm.invoke(messages);
+
+    // Parse and validate the response
+    let followUpObj;
+    try {
+      followUpObj = JSON.parse(response.content);
+      if (
+        !followUpObj.question ||
+        typeof followUpObj.question !== "string" ||
+        !followUpObj.correctAnswer ||
+        typeof followUpObj.correctAnswer !== "string"
+      ) {
+        throw new Error("Invalid response format from AI");
+      }
+    } catch (err) {
+      console.error("Failed to parse AI response for follow-up question:", err);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to generate follow-up question. Please try again.",
+      });
+    }
+
+    return res.json({
+      success: true,
+      followUpQuestion: {
+        question: followUpObj.question,
+        correctAnswer: followUpObj.correctAnswer,
+      },
+    });
+  } catch (err) {
+    console.error("Error in generateFollowUpQuestions:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 };

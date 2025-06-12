@@ -7,6 +7,7 @@ import {
   fetchPurchasedCaseStudies,
   fetchPurchasedCaseStudyById,
   requestCaseStudy,
+  generateQuestions,
 } from "../../Controllers/CaseStydiesControllers/CaseStudiesController.js";
 
 import {
@@ -32,7 +33,7 @@ router.get("/purchased-case-studies", fetchPurchasedCaseStudies);
 
 router.get("/purchased-case-studies/:id", fetchPurchasedCaseStudyById);
 
-router.post("/generate-questions", generateQuestionsWithLangchain);
+router.post("/generate-questions", generateQuestions);
 
 router.post("/generate-follow-up-question", generateFollowUpQuestions);
 
