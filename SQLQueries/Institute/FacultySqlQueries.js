@@ -147,10 +147,10 @@ JOIN [dbo].[mentee_dtls] m ON cm.[mentee_dtls_id] = m.[mentee_dtls_id]
 JOIN [dbo].[users_dtls] u ON m.[mentee_user_dtls_id] = u.[user_dtls_id]
 WHERE cm.[class_dtls_id] = @classId
 `;
-export const deleteStudentfromClassSqlQuary =`
+export const deleteStudentfromClassSqlQuary = `
 DELETE FROM [dbo].[class_mentee_mapping]
 WHERE [class_mentee_mapping_id] = @class_Mapping_Id;
-`
+`;
 
 export const AvailableCaseStudiesForfacultyQuery = `SELECT 
     a.institute_case_assign_dtls_id,
@@ -358,7 +358,9 @@ SELECT
     fca.faculty_case_assign_class_end_date,
     fca.faculty_case_assign_fact_question_qty,
     fca.faculty_case_assign_analysis_question_qty,
-    fca.faculty_case_assign_question_distribution
+    fca.faculty_case_assign_question_distribution,
+    fca.faculty_case_assign_cr_date,
+    fca.faculty_case_assign_update_date
 FROM
     dbo.faculty_case_assign_dtls fca
 LEFT JOIN

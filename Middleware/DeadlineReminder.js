@@ -29,13 +29,16 @@ export async function checkCaseDeadlines() {
 
     const notificationColumnExists =
       columnCheckResult.recordset[0].columnExists > 0;
-    console.log(`Notification column exists: ${notificationColumnExists}`);
+    console.log(`Notification column exists: ${notificationColumnExists}`); // Get current date and time in UTC
+    const currentDateUTC = new Date();
 
-    // Get current date and time
-    const currentDate = new Date();
+    // Convert to IST (UTC+5:30)
+    const currentDate = new Date(
+      currentDateUTC.getTime() + 5.5 * 60 * 60 * 1000
+    );
 
-    // Get date 24 hours from now
-    const reminderDate = new Date(currentDate);
+    // Get date 24 hours from now in IST
+    const reminderDate = new Date(currentDate.getTime());
     reminderDate.setHours(reminderDate.getHours() + 24); // Query to find assignments with deadlines in the next 24 hours
     const request = pool.request();
     request.input("currentDate", sql.DateTime, currentDate);
@@ -162,12 +165,15 @@ export async function checkCaseDeadlines() {
             } catch (caseError) {
               console.error("Error getting case study details:", caseError);
             }
-          }
-
-          // Create a custom message with the available details
-          const customMessage = `You have a deadline approaching for ${caseName} in class "${className}". The deadline is set for ${new Date(
-            assignment.deadline
-          ).toLocaleString()}.`;
+          } // Create a custom message with the available details
+          // Convert deadline to IST for display
+          const deadlineIST = new Date(
+            new Date(assignment.deadline).getTime() + 5.5 * 60 * 60 * 1000
+          );
+          const customMessage = `You have a deadline approaching for ${caseName} in class "${className}". The deadline is set for ${deadlineIST.toLocaleString(
+            "en-IN",
+            { timeZone: "Asia/Kolkata" }
+          )}.`;
 
           // Send notification to the user ID, not the faculty ID
           await InsertNotificationHandler(
