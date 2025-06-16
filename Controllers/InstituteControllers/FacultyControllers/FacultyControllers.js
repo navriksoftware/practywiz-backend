@@ -1425,28 +1425,28 @@ export async function updateNonPractywizCaseStudy(req, res, next) {
   const { title, author, category, facultyId, questions,caseStudyId } = req.body;
 
   console.log("Updating non-Practywiz case study with data:", req.body);
-  // try {
-  //   if (!title || !author || !category || !facultyId || !questions || !caseStudyId) {
-  //     return res.status(400).json({ error: "Missing required fields" });
-  //   }
+  try {
+    if (!title || !author || !category || !facultyId || !questions || !caseStudyId) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
 
-  //   await poolConnect;
-  //   const request = pool.request();
-  //   request.input("title", sql.VarChar, title);
-  //   request.input("author", sql.VarChar, author);
-  //   request.input("category", sql.VarChar, category);
-  //   request.input("facultyId", sql.Int, facultyId);
-  //   request.input("questions", sql.Text, JSON.stringify(questions));
-  //   request.input("caseStudyId", sql.Int, caseStudyId);
+    await poolConnect;
+    const request = pool.request();
+    request.input("title", sql.VarChar, title);
+    request.input("author", sql.VarChar, author);
+    request.input("category", sql.VarChar, category);
+    request.input("facultyId", sql.Int, facultyId);
+    request.input("questions", sql.Text, JSON.stringify(questions));
+    request.input("caseStudyId", sql.Int, caseStudyId);
 
 
-  //   await request.query(updateNonPractywizCaseStudyQuery);
+    await request.query(updateNonPractywizCaseStudyQuery);
 
-  //   return res.status(200).json({ message: "Case study updated successfully" });
-  // } catch (error) {
-  //   console.error("Error in updateNonPractywizCaseStudy:", error.message);
-  //   return res.status(500).json({ error: error.message });
-  // }
+    return res.status(200).json({ message: "Case study updated successfully" });
+  } catch (error) {
+    console.error("Error in updateNonPractywizCaseStudy:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
 }
 
 // Handle cleanup when the process exits
