@@ -299,7 +299,6 @@ export async function ApplyInternship(req, res) {
     internship_post_dtls_id,
     resume,
   } = req.body;
-  console.log(req.body);
   // return res.json({ error: "this is an custom error" });
   try {
     sql.connect(config, (err, db) => {
@@ -317,13 +316,13 @@ export async function ApplyInternship(req, res) {
       request.query(ApplyInternshipSqlQuery, (err, result) => {
         if (err) return res.json({ error: err.message });
         if (result) {
-          costumMssgHeading = "Internship Applied";
-          costumMssg = "You have successfully applied for the internship";
+          const customMssgHeading = "Internship Applied";
+          const customMssg = "You have successfully applied for the internship";
           const menteeNotificationHandler = InsertNotificationHandler(
             mentee_user_dtls_id,
             SuccessMsg,
-            costumMssgHeading,
-            InternshipPostMessage
+            customMssgHeading,
+            customMssg
           );
           return res.json({
             success: "Successfully applied for the internship",
