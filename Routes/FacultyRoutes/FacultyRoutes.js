@@ -20,7 +20,7 @@ import {
   fetchAssignSingleCaseStudiesDetails,
   handleDeleteClass,
   fetchStudentListofScorePage,SingleStudentAssessmentDetails,SingleStudentAssessmentUpdate,
-  removeStudentFromClass
+  removeStudentFromClass,updateNonPractywizCaseStudy
 } from "../../Controllers/InstituteControllers/FacultyControllers/FacultyControllers.js";
 
 const router = express.Router();
@@ -74,6 +74,8 @@ router.post("/case-study/list", fetchAvailableCaseStudiesForfaculty);
 
 // Route to add a non-Practiwiz case study
 router.post("/case-study/add-non-practywiz-case", addNonPractywizCaseStudy);
+// Route to update a non-Practiwiz case study
+router.post("/case-study/add-non-practywiz-case/update", updateNonPractywizCaseStudy);
 
 // Route to get non-Practiwiz case studies by faculty
 router.post("/case-study/list-non-practywiz-case", getNonPractywizCaseStudiesByFaculty);

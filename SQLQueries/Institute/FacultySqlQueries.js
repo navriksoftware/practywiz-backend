@@ -323,6 +323,7 @@ export const getNonPractywizCaseStudiesByFacultyQuery = `
     non_practywiz_case_dtls_id,
     non_practywiz_case_title,
     non_practywiz_case_author,
+    non_practywiz_case_question,
     non_practywiz_case_category,
     non_practywiz_case_faculty_dtls_id,
     non_practywiz_case_cr_date,
@@ -750,3 +751,17 @@ WHERE
     AND [mentee_result_faculty_case_assign_dtls_id] = @Assign_Id;
 
 `;
+
+
+export const updateNonPractywizCaseStudyQuery = `
+UPDATE [dbo].[non_practywiz_case_dtls]
+SET 
+  [non_practywiz_case_title] = @title,
+  [non_practywiz_case_author] = @author,
+  [non_practywiz_case_category] = @category,
+  [non_practywiz_case_question] = @questions,
+  [non_practywiz_case_faculty_dtls_id] = @facultyId,
+  [non_practywiz_case_update_date] = GETDATE()
+WHERE 
+  [non_practywiz_case_dtls_id] = @caseStudyId;
+`
