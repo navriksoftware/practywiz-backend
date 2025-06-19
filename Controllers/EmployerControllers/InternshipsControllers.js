@@ -368,7 +368,6 @@ export async function employerProfileSettingUpdate(req, res) {
       return res.status(404).json({ error: "Employer not found" });
     }
 
-    // Adding necessary input parameters
     request.input("employer_Org_name", sql.Text, organization_name);
     request.input("employer_Org_Dec", sql.Text, organization_description);
     request.input("employer_Company_size", sql.VarChar, company_size);
