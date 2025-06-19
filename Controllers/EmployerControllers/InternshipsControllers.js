@@ -314,7 +314,9 @@ export async function ApplyInternship(req, res) {
       request.input("mentee_resume_link", sql.VarChar, "false");
       request.input("mentee_internship_applied_status", sql.VarChar, "applied");
       request.query(ApplyInternshipSqlQuery, (err, result) => {
-        if (err) return res.json({ error: err.message });
+        if (err) {
+          return res.json({ error: err.message });
+        }
         if (result) {
           const customMssgHeading = "Internship Applied";
           const customMssg = "You have successfully applied for the internship";

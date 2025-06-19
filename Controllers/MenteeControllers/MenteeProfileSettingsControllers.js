@@ -29,7 +29,6 @@ export async function UpdateMenteeProfileDetails(req, res, next) {
     mentee_gender,
     mentee_aboutyouself,
   } = req.body.formData;
-
   const { menteeUserDtlsId } = req.body;
   try {
     sql.connect(config, (err, db) => {
