@@ -16,6 +16,12 @@ import {
   CaseRequestToPractywizTemplate,
   CaseRequestAuthorAutoReplyTemplate,
 } from "../../EmailTemplates/CaseStudyEmailTemplate/CaseStudyConsultantEmailTemplate.js";
+import {
+  checkMenteeResultExists,
+  getUpdateMenteeResultQuery,
+  insertMenteeResult,
+} from "../../SQLQueries/CaseStudy/CaseStudySqlQueries.js";
+import { evaluateAnalysisQuestionsWithAI } from "./langchainController.js";
 
 dotenv.config();
 
@@ -372,7 +378,8 @@ export const generateQuestions = async (req, res) => {
   if (!facultyCaseAssignId || !menteeId || !questionStatus) {
     return res.status(400).json({
       success: false,
-      message: "Missing required parameters: facultyCaseAssignId, menteeId, or questionStatus"
+      message:
+        "Missing required parameters: facultyCaseAssignId, menteeId, or questionStatus",
     });
   }
 
@@ -382,7 +389,7 @@ export const generateQuestions = async (req, res) => {
 
     // Step 1: Get faculty case assign details
     request.input("facultyCaseAssignId", sql.Int, facultyCaseAssignId);
-    
+
     const facultyCaseAssignQuery = `
       SELECT 
         faculty_case_assign_dtls_id,
@@ -408,10 +415,13 @@ export const generateQuestions = async (req, res) => {
 
     const facultyCaseResult = await request.query(facultyCaseAssignQuery);
 
-    if (!facultyCaseResult.recordset || facultyCaseResult.recordset.length === 0) {
+    if (
+      !facultyCaseResult.recordset ||
+      facultyCaseResult.recordset.length === 0
+    ) {
       return res.status(404).json({
         success: false,
-        message: "Faculty case assignment not found"
+        message: "Faculty case assignment not found",
       });
     }
 
@@ -421,7 +431,7 @@ export const generateQuestions = async (req, res) => {
     if (facultyCaseData.faculty_case_assign_owned_by_practywiz === 1) {
       return res.status(400).json({
         success: false,
-        message: "This is not a non-practywiz case study"
+        message: "This is not a non-practywiz case study",
       });
     }
 
@@ -448,7 +458,7 @@ export const generateQuestions = async (req, res) => {
     if (!caseStudyResult.recordset || caseStudyResult.recordset.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Case study not found"
+        message: "Case study not found",
       });
     }
 
@@ -462,12 +472,15 @@ export const generateQuestions = async (req, res) => {
       console.error("Error parsing questions JSON:", parseError);
       return res.status(500).json({
         success: false,
-        message: "Invalid questions format in database"
+        message: "Invalid questions format in database",
       });
     }
 
     // Step 5: Filter questions based on questionStatus
-    const filteredQuestions = filterQuestionsByStatus(allQuestions, questionStatus);
+    const filteredQuestions = filterQuestionsByStatus(
+      allQuestions,
+      questionStatus
+    );
 
     // Step 6: Return the filtered questions
     return res.status(200).json({
@@ -477,16 +490,15 @@ export const generateQuestions = async (req, res) => {
       caseStudyInfo: {
         title: caseStudyData.non_practywiz_case_title,
         author: caseStudyData.non_practywiz_case_author,
-        category: caseStudyData.non_practywiz_case_category
-      }
+        category: caseStudyData.non_practywiz_case_category,
+      },
     });
-
   } catch (error) {
     console.error("Error in generateQuestions:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error while generating questions",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -496,31 +508,261 @@ function filterQuestionsByStatus(allQuestions, questionStatus) {
   const {
     factBasedQuestions: factStatus,
     analysisBasedQuestions: analysisStatus,
-    researchBasedQuestions: researchStatus
+    researchBasedQuestions: researchStatus,
   } = questionStatus;
 
   const result = {};
 
   // Only include questions that have "available" status
-  if (factStatus === 'available' && allQuestions.factBasedQuestions) {
+  if (factStatus === "available" && allQuestions.factBasedQuestions) {
     result.factBasedQuestions = allQuestions.factBasedQuestions;
   }
 
-  if (analysisStatus === 'available' && allQuestions.analysisBasedQuestions) {
+  if (analysisStatus === "available" && allQuestions.analysisBasedQuestions) {
     result.analysisBasedQuestions = allQuestions.analysisBasedQuestions;
   }
 
-  if (researchStatus === 'available' && allQuestions.researchBasedQuestions) {
+  if (researchStatus === "available" && allQuestions.researchBasedQuestions) {
     result.researchBasedQuestions = allQuestions.researchBasedQuestions;
   }
 
-  console.log('Filtered Questions:', {
+  console.log("Filtered Questions:", {
     factStatus,
     analysisStatus,
     researchStatus,
-    resultKeys: Object.keys(result)
+    resultKeys: Object.keys(result),
   });
 
   return result;
 }
 
+export async function submitMenteeResultPartial(req, res) {
+  try {
+    const {
+      menteeId,
+      facultyCaseAssignId,
+      factBasedResponses,
+      analysisBasedResponses,
+      researchBasedResponses,
+      maxMarks, // <-- frontend sends this
+    } = req.body || {};
+
+    if (!menteeId || !facultyCaseAssignId) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "menteeId and facultyCaseAssignId are required",
+        });
+    }
+
+    if (
+      !factBasedResponses &&
+      !analysisBasedResponses &&
+      !researchBasedResponses
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No valid question data provided" });
+    }
+
+    // Prepare fields to update/insert
+    const fieldsToUpdate = [];
+    const paramValues = {};
+
+    // Fact-based obtained marks calculation
+    let factObtained = 0;
+    if (factBasedResponses) {
+      // Sum maxMark for all correct answers
+      factObtained = Array.isArray(factBasedResponses)
+        ? factBasedResponses.reduce(
+            (sum, q) => (q.isCorrect ? sum + (q.maxMark || 0) : sum),
+            0
+          )
+        : 0;
+      fieldsToUpdate.push({
+        dbField: "mentee_result_fact_details",
+        param: "factDetails",
+      });
+      paramValues.factDetails = JSON.stringify(factBasedResponses);
+    }
+
+    // Analysis-based obtained marks calculation (AI)
+    let analysisObtained = 0;
+    let aiResult = null;
+    if (analysisBasedResponses) {
+      aiResult = await evaluateAnalysisQuestionsWithAI(analysisBasedResponses);
+      analysisObtained = Array.isArray(aiResult.questions)
+        ? aiResult.questions.reduce((sum, q) => sum + (q.obtainedMark || 0), 0)
+        : 0;
+      fieldsToUpdate.push({
+        dbField: "mentee_result_analysis_details",
+        param: "analysisDetails",
+      });
+      paramValues.analysisDetails = JSON.stringify(aiResult);
+    }
+
+    // Research-based (no marks calculation)
+    if (researchBasedResponses) {
+      fieldsToUpdate.push({
+        dbField: "mentee_result_research_details",
+        param: "researchDetails",
+      });
+      paramValues.researchDetails = JSON.stringify(researchBasedResponses);
+    }
+
+    // Always store maxMarks in mentee_result_max_score
+    if (typeof maxMarks === "number") {
+      fieldsToUpdate.push({
+        dbField: "mentee_result_max_score",
+        param: "maxScore",
+      });
+      paramValues.maxScore = maxMarks;
+    }
+
+    // Connect to DB and check for existing record
+    await sql.connect(config);
+    const checkRequest = new sql.Request();
+    checkRequest.input("menteeId", sql.Int, menteeId);
+    checkRequest.input("facultyCaseAssignId", sql.Int, facultyCaseAssignId);
+    const checkResult = await checkRequest.query(checkMenteeResultExists);
+
+    let prevFactObtained = 0;
+    let prevAnalysisObtained = 0;
+
+    if (checkResult.recordset.length > 0) {
+      // Record exists, check for duplicate submission for each field
+      const existing = checkResult.recordset[0];
+      const duplicateFields = [];
+      if (factBasedResponses && existing.mentee_result_fact_details !== null)
+        duplicateFields.push("factBasedResponses");
+      if (
+        analysisBasedResponses &&
+        existing.mentee_result_analysis_details !== null
+      )
+        duplicateFields.push("analysisBasedResponses");
+      if (
+        researchBasedResponses &&
+        existing.mentee_result_research_details !== null
+      )
+        duplicateFields.push("researchBasedResponses");
+
+      if (duplicateFields.length > 0) {
+        return res.status(409).json({
+          success: false,
+          message: `Aapne pehle se hi submit kiya hua hai: ${duplicateFields.join(
+            ", "
+          )}. Dobara submit nahi kar sakte.`,
+        });
+      }
+
+      // If only one type is submitted now, get previous obtained marks for the other type
+      if (!factBasedResponses && existing.mentee_result_fact_details) {
+        try {
+          const prevFact = JSON.parse(existing.mentee_result_fact_details);
+          prevFactObtained = Array.isArray(prevFact)
+            ? prevFact.reduce(
+                (sum, q) => (q.isCorrect ? sum + (q.maxMark || 0) : sum),
+                0
+              )
+            : 0;
+        } catch {}
+      }
+      if (!analysisBasedResponses && existing.mentee_result_analysis_details) {
+        try {
+          const prevAnalysis = JSON.parse(
+            existing.mentee_result_analysis_details
+          );
+          prevAnalysisObtained = Array.isArray(prevAnalysis.questions)
+            ? prevAnalysis.questions.reduce(
+                (sum, q) => sum + (q.obtainedMark || 0),
+                0
+              )
+            : 0;
+        } catch {}
+      }
+
+      // mentee_result_total_score = sum of all obtained marks (fact + analysis)
+      const totalScore =
+        factObtained +
+        analysisObtained +
+        prevFactObtained +
+        prevAnalysisObtained;
+      fieldsToUpdate.push({
+        dbField: "mentee_result_total_score",
+        param: "totalScore",
+      });
+      paramValues.totalScore = totalScore;
+
+      // Build dynamic update query for only the fields being submitted
+      const updateQuery = getUpdateMenteeResultQuery(fieldsToUpdate);
+      const updateRequest = new sql.Request();
+      fieldsToUpdate.forEach(({ param }) => {
+        if (param.endsWith("Details")) {
+          updateRequest.input(param, sql.Text, paramValues[param]);
+        } else {
+          updateRequest.input(param, sql.Int, paramValues[param]);
+        }
+      });
+      updateRequest.input("menteeId", sql.Int, menteeId);
+      updateRequest.input("facultyCaseAssignId", sql.Int, facultyCaseAssignId);
+
+      await updateRequest.query(updateQuery);
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+          message: "Submission successful (updated existing record)",
+        });
+    } else {
+      // mentee_result_total_score = sum of all obtained marks (fact + analysis)
+      const totalScore = factObtained + analysisObtained;
+      fieldsToUpdate.push({
+        dbField: "mentee_result_total_score",
+        param: "totalScore",
+      });
+      paramValues.totalScore = totalScore;
+
+      // Insert new record, fill only the submitted fields, others as null
+      const insertRequest = new sql.Request();
+      insertRequest.input("facultyCaseAssignId", sql.Int, facultyCaseAssignId);
+      insertRequest.input("menteeId", sql.Int, menteeId);
+      insertRequest.input(
+        "factDetails",
+        sql.Text,
+        paramValues.factDetails ?? null
+      );
+      insertRequest.input(
+        "analysisDetails",
+        sql.Text,
+        paramValues.analysisDetails ?? null
+      );
+      insertRequest.input(
+        "researchDetails",
+        sql.Text,
+        paramValues.researchDetails ?? null
+      );
+      insertRequest.input(
+        "totalScore",
+        sql.Int,
+        paramValues.totalScore ?? null
+      );
+      insertRequest.input("maxScore", sql.Int, paramValues.maxScore ?? null);
+
+      await insertRequest.query(insertMenteeResult);
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+          message: "Submission successful (new record inserted)",
+        });
+    }
+  } catch (error) {
+    console.error("Error in partial submission:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+}

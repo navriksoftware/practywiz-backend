@@ -8,6 +8,7 @@ import {
   fetchPurchasedCaseStudyById,
   requestCaseStudy,
   generateQuestions,
+  submitMenteeResultPartial,
 } from "../../Controllers/CaseStydiesControllers/CaseStudiesController.js";
 
 import {
@@ -42,5 +43,7 @@ router.post("/check-full-analysis-questions-result", checkFullAnalysisResult);
 router.post("/connect-with-consultant", connectWithCaseStudyConsultant);
 
 router.post("/request-case-study", requestCaseStudy);
+
+router.post("/submit-responses", submitMenteeResultPartial);
 
 export default router;

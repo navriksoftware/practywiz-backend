@@ -453,8 +453,100 @@ Generate a follow-up question and its correct answer.
   }
 };
 
+/**
+ * Evaluate analysis-based questions using AI (LangChain/OpenAI).
+ * Ensures obtainedMark does not exceed maxMark.
+ * Returns mapped result as per requirements.
+ * @param {Array} analysisQuestions - Array of question objects
+ * @returns {Promise<{ performance: string, questions: Array }>}
+ */
+export async function evaluateAnalysisQuestionsWithAI(analysisQuestions) {
+  if (!Array.isArray(analysisQuestions) || analysisQuestions.length === 0) {
+    throw new Error("analysisQuestions must be a non-empty array");
+  }
+
+  const llm = new ChatOpenAI({
+    modelName: "gpt-3.5-turbo",
+    temperature: 0.4,
+    openAIApiKey: process.env.OPENAI_API_KEY,
+  });
+
+  // Prepare prompt for AI
+  const systemPrompt = `
+You are an expert evaluator. For each analysis-based question, compare the user's answer with the correct answer and provide:
+- A score (0 to the given maxMark for that question)
+- Feedback (strengths, improvements)
+- Key strengths
+- Key improvements
+
+At the end, provide an overall feedback for all answers.
+
+Format your response as:
+{
+  "evaluations": [
+    {
+      "id": "AQ1",
+      "score": 7,
+      "feedback": "...",
+      "strengths": "...",
+      "improvements": "..."
+    }
+  ],
+  "overallFeedback": "..."
+}
+`;
+
+  let userPrompt = `Analysis-Based Questions:\n`;
+  analysisQuestions.forEach((q, idx) => {
+    userPrompt += `\nQ${idx + 1} (id: ${q.id}):\n`;
+    userPrompt += `Question: ${q.question}\n`;
+    userPrompt += `Correct Answer: ${q.correctAnswer}\n`;
+    userPrompt += `User Answer: ${q.userAnswer}\n`;
+    userPrompt += `Maximum Marks: ${q.maxMark}\n`;
+  });
+
+  const messages = [
+    new SystemMessage(systemPrompt),
+    new HumanMessage(userPrompt),
+  ];
+
+  const aiResponse = await llm.invoke(messages);
+
+  let aiResult;
+  try {
+    aiResult = JSON.parse(aiResponse.content);
+
+    if (!aiResult.evaluations || !Array.isArray(aiResult.evaluations)) {
+      throw new Error("Invalid AI response structure");
+    }
+  } catch (err) {
+    throw new Error("Failed to parse AI response: " + err.message);
+  }
+
+  // Map AI fields to required DB fields, ensure obtainedMark <= maxMark
+  const mappedQuestions = analysisQuestions.map((q) => {
+    const aiEval = aiResult.evaluations.find((e) => e.id === q.id);
+    let obtainedMark = aiEval?.score ?? 0;
+    if (obtainedMark > q.maxMark) obtainedMark = q.maxMark;
+    return {
+      ...q,
+      obtainedMark,
+      feedback: aiEval?.feedback ?? "",
+      strengths: aiEval?.strengths ?? "",
+      areaToImprove: aiEval?.improvements ?? ""
+    };
+  });
+
+  return {
+    performance: aiResult.overallFeedback || "",
+    questions: mappedQuestions
+  };
+}
+
 export default {
   generateQuestionsWithLangchain,
   generateFollowUpQuestions,
   checkFullAnalysisResult,
 };
+
+
