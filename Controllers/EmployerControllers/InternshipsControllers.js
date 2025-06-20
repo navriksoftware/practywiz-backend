@@ -299,7 +299,6 @@ export async function ApplyInternship(req, res) {
     internship_post_dtls_id,
     resume,
   } = req.body;
-  console.log(req.body);
   // return res.json({ error: "this is an custom error" });
   try {
     sql.connect(config, (err, db) => {
@@ -315,15 +314,17 @@ export async function ApplyInternship(req, res) {
       request.input("mentee_resume_link", sql.VarChar, "false");
       request.input("mentee_internship_applied_status", sql.VarChar, "applied");
       request.query(ApplyInternshipSqlQuery, (err, result) => {
-        if (err) return res.json({ error: err.message });
+        if (err) {
+          return res.json({ error: err.message });
+        }
         if (result) {
-          costumMssgHeading = "Internship Applied";
-          costumMssg = "You have successfully applied for the internship";
+          const customMssgHeading = "Internship Applied";
+          const customMssg = "You have successfully applied for the internship";
           const menteeNotificationHandler = InsertNotificationHandler(
             mentee_user_dtls_id,
             SuccessMsg,
-            costumMssgHeading,
-            InternshipPostMessage
+            customMssgHeading,
+            customMssg
           );
           return res.json({
             success: "Successfully applied for the internship",
@@ -369,7 +370,6 @@ export async function employerProfileSettingUpdate(req, res) {
       return res.status(404).json({ error: "Employer not found" });
     }
 
-    // Adding necessary input parameters
     request.input("employer_Org_name", sql.Text, organization_name);
     request.input("employer_Org_Dec", sql.Text, organization_description);
     request.input("employer_Company_size", sql.VarChar, company_size);
