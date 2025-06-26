@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import {
   sendEmail,
   uploadMenteeResumeToAzure,
+  calculateMentorScore,
 } from "../../Middleware/AllFunctions.js";
 import moment from "moment";
 
@@ -23,6 +24,22 @@ import {
 } from "../../SQLQueries/Mentee/MenteeDashboardSQlQueries.js";
 import { format } from "path";
 dotenv.config();
+
+// Helper function to safely parse JSON strings
+const safeJSONParse = (jsonString, defaultValue = "[]") => {
+  try {
+    if (!jsonString || jsonString === "undefined" || jsonString === "null") {
+      return JSON.parse(defaultValue);
+    }
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.warn(
+      `Failed to parse JSON: ${jsonString}, using default value: ${defaultValue}`
+    );
+    return JSON.parse(defaultValue);
+  }
+};
+
 // get all mentee user details in the dashboard after login
 // to fetch single mentor and need to pass the user id
 export async function fetchSingleDashboardMenteeDetails(req, res) {
@@ -491,3 +508,143 @@ export async function GetMenteeResultSubmissionStatus(req, res) {
     });
   }
 }
+
+export const GetRecommendedMentors = async (req, res) => {
+  const { menteeId } = req.params;
+  console.log("Mentee ID:", menteeId);
+
+  if (!menteeId)
+    return res.status(400).json({ error: "Mentee ID is required" });
+
+  try {
+    const pool = await sql.connect();
+    console.log("Connected to the database debug");
+    // Fetch mentee
+    const menteeResult = await pool
+      .request()
+      .input("menteeId", sql.Int, menteeId)
+      .query(`SELECT * FROM mentee_dtls WHERE mentee_dtls_id = @menteeId`);
+
+    if (menteeResult.recordset.length === 0) {
+      return res.status(404).json({ error: "Mentee not found" });
+    }
+    const mentee = menteeResult.recordset[0];
+
+    // Parse JSON fields
+    mentee.mentee_skills = safeJSONParse(mentee.mentee_skills);
+    mentee.mentee_language = safeJSONParse(mentee.mentee_language);
+    mentee.mentee_institute_details = safeJSONParse(
+      mentee.mentee_institute_details
+    ); // Fetch mentors with user details
+    const mentorResult = await pool.request().query(`
+        SELECT m.*, 
+               CONCAT(u.user_firstname, ' ', u.user_lastname) AS mentor_name
+        FROM mentor_dtls m
+        INNER JOIN users_dtls u ON m.mentor_user_dtls_id = u.user_dtls_id
+        WHERE m.mentor_approved_status = 'Yes'
+      `);
+
+    const mentors = mentorResult.recordset.map((mentor) => ({
+      ...mentor,
+      mentor_language: safeJSONParse(mentor.mentor_language),
+      mentor_institute: safeJSONParse(mentor.mentor_institute),
+      mentor_area_expertise: safeJSONParse(mentor.mentor_area_expertise),
+      mentor_timeslots_json: safeJSONParse(mentor.mentor_timeslots_json),
+      mentor_domain: safeJSONParse(mentor.mentor_domain),
+    }));
+
+    // Score and sort
+    const scoredMentors = mentors
+      .map((mentor) => ({
+        mentor,
+        score: calculateMentorScore(mentee, mentor),
+      }))
+      .sort((a, b) => b.score - a.score);
+    const topMentors = scoredMentors.slice(0, 10).map((m) => ({
+      mentor_id: m.mentor.mentor_dtls_id,
+      mentor_name: m.mentor.mentor_name,
+      mentor_company: m.mentor.mentor_company_name,
+      matched_score: m.score,
+      matched_skills: m.mentor.mentor_area_expertise,
+      matched_languages: m.mentor.mentor_language,
+      linkedin: m.mentor.mentor_social_media_profile,
+      profile_photo: m.mentor.mentor_profile_photo,
+      mentor_domain: m.mentor.mentor_domain,
+      mentor_titile: m.mentor.mentor_job_title,
+    }));
+
+    return res.json({ menteeId, recommendedMentors: topMentors });
+  } catch (err) {
+    console.error("Recommendation Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const GetRecommendedInternships = async (req, res) => {
+  const countMatchedElements = (arr1, arr2) => {
+    const set2 = new Set(arr2);
+    return arr1.filter((item) => set2.has(item)).length;
+  };
+
+  const { menteeId } = req.params;
+  console.log("Mentee ID:", menteeId);
+
+  if (!menteeId) {
+    return res.status(400).json({ error: "Mentee ID is required" });
+  }
+
+  try {
+    const pool = await sql.connect();
+
+    // Fetch mentee details
+    const menteeResult = await pool
+      .request()
+      .input("menteeId", sql.Int, menteeId)
+      .query("SELECT * FROM mentee_dtls WHERE mentee_dtls_id = @menteeId");
+
+    if (menteeResult.recordset.length === 0) {
+      return res.status(404).json({ error: "Mentee not found" });
+    }
+
+    const mentee = menteeResult.recordset[0];
+    mentee.mentee_skills = safeJSONParse(mentee.mentee_skills);
+    console.log("mentee skills", mentee.mentee_skills);
+
+    // Fetch open internships
+    const internshipResult = await pool.request().query(`
+        SELECT * FROM employer_internship_posts_dtls
+        WHERE employer_internship_post_status = 'open'
+      `);
+
+    // Transform and filter internships based on skill matches
+    const matchedInternships = internshipResult.recordset
+      .map((internship) => {
+        const internshipSkills =
+          safeJSONParse(internship.employer_internship_post_skills) || [];
+        const skillsCount = countMatchedElements(
+          internshipSkills,
+          mentee.mentee_skills
+        );
+
+        return {
+          internship_id: internship.employer_internship_post_dtls_id,
+          internship_title: internship.employer_internship_post_domain,
+          internship_location: internship.employer_internship_post_location,
+          internship_amount: internship.employer_internship_post_stipend_amount,
+          internship_duration: internship.employer_internship_post_cr_date,
+          internship_domain: internship.employer_internship_post_domain,
+          internship_skills: internshipSkills,
+          skillsCount,
+        };
+      })
+      .filter((internship) => internship.skillsCount > 0)
+      .sort((a, b) => b.skillsCount - a.skillsCount)
+      .map(({ skillsCount, ...internship }) => internship);
+
+    console.log("internships", matchedInternships);
+    return res.json({ msg: matchedInternships });
+  } catch (err) {
+    console.error("Recommendation Error:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
