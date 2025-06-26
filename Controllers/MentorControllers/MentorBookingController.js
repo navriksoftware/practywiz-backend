@@ -203,18 +203,18 @@ export async function createMentorBookingAppointment(req, res, next) {
             ).toLocaleDateString()} at ${from}-${to}. Please wait for the mentor to accept the session.`
           );
 
-          // menteePaymentReceivedMessage(menteePhoneNo, username,formattedDate,from,to,"mentee_payment_received");
+          menteePaymentReceivedMessage(menteePhoneNo, username,formattedDate,from,to,"mentee_payment_received");
 
           // Notify mentor about session booking
-          // ApprovalReqToMentorMessage(
-          //   mentorPhoneNo,
-          //   mentorName,
-          //   username,
-          //   formattedDate,
-          //   from,
-          //   to,
-          //   "session_booking_approval_req"
-          // );
+          ApprovalReqToMentorMessage(
+            mentorPhoneNo,
+            mentorName,
+            username,
+            formattedDate,
+            from,
+            to,
+            "session_booking_approval_req"
+          );
 
           return res.json({ success: "Successfully appointment is created" }); // ✅ Final response
         }
@@ -334,25 +334,25 @@ export async function UpdateMentorBookingAppointment(req, res, next) {
                 );
                 const SessionDate =formatDate(mentorBookingStartsTime);
 
-                // SessionApprovedToMenteeMessage(
-                //   menteePhoneNo,
-                //   menteeName,
-                //   mentorName,
-                //   SessionDate,
-                //   starttime,
-                //   endtime,
-                //   joinURL,
-                //   "session_approved_to_mentee ");
-                // SessionApprovedToMentorMessage(
-                //   mentorPhoneNo,
-                //   mentorName,
-                //   menteeName,
-                //   SessionDate,
-                //   starttime,
-                //   endtime,
-                //   joinURL,
-                //   "mentor_session_approved_details "
-                // );
+                SessionApprovedToMenteeMessage(
+                  menteePhoneNo,
+                  menteeName,
+                  mentorName,
+                  SessionDate,
+                  starttime,
+                  endtime,
+                  joinURL,
+                  "session_approved_to_mentee ");
+                SessionApprovedToMentorMessage(
+                  mentorPhoneNo,
+                  mentorName,
+                  menteeName,
+                  SessionDate,
+                  starttime,
+                  endtime,
+                  joinURL,
+                  "mentor_session_approved_details "
+                );
 
 
                 const emailResponse = await sendEmail(msg);

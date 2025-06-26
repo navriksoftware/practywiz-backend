@@ -7,6 +7,8 @@ import {
   fetchPurchasedCaseStudies,
   fetchPurchasedCaseStudyById,
   requestCaseStudy,
+  generateQuestions,
+  submitMenteeResultPartial,
 } from "../../Controllers/CaseStydiesControllers/CaseStudiesController.js";
 
 import {
@@ -32,7 +34,7 @@ router.get("/purchased-case-studies", fetchPurchasedCaseStudies);
 
 router.get("/purchased-case-studies/:id", fetchPurchasedCaseStudyById);
 
-router.post("/generate-questions", generateQuestionsWithLangchain);
+router.post("/generate-questions", generateQuestions);
 
 router.post("/generate-follow-up-question", generateFollowUpQuestions);
 
@@ -41,5 +43,7 @@ router.post("/check-full-analysis-questions-result", checkFullAnalysisResult);
 router.post("/connect-with-consultant", connectWithCaseStudyConsultant);
 
 router.post("/request-case-study", requestCaseStudy);
+
+router.post("/submit-responses", submitMenteeResultPartial);
 
 export default router;

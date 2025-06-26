@@ -147,10 +147,10 @@ JOIN [dbo].[mentee_dtls] m ON cm.[mentee_dtls_id] = m.[mentee_dtls_id]
 JOIN [dbo].[users_dtls] u ON m.[mentee_user_dtls_id] = u.[user_dtls_id]
 WHERE cm.[class_dtls_id] = @classId
 `;
-export const deleteStudentfromClassSqlQuary =`
+export const deleteStudentfromClassSqlQuary = `
 DELETE FROM [dbo].[class_mentee_mapping]
 WHERE [class_mentee_mapping_id] = @class_Mapping_Id;
-`
+`;
 
 export const AvailableCaseStudiesForfacultyQuery = `SELECT 
     a.institute_case_assign_dtls_id,
@@ -323,6 +323,7 @@ export const getNonPractywizCaseStudiesByFacultyQuery = `
     non_practywiz_case_dtls_id,
     non_practywiz_case_title,
     non_practywiz_case_author,
+    non_practywiz_case_question,
     non_practywiz_case_category,
     non_practywiz_case_faculty_dtls_id,
     non_practywiz_case_cr_date,
@@ -358,7 +359,9 @@ SELECT
     fca.faculty_case_assign_class_end_date,
     fca.faculty_case_assign_fact_question_qty,
     fca.faculty_case_assign_analysis_question_qty,
-    fca.faculty_case_assign_question_distribution
+    fca.faculty_case_assign_question_distribution,
+    fca.faculty_case_assign_cr_date,
+    fca.faculty_case_assign_update_date
 FROM
     dbo.faculty_case_assign_dtls fca
 LEFT JOIN
@@ -748,3 +751,17 @@ WHERE
     AND [mentee_result_faculty_case_assign_dtls_id] = @Assign_Id;
 
 `;
+
+
+export const updateNonPractywizCaseStudyQuery = `
+UPDATE [dbo].[non_practywiz_case_dtls]
+SET 
+  [non_practywiz_case_title] = @title,
+  [non_practywiz_case_author] = @author,
+  [non_practywiz_case_category] = @category,
+  [non_practywiz_case_question] = @questions,
+  [non_practywiz_case_faculty_dtls_id] = @facultyId,
+  [non_practywiz_case_update_date] = GETDATE()
+WHERE 
+  [non_practywiz_case_dtls_id] = @caseStudyId;
+`

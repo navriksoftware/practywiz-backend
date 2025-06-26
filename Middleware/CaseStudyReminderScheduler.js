@@ -16,15 +16,20 @@ export function scheduleCaseStudyReminder(reminderData, startTime, taskType) {
   const { userIds, emails, names, caseStudyTitle, className, classSubject } =
     reminderData;
 
+  // Convert startTime to IST (UTC+5:30)
+  const istStartTime = new Date(startTime);
+  istStartTime.setMinutes(istStartTime.getMinutes() + 330); // Add 5 hours 30 minutes
+
   // Calculate when to send the reminder (1 hour before start time)
-  const reminderTime = new Date(startTime);
+  const reminderTime = new Date(istStartTime);
   reminderTime.setHours(reminderTime.getHours() - 1);
 
-  // Current time for comparison
+  // Current time in IST for comparison
   const now = new Date();
+  const istNow = new Date(now.getTime() + 330 * 60000); // Convert current time to IST
 
   // If the reminder time is in the past, return early without scheduling
-  if (reminderTime <= now) {
+  if (reminderTime <= istNow) {
     console.log(
       `Skipping reminder for ${caseStudyTitle} - reminder time already passed`
     );
@@ -43,11 +48,15 @@ export function scheduleCaseStudyReminder(reminderData, startTime, taskType) {
   // Schedule the reminder
   setTimeout(() => {
     try {
-      sendReminders(
-        reminderData,
-        new Date(startTime).toLocaleString(),
-        taskType
+      // Format the time in IST
+      const formattedISTStartTime = new Date(istStartTime).toLocaleString(
+        "en-US",
+        {
+          timeZone: "Asia/Kolkata",
+        }
       );
+
+      sendReminders(reminderData, formattedISTStartTime, taskType);
       console.log(`Sent reminders for ${caseStudyTitle} - ${taskType}`);
     } catch (error) {
       console.error(`Error sending reminders for ${caseStudyTitle}:`, error);

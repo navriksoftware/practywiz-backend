@@ -126,3 +126,45 @@ export async function scheduleReminderHandler(
     }
   });
 }
+
+export function calculateMentorScore(mentee, mentor) {
+  let score = 0;
+
+  // Skills Match
+  const menteeSkills = mentee.mentee_skills || [];
+  const mentorSkills = mentor.mentor_area_expertise || [];
+  const commonSkills = mentorSkills.filter((skill) =>
+    menteeSkills.includes(skill)
+  );
+  score += (commonSkills.length / Math.max(menteeSkills.length, 1)) * 30;
+
+  // Language Match
+  const menteeLangs = (mentee.mentee_language || []).map((l) => l.value || l);
+  const mentorLangs = mentor.mentor_language || [];
+  const commonLangs = mentorLangs.filter((lang) => menteeLangs.includes(lang));
+  score += (commonLangs.length / Math.max(menteeLangs.length, 1)) * 15;
+
+  // Institute Match
+  const menteeInstitute =
+    mentee.mentee_institute_details?.[0]?.collage_name || "";
+  const mentorInstitutes =
+    mentor.mentor_institute?.map((i) => i.Institute) || [];
+  if (mentorInstitutes.includes(menteeInstitute)) score += 10;
+
+  // Domain/Passion Match (basic text check)
+  const menteeAbout = (mentee.mentee_about || "").toLowerCase();
+  const mentorDomains = mentor.mentor_domain || [];
+  if (
+    mentorDomains.some((domain) => menteeAbout.includes(domain.toLowerCase()))
+  )
+    score += 20;
+
+  // Experience Match
+  const expStr = mentor.mentor_years_of_experience || "0";
+  const expYears = parseInt(expStr.split("-")[0]);
+  if (!isNaN(expYears) && expYears >= 5) score += 10;
+
+  // Availability
+  if ((mentor.mentor_timeslots_json || []).length > 0) score += 10;
+  return score;
+}
