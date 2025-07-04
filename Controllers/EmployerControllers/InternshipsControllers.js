@@ -24,6 +24,7 @@ import {
   CreateInternshipPostSqlQuery,
   FetchAllInternshipPostsSqlQuery,
   Show10InternshipsSqlQuery,
+  UpdateInternshipPostSqlQuery,
 } from "../../SQLQueries/EmployerSQlQueries/InternshipSqlQueries.js";
 import { FetchInternshipPostDetailsSqlQuery } from "../../SQLQueries/EmployerSQlQueries/EmployerSqlQueries.js";
 
@@ -463,8 +464,153 @@ export async function EditInternshipPost(req, res) {
     internshipDomain,
     employerOrgDtlsId,
   } = req.body;
+  let pool;
+  try {
+    pool = await sql.connect(config);
+    const request = pool.request();
+    request.input(
+      "employer_internship_post_dtls_id",
+      sql.Int,
+      internshipPostId
+    );
+    request.input(
+      "employer_internship_post_user_dtls_id",
+      sql.Int,
+      employerUserDtlsId
+    );
+    request.input(
+      "employer_internship_post_org_dtls_id",
+      sql.Int,
+      employerOrgDtlsId
+    );
+    request.input(
+      "employer_internship_post_supervision_type",
+      sql.VarChar,
+      supervisionType
+    );
+    request.input(
+      "employer_internship_post_position",
+      sql.VarChar,
+      internshipProfile
+    );
+    request.input("employer_internship_post_type", sql.VarChar, internshipType);
+    request.input(
+      "employer_internship_post_openings",
+      sql.Int,
+      internshipOpening
+    );
+    request.input(
+      "employer_internship_post_part_full_time",
+      sql.VarChar,
+      partFullTime
+    );
+    request.input(
+      "employer_internship_post_coll_hours",
+      sql.VarChar,
+      StartTimeFrom + "-" + endTimeTo
+    );
+    request.input(
+      "employer_internship_post_timezone",
+      sql.VarChar,
+      internshipPostTimezone
+    );
+    request.input(
+      "employer_internship_post_location",
+      sql.VarChar,
+      InternshipLocation
+    );
+    request.input(
+      "employer_internship_post_internship_start",
+      sql.VarChar,
+      internshipStart
+    );
+    request.input(
+      "employer_internship_post_internship_start_date",
+      sql.VarChar,
+      internshipSatrtBy
+    );
+    request.input(
+      "employer_internship_post_duration",
+      sql.Int,
+      internshipDuration
+    );
+    request.input(
+      "employer_internship_post_skills",
+      sql.Text,
+      internshipSkills
+    );
+    request.input(
+      "employer_internship_post_req",
+      sql.Text,
+      internshipRequirementsDeatils
+    );
+    request.input(
+      "employer_internship_post_res",
+      sql.Text,
+      internshipResponsibilities
+    );
+    request.input(
+      "employer_internship_post_stipend_type",
+      sql.VarChar,
+      internshipStipendType
+    );
+    request.input(
+      "employer_internship_post_currency_type",
+      sql.VarChar,
+      stipendCurrencyType
+    );
+    request.input(
+      "employer_internship_post_stipend_amount",
+      sql.VarChar,
+      stipendAmount
+    );
+    request.input(
+      "employer_internship_post_pay_type",
+      sql.VarChar,
+      stipendTime
+    );
+    request.input(
+      "employer_internship_post_perks",
+      sql.VarChar,
+      internshipPerks
+    );
+    request.input(
+      "employer_internship_post_ppo",
+      sql.Bit,
+      internshipPPOcheckbox
+    );
+    request.input("employer_internship_post_support", sql.Text, taskCategory);
+    request.input(
+      "employer_internship_post_project",
+      sql.Text,
+      businessObjective
+    );
+    request.input(
+      "employer_internship_post_contribution",
+      sql.Text,
+      projectPlan
+    );
+    request.input(
+      "employer_internship_post_domain",
+      sql.VarChar,
+      String(internshipDomain)
+    );
+    request.query(UpdateInternshipPostSqlQuery, (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.json({ error: err.message });
+      }
 
-  console.log("body data", req.body.payload);
-
-  return res.status(200).json({ success: "Post Edited Successfully" });
+      if (result) {
+        return res.json({
+          success: "Successfully internship post is Updated",
+        });
+      } else {
+        return res.json({ error: "Update failed. No result returned." });
+      }
+    });
+  } catch (error) {
+    console.log("error in sql configuration", error);
+    return res.json({ error: error.message });
+  }
 }
