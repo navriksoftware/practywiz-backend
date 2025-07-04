@@ -399,13 +399,16 @@ export async function ResumeDownload(req, res) {
       `select mentee_resume_url from [dbo].[mentee_dtls] 
          WHERE mentee_user_dtls_id = @mentee_user_dtls_id`
     );
+    if (result.recordset[0].mentee_resume_url == null) {
+      return res.status(404).json({ message: "Resume not found" });
+    }
     return res.status(200).json({
       message: "Got Resume URL Successfully",
       url: `${result.recordset[0].mentee_resume_url}`,
     });
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(404).json({ error: e });
   }
 }
 export async function MenteefetchCaseStudiesDetails(req, res) {
@@ -585,14 +588,12 @@ export const GetRecommendedInternships = async (req, res) => {
     const set2 = new Set(arr2);
     return arr1.filter((item) => set2.has(item)).length;
   };
-
   const { menteeId } = req.params;
-  console.log("Mentee ID:", menteeId);
 
   if (!menteeId) {
     return res.status(400).json({ error: "Mentee ID is required" });
   }
-
+  console.log(menteeId);
   try {
     const pool = await sql.connect();
 
@@ -617,7 +618,7 @@ export const GetRecommendedInternships = async (req, res) => {
       `);
 
     // Transform and filter internships based on skill matches
-    const matchedInternships = internshipResult.recordset
+    const allInternships = internshipResult.recordset
       .map((internship) => {
         const internshipSkills =
           safeJSONParse(internship.employer_internship_post_skills) || [];
@@ -628,21 +629,47 @@ export const GetRecommendedInternships = async (req, res) => {
 
         return {
           internship_id: internship.employer_internship_post_dtls_id,
-          internship_title: internship.employer_internship_post_domain,
+          internship_title: internship.employer_internship_post_position,
           internship_location: internship.employer_internship_post_location,
           internship_amount: internship.employer_internship_post_stipend_amount,
-          internship_duration: internship.employer_internship_post_cr_date,
-          internship_domain: internship.employer_internship_post_domain,
+          internship_duration: internship.employer_internship_post_duration,
+          internship_domain: safeJSONParse(
+            internship.employer_internship_post_domain
+          ).value,
           internship_skills: internshipSkills,
           skillsCount,
         };
       })
-      .filter((internship) => internship.skillsCount > 0)
-      .sort((a, b) => b.skillsCount - a.skillsCount)
-      .map(({ skillsCount, ...internship }) => internship);
+      .sort((a, b) => b.skillsCount - a.skillsCount);
 
-    console.log("internships", matchedInternships);
-    return res.json({ msg: matchedInternships });
+    // Get internships with matching skills first
+    const matchingInternships = allInternships
+      .filter((internship) => internship.skillsCount > 0)
+      .slice(0, 4);
+
+    // If we don't have 4 matching internships, fill with non-matching ones
+    const remainingCount = 4 - matchingInternships.length;
+    const nonMatchingInternships =
+      remainingCount > 0
+        ? allInternships
+            .filter((internship) => internship.skillsCount === 0)
+            .slice(0, remainingCount)
+        : [];
+
+    // Combine and remove skillsCount from final result
+    const matchedInternships = [
+      ...matchingInternships,
+      ...nonMatchingInternships,
+    ].map(({ skillsCount, ...internship }) => internship);
+
+    matchedInternships.map((internship) => {
+      if (!internship.internship_amount) {
+        internship.internship_amount = "Unpaid";
+      }
+    });
+
+    console.log("matched internships", matchedInternships);
+    return res.json({ matchedInternships });
   } catch (err) {
     console.error("Recommendation Error:", err);
     return res.status(500).json({ error: "Internal Server Error" });

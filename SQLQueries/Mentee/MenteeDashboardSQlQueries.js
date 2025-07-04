@@ -106,12 +106,14 @@ export const MenteeApprovedBookingQuery = `SELECT
     mba.[trainee_modification_changed_times],
     mba.[trainee_rescheduled_times],
     mba.[trainee_and_mentor_reward_points],
+    mba.[mentor_options],
+    mba.[mentor_booking_confirmed],
     md.[mentor_dtls_id],
     md.[mentor_profile_photo],
     md.[mentor_user_dtls_id], 
     md.[mentor_job_title],   
     ud.[user_firstname],
-    ud.[user_lastname] 
+    ud.[user_lastname]
 FROM 
     [dbo].[mentor_booking_appointments_dtls] mba
 INNER JOIN 
@@ -323,7 +325,6 @@ SELECT
 
     WHERE m.mentee_dtls_id = @menteeId;
 `;
-
 
 // It returns the submission details such as fact-based questions, analysis-based questions, and research-based questions.
 export const GetMenteeResultSubmissionStatusSqlQuery = `

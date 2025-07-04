@@ -55,6 +55,37 @@ VALUES (
     @employer_internship_post_domain
 )`;
 
+export const UpdateInternshipPostSqlQuery = `UPDATE [dbo].[employer_internship_posts_dtls]
+SET
+    employer_internship_post_user_dtls_id = @employer_internship_post_user_dtls_id,
+    employer_internship_post_org_dtls_id = @employer_internship_post_org_dtls_id,
+    employer_internship_post_supervision_type = @employer_internship_post_supervision_type,
+    employer_internship_post_position = @employer_internship_post_position,
+    employer_internship_post_type = @employer_internship_post_type,
+    employer_internship_post_openings = @employer_internship_post_openings,
+    employer_internship_post_part_full_time = @employer_internship_post_part_full_time,
+    employer_internship_post_coll_hours = @employer_internship_post_coll_hours,
+    employer_internship_post_timezone = @employer_internship_post_timezone,
+    employer_internship_post_location = @employer_internship_post_location,
+    employer_internship_post_internship_start = @employer_internship_post_internship_start,
+    employer_internship_post_internship_start_date = @employer_internship_post_internship_start_date,
+    employer_internship_post_duration = @employer_internship_post_duration,
+    employer_internship_post_skills = @employer_internship_post_skills,
+    employer_internship_post_req = @employer_internship_post_req,
+    employer_internship_post_res = @employer_internship_post_res,
+    employer_internship_post_stipend_type = @employer_internship_post_stipend_type,
+    employer_internship_post_currency_type = @employer_internship_post_currency_type,
+    employer_internship_post_stipend_amount = @employer_internship_post_stipend_amount,
+    employer_internship_post_pay_type = @employer_internship_post_pay_type,
+    employer_internship_post_perks = @employer_internship_post_perks,
+    employer_internship_post_ppo = @employer_internship_post_ppo,
+    employer_internship_post_support = @employer_internship_post_support,
+    employer_internship_post_project = @employer_internship_post_project,
+    employer_internship_post_contribution = @employer_internship_post_contribution, 
+    employer_internship_post_domain = @employer_internship_post_domain
+WHERE
+    employer_internship_post_dtls_id = @employer_internship_post_dtls_id`;
+
 export const FetchAllInternshipPostsSqlQuery = `
 SELECT 
         ei.[employer_internship_post_dtls_id],
@@ -179,7 +210,6 @@ VALUES (
     GETDATE(), -- Automatically set creation date
     GETDATE()  -- Automatically set update date
 )`;
-
 
 // export const GetAppliedInternshipsSqlQuery = `
 // SELECT

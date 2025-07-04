@@ -38,11 +38,7 @@ router.get("/resume/download", ResumeDownload);
 
 router.post("/get-result-submission-status", GetMenteeResultSubmissionStatus);
 
-router.get(
-  "/recommend-mentors/:menteeId",
-  verifyUserToken,
-  GetRecommendedMentors
-);
+router.get("/recommend-mentors/:menteeId", GetRecommendedMentors);
 router.get("/recommend-internships/:menteeId", GetRecommendedInternships);
 
 export default router;
